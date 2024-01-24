@@ -1,3 +1,10 @@
-# CosmWasm Workspace Example
+# Xion Hackton - 
 
-This is an example cargo workspace for a CosmWasm project. It contains a template contract in the `contracts` directory. The goal is to show how to structure a cargo workspace with multiple contracts. I use this as a template for my own projects. If you also need to maintain packages shared between contracts, you can create a `packages` directory and add them there, you'll also need to modify `Cargo.toml` to include them.
+I'm excited to announce that I'll be publishing the architecture for the project we're planning to build for the Hackathon. Any feedback or suggestions you may have are more than welcome!
+
+The Story: Users often find themselves in a situation where they want to purchase an expensive NFT or perform a significant swap, but they lack the required funds. In response, they open a vault smart contract on Xion that demands multiple signatures. The user deposits tokens into a smart account that will generate ICA on the Injective network, execute the swap/purchase, and then return the assets to the Xion account.
+
+
+<img width="1265" alt="Screenshot 2024-01-17 at 9 31 19 PM" src="https://github.com/chelofinance/Xion-hackton/assets/81328098/ddd4f835-5605-4760-8c35-ed99d8252d18">
+
+
