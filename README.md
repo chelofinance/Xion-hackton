@@ -7,4 +7,7 @@ The Story: Users often find themselves in a situation where they want to purchas
 
 <img width="1265" alt="Screenshot 2024-01-17 at 9 31 19 PM" src="https://github.com/chelofinance/Xion-hackton/assets/81328098/ddd4f835-5605-4760-8c35-ed99d8252d18">
 
+## A more specific view of our contracts and the interactions between them
+
+![xion_hackton drawio](https://github.com/chelofinance/Xion-hackton/assets/99182859/65b8a2aa-2aec-4f32-891f-e3ae3ea70224)
 
