@@ -8,7 +8,7 @@ use cosmwasm_schema::{cw_serde, QueryResponses};
 #[cw_serde]
 pub struct InstantiateMsg {
     /// The code ID of the multisig contract.
-    pub multisig_code_id: u64,
+    pub cw3_multisig_code_id: u64,
     /// The code ID of the `cw-ica-controller` contract.
     pub cw_ica_controller_code_id: u64,
 }

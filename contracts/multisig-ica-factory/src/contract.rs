@@ -7,22 +7,27 @@ use cosmwasm_std::{Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult}
 
 use crate::error::ContractError;
 use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
+use crate::state;
 
-/*
 // version info for migration info
-const CONTRACT_NAME: &str = "crates.io:cw-template-minimal";
+const CONTRACT_NAME: &str = "multisig-ica-factory";
 const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
-*/
 
 /// Instantiates the contract.
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn instantiate(
-    _deps: DepsMut,
+    deps: DepsMut,
     _env: Env,
     _info: MessageInfo,
-    _msg: InstantiateMsg,
+    msg: InstantiateMsg,
 ) -> Result<Response, ContractError> {
-    unimplemented!()
+    // Set the contract version using the cw2 standard.
+    cw2::set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
+
+    // Store the state of the contract.
+    state::STATE.save(deps.storage, &state::ContractState::new(msg.cw_ica_controller_code_id, msg.cw3_multisig_code_id))?;
+
+    Ok(Response::default())
 }
 
 /// Handles the execution of the contract.
