@@ -25,7 +25,10 @@ pub fn instantiate(
     cw2::set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
 
     // Store the state of the contract.
-    state::STATE.save(deps.storage, &state::ContractState::new(msg.cw_ica_controller_code_id, msg.cw3_multisig_code_id))?;
+    state::STATE.save(
+        deps.storage,
+        &state::ContractState::new(msg.cw_ica_controller_code_id, msg.cw3_multisig_code_id),
+    )?;
 
     Ok(Response::default())
 }
