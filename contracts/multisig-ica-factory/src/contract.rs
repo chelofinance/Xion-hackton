@@ -53,6 +53,9 @@ pub fn execute(
             channel_open_init_options,
             salt,
         ),
+        ExecuteMsg::ReceiveIcaCallback(callback_msg) => {
+            execute::receive_ica_callback(deps, env, info, callback_msg)
+        }
     }
 }
 
@@ -65,7 +68,9 @@ pub fn query(_deps: Deps, _env: Env, _msg: QueryMsg) -> StdResult<Binary> {
 mod execute {
     use crate::utils;
     use cosmwasm_std::to_json_binary;
-    use cw_ica_controller::types::msg::options::ChannelOpenInitOptions;
+    use cw_ica_controller::types::{
+        callbacks::IcaControllerCallbackMsg, msg::options::ChannelOpenInitOptions,
+    };
     use multisig::msg::InstantiateMsg as MultisigInstantiateMsg;
 
     use super::*;
@@ -118,6 +123,26 @@ mod execute {
         Ok(Response::new()
             .add_message(multisig_init_cosmos_msg)
             .add_message(cw_ica_init_cosmos_msg))
+    }
+
+    pub fn receive_ica_callback(
+        deps: DepsMut,
+        _env: Env,
+        info: MessageInfo,
+        callback_msg: IcaControllerCallbackMsg,
+    ) -> Result<Response, ContractError> {
+        if !state::ICA_MULTISIG.has(deps.storage, &info.sender) {
+            return Err(ContractError::Unauthorized);
+        }
+
+        // TODO: handle the callback messages?
+        match callback_msg {
+            IcaControllerCallbackMsg::OnChannelOpenAckCallback { .. } => {}
+            IcaControllerCallbackMsg::OnAcknowledgementPacketCallback { .. } => {}
+            IcaControllerCallbackMsg::OnTimeoutPacketCallback { .. } => {}
+        }
+
+        Ok(Response::default())
     }
 }
 
