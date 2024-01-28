@@ -1,3 +1,5 @@
+//! This module handles the execution logic of the contract.
+
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
 use cosmwasm_std::{Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult};
@@ -12,6 +14,7 @@ const CONTRACT_NAME: &str = "crates.io:cw-template-minimal";
 const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
 */
 
+/// Instantiates the contract.
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn instantiate(
     _deps: DepsMut,
@@ -22,6 +25,7 @@ pub fn instantiate(
     unimplemented!()
 }
 
+/// Handles the execution of the contract.
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn execute(
     _deps: DepsMut,
@@ -32,6 +36,7 @@ pub fn execute(
     unimplemented!()
 }
 
+/// Handles the query of the contract.
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn query(_deps: Deps, _env: Env, _msg: QueryMsg) -> StdResult<Binary> {
     unimplemented!()

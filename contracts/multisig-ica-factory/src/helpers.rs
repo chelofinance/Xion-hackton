@@ -1,3 +1,6 @@
+//! This file contains helper functions for working with this contract from
+//! external contracts.
+
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -11,10 +14,16 @@ use crate::msg::ExecuteMsg;
 pub struct CwTemplateContract(pub Addr);
 
 impl CwTemplateContract {
+    /// `addr` returns the address of the contract
     pub fn addr(&self) -> Addr {
         self.0.clone()
     }
 
+    /// call creates a [`WasmMsg::Execute`] message targeting this contract,
+    ///
+    /// # Errors
+    ///
+    /// This function returns an error if the given message cannot be serialized
     #[allow(unreachable_code)]
     pub fn call<T: Into<ExecuteMsg>>(&self, msg: T) -> StdResult<CosmosMsg> {
         Ok(WasmMsg::Execute {
