@@ -3,6 +3,7 @@
 //! This module defines the messages the contract receives.
 
 use cosmwasm_schema::{cw_serde, QueryResponses};
+use cw_ica_controller::types::msg::options::ChannelOpenInitOptions;
 
 /// The message to instantiate this contract.
 #[cw_serde]
@@ -15,7 +16,16 @@ pub struct InstantiateMsg {
 
 /// The messages to execute this contract.
 #[cw_serde]
-pub enum ExecuteMsg {}
+pub enum ExecuteMsg {
+    /// `DeployMultisigIca` deploys a new multisig contract and a new ICA controller contract.
+    DeployMultisigIca {
+        /// The message to instantiate the multisig contract.
+        multisig_instantiate_msg: multisig::msg::InstantiateMsg,
+        /// The options for the ICA channel to be opened.
+        /// This is used to specify the underlying connection identifiers.
+        channel_open_init_options: ChannelOpenInitOptions,
+    }
+}
 
 /// The messages to query this contract.
 #[cw_serde]

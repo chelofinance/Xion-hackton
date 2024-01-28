@@ -743,6 +743,7 @@ dependencies = [
  "cw-ica-controller",
  "cw-storage-plus",
  "cw2",
+ "multisig",
  "schemars",
  "serde",
  "thiserror",
