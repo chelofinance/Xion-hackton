@@ -24,7 +24,7 @@ pub enum ExecuteMsg {
         /// The options for the ICA channel to be opened.
         /// This is used to specify the underlying connection identifiers.
         channel_open_init_options: ChannelOpenInitOptions,
-    }
+    },
 }
 
 /// The messages to query this contract.

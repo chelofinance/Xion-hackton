@@ -1,11 +1,16 @@
 //! This module defines the state storage of the Contract.
 
-use cw_storage_plus::Item;
+use cosmwasm_std::Addr;
+use cw_storage_plus::{Item, Map};
 
 pub use contract::State as ContractState;
 
 /// The item used to store the state of the application.
 pub const STATE: Item<ContractState> = Item::new("state");
+
+/// The mapping of the multisig contract addresses to the `cw-ica-controller`
+/// contract addresses that they own.
+pub const MULTISIG_ICA: Map<&Addr, Addr> = Map::new("multisig_ica");
 
 mod contract {
     use cosmwasm_schema::schemars::JsonSchema;
