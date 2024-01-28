@@ -1,5 +1,6 @@
 [workspace]
 members = ["multisig", "multisig-ica-factory"]
+resolver = "2"
 
 [workspace.package]
 version       = "0.1.0"
@@ -24,12 +25,12 @@ rpath = false
 overflow-checks = true
 
 [workspace.dependencies]
-cosmwasm-schema = { version = "1.4.0" }
+cosmwasm-schema = "1.5.0"
+cosmwasm-std = { version = "1.5.0", features = ["cosmwasm_1_3"] }
 cw-utils = "1.0.1"
-cw2 = {  version = "1.1.2" }
-cw3 = {  version = "1.1.2" }
+cw2 = "1.1.2"
+cw3 = "1.1.2"
 cw-storage-plus = "1.1.0"
-cosmwasm-std = { version = "1.4.0" }
 schemars = "0.8.15"
 serde = { version = "1.0.188", default-features = false, features = ["derive"] }
 thiserror = "1.0.49"
