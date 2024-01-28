@@ -11,7 +11,8 @@ pub enum ContractError {
     Std(#[from] StdError),
 
     #[error("Unauthorized")]
-    Unauthorized {},
-    // Add any other custom errors you like here.
-    // Look at https://docs.rs/thiserror/1.0.21/thiserror/ for details.
+    Unauthorized,
+
+    #[error("error when computing the instantiate2 address: {0}")]
+    Instantiate2AddressError(#[from] cosmwasm_std::Instantiate2AddressError),
 }
