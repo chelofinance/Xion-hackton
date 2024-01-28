@@ -1,6 +1,6 @@
 use cosmwasm_schema::write_api;
 
-use cw_template_minimal::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
+use multisig_ica_factory::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
 
 fn main() {
     write_api! {

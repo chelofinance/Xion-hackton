@@ -1,6 +1,6 @@
 [package]
-name = "cw-template-minimal"
-description = "Minimal template for CosmWasm contracts"
+name = "multisig-ica-factory"
+description = "Factory to produce multisig and ica contracts"
 version = { workspace = true }
 authors = { workspace = true }
 edition = { workspace = true }
