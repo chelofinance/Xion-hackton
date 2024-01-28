@@ -24,6 +24,9 @@ pub enum ExecuteMsg {
         /// The options for the ICA channel to be opened.
         /// This is used to specify the underlying connection identifiers.
         channel_open_init_options: ChannelOpenInitOptions,
+        /// This is the salt used to generate the address of the multisig contract
+        /// and the ICA controller contract.
+        salt: String,
     },
 }
 

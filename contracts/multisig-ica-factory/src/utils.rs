@@ -3,8 +3,7 @@
 /// Utils to instantiate a contract using the instantiate2 pattern.
 pub mod instantiate2 {
     use cosmwasm_std::{
-        instantiate2_address, Addr, Api, Binary, CosmosMsg, Env, QuerierWrapper,
-        WasmMsg,
+        instantiate2_address, Addr, Api, Binary, CosmosMsg, Env, QuerierWrapper, WasmMsg,
     };
 
     use crate::ContractError;

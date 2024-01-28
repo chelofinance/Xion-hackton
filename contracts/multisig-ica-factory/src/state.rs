@@ -7,10 +7,12 @@ pub use contract::State as ContractState;
 
 /// The item used to store the state of the application.
 pub const STATE: Item<ContractState> = Item::new("state");
-
 /// The mapping of the multisig contract addresses to the `cw-ica-controller`
 /// contract addresses that they own.
 pub const MULTISIG_ICA: Map<&Addr, Addr> = Map::new("multisig_ica");
+/// The mapping of the `cw-ica-controller` contract addresses to the multisig
+/// contract addresses that own them. This is the reverse of [`MULTISIG_ICA`].
+pub const ICA_MULTISIG: Map<&Addr, Addr> = Map::new("ica_multisig");
 
 mod contract {
     use cosmwasm_schema::schemars::JsonSchema;
