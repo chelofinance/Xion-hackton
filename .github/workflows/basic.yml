@@ -1,5 +1,5 @@
 # Based on https://github.com/actions-rs/example/blob/master/.github/workflows/quickstart.yml
-name: rust
+name: Basic
 
 on:
   push:
