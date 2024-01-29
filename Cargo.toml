@@ -1,5 +1,5 @@
 [workspace]
-members = ["multisig", "multisig-ica-factory"]
+members = ["contracts/*"]
 resolver = "2"
 
 [workspace.package]
@@ -35,4 +35,4 @@ schemars = "0.8.15"
 serde = { version = "1.0.188", default-features = false, features = ["derive"] }
 thiserror = "1.0.49"
 cw-ica-controller = "0.4.1"
-multisig = { path = "multisig" }
+multisig = { path = "contracts/multisig" }
