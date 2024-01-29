@@ -32,49 +32,49 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: clippy
-    test:
-      name: Unit Tests
-      runs-on: ubuntu-latest
-      steps:
-        - name: Checkout sources
-          uses: actions/checkout@v2
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
 
-        - name: Install stable toolchain
-          uses: actions-rs/toolchain@v1
-          with:
-            profile: minimal
-            toolchain: 1.73.0
-            override: true
-            components: rustfmt, clippy
+      - name: Install stable toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: 1.73.0
+          override: true
+          components: rustfmt, clippy
 
-        - name: Run tests
-          uses: actions-rs/cargo@v1
-          with:
-            toolchain: stable
-            command: all-test
-            args: --locked
-          env:
-            RUST_BACKTRACE: 1
-    wasm:
-      name: Build Wasm
-      runs-on: ubuntu-latest
-      steps:
-        - name: Checkout sources
-          uses: actions/checkout@v2
+      - name: Run tests
+        uses: actions-rs/cargo@v1
+        with:
+          toolchain: stable
+          command: all-test
+          args: --locked
+        env:
+          RUST_BACKTRACE: 1
+  wasm:
+    name: Build Wasm
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
 
-        - name: Install latest stable toolchain
-          uses: actions-rs/toolchain@v1
-          with:
-            profile: minimal
-            toolchain: stable
-            target: wasm32-unknown-unknown
-            override: true
+      - name: Install latest stable toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          target: wasm32-unknown-unknown
+          override: true
 
-        - name: Compile WASM contract
-          uses: actions-rs/cargo@v1
-          with:
-            toolchain: stable
-            command: wasm
-            args: --locked
-          env:
-            RUSTFLAGS: "-C link-arg=-s"
+      - name: Compile WASM contract
+        uses: actions-rs/cargo@v1
+        with:
+          toolchain: stable
+          command: wasm
+          args: --locked
+        env:
+          RUSTFLAGS: "-C link-arg=-s"
