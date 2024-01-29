@@ -51,8 +51,8 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           toolchain: stable
-          command: all-test
-          args: --locked
+          command: test
+          args: --locked --workspace
         env:
           RUST_BACKTRACE: 1
   wasm:
