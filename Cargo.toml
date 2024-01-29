@@ -1,5 +1,6 @@
 [workspace]
 members = ["contracts/*"]
+exclude = ["external/cw-ica-controller"]
 resolver = "2"
 
 [workspace.package]
