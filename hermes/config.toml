@@ -61,7 +61,11 @@ rpc_timeout = '10s'
 account_prefix = 'xion'
 store_prefix='ibc'
 key_name = 'xion_dev'
-gas_price = { price = 0.1, denom = 'uxion' }
+gas_price = { price = 0.001, denom = 'uxion' }
+gas_multiplier = 1.3
+default_gas = 4000000
+max_gas = 900000000
+memo_prefix = 'relayed by 0xR360'
 
 [[chains]]
 id = 'injective-888'
@@ -85,4 +89,30 @@ clock_drift = '5s'
 max_block_time = '30s'
 trusting_period = '14days'
 trust_threshold = { numerator = '2', denominator = '3' }
+memo_prefix = 'relayed by 0xR360'
+
+[[chains]]
+id = 'osmo-test-5'
+type = 'CosmosSdk'
+rpc_addr = 'https://rpc.testnet.osmosis.zone:443'
+event_source = { mode = 'pull', interval = '800ms' }
+grpc_addr = 'https://grpc.testnet.osmosis.zone'
+rpc_timeout = '10s'
+account_prefix = 'osmo'
+key_name = 'osmo_test'
+key_store_type = 'Test'
+store_prefix = 'ibc'
+gas_price = { price = 0.1, denom = 'uosmo' }
+default_gas = 100000
+max_gas = 400000
+gas_multiplier = 1.1
+max_msg_num = 30
+max_tx_size = 2097152
+clock_drift = '5s'
+max_block_time = '30s'
+memo_prefix = ''
+sequential_batch_tx = false
+trusting_period = '14days'
+trust_threshold = { numerator = '2', denominator = '3' }
+memo_prefix = 'relayed by 0xR360'
 
