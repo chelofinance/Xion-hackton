@@ -26,4 +26,4 @@ schemars = { workspace = true }
 serde = { workspace = true }
 thiserror = { workspace = true }
 cw-ica-controller = { workspace = true }
-multisig = { workspace = true }
+multisig = { workspace = true, features = ["library"] }
