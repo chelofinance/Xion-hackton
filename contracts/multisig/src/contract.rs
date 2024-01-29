@@ -241,8 +241,12 @@ pub fn execute_close(
 pub fn query(deps: Deps, env: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
         QueryMsg::Threshold {} => to_json_binary(&query_threshold(deps)?),
-        QueryMsg::Proposal { proposal_id } => to_json_binary(&query_proposal(deps, env, proposal_id)?),
-        QueryMsg::Vote { proposal_id, voter } => to_json_binary(&query_vote(deps, proposal_id, voter)?),
+        QueryMsg::Proposal { proposal_id } => {
+            to_json_binary(&query_proposal(deps, env, proposal_id)?)
+        }
+        QueryMsg::Vote { proposal_id, voter } => {
+            to_json_binary(&query_vote(deps, proposal_id, voter)?)
+        }
         QueryMsg::ListProposals { start_after, limit } => {
             to_json_binary(&list_proposals(deps, env, start_after, limit)?)
         }
@@ -485,8 +489,7 @@ mod tests {
             start_after: None,
             limit: None,
         };
-        let votes: VoteListResponse =
-            from_json(query(deps, mock_env(), voters).unwrap()).unwrap();
+        let votes: VoteListResponse = from_json(query(deps, mock_env(), voters).unwrap()).unwrap();
         // Sum the weights of the Yes votes to get the tally
         votes
             .votes
