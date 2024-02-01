@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -17,22 +21,58 @@
     "downlevelIteration": true,
     "baseUrl": ".",
     "paths": {
-      "@/analytics/*": ["analytics/*"],
-      "@/components/*": ["components/*"],
-      "@/connection/*": ["connection/*"],
-      "@/connectors/*": ["connectors/*"],
-      "@/constants/*": ["constants/*"],
-      "@/data/*": ["data/*"],
-      "@/hooks/*": ["hooks/*"],
-      "@/pages/*": ["pages/*"],
-      "@/providers/*": ["providers/*"],
-      "@/store/*": ["store/*"],
-      "@/styles/*": ["styles/*"],
-      "@/types/*": ["types/*"],
-      "@/utils/*": ["utils/*"],
-      "@/resources/*": ["resources/*"]
+      "@/analytics/*": [
+        "analytics/*"
+      ],
+      "@/components/*": [
+        "components/*"
+      ],
+      "@/connection/*": [
+        "connection/*"
+      ],
+      "@/connectors/*": [
+        "connectors/*"
+      ],
+      "@/constants/*": [
+        "constants/*"
+      ],
+      "@/data/*": [
+        "data/*"
+      ],
+      "@/hooks/*": [
+        "hooks/*"
+      ],
+      "@/pages/*": [
+        "pages/*"
+      ],
+      "@/providers/*": [
+        "providers/*"
+      ],
+      "@/store/*": [
+        "store/*"
+      ],
+      "@/styles/*": [
+        "styles/*"
+      ],
+      "@/types/*": [
+        "types/*"
+      ],
+      "@/utils/*": [
+        "utils/*"
+      ],
+      "@/resources/*": [
+        "resources/*"
+      ]
     },
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "tailwind.config.js", "next.config.js"],
-  "exclude": ["node_modules"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "tailwind.config.js",
+    "next.config.js"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

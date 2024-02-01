@@ -43,8 +43,9 @@ const CheckItem = ({ imgURL, label, checked = false, onChange, disabled, trailin
 
   return (
     <div
-      className={`group/check-item Component relative rounded-md bg-ground box-content px-1 Transition_500 transition-colors border-2 border-solid ${isChecked ? 'border-primary' : 'border-transparent'
-        } ${opacityClassName} ${hoverClassName}`}
+      className={`group/check-item Component relative rounded-md bg-ground box-content px-1 Transition_500 transition-colors border-2 border-solid ${
+        isChecked ? 'border-primary' : 'border-transparent'
+      } ${opacityClassName} ${hoverClassName}`}
     >
       {Content}
       <input

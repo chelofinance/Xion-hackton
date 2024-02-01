@@ -53,7 +53,7 @@ const AsciiGlobe = ({ onRender, className = '' }: AsciiGlobeProps) => {
           fgColor="#EA580C"
           bgColor="transparent"
           characters=" .:-+*=%@#"
-        // invert={true}
+          // invert={true}
         />
       </Canvas>
     </div>
