@@ -28,7 +28,7 @@ type VaultsTableProps = {
   tooltipLayer: TooltipLayer;
 };
 
-const HOT_VAULTS: { id: string; vaultName: string; balance: number; vol: number; }[] = [
+const HOT_VAULTS: { id: string; vaultName: string; balance: number; vol: number }[] = [
   {
     id: 'MultiSig 1',
     vaultName: 'MultiSig 1',
@@ -64,7 +64,7 @@ const VaultsTable = ({ className = '', tooltipLayer }: VaultsTableProps) => {
         const id = String(item.id);
         const vault = (
           <A href={`/vault/${id}`} className="flex items-center gap-x-1">
-            <CoinLabel size="lg" symbol={item.id} logoURL={""} />
+            <CoinLabel size="lg" symbol={item.id} logoURL={''} />
             <Icon type="external_link" size="md" className="text-caption_dark" />
           </A>
         );
@@ -73,11 +73,17 @@ const VaultsTable = ({ className = '', tooltipLayer }: VaultsTableProps) => {
 
         const icaChains = (
           <OverlayGrid xUnitPx={16} className="!w-10">
-              {SUPPORTED_CHAINS.slice(1).map(supportedChain => (
-                  <OverlayGrid.Item key={supportedChain.name}>
-                      <Image src={supportedChain.logoURL ?? ''} width={24} height={24} alt={supportedChain.name} className="rounded-full overflow-hidden border border-solid border-primary_line_light"/>
-                  </OverlayGrid.Item>
-              ))}
+            {SUPPORTED_CHAINS.slice(1).map((supportedChain) => (
+              <OverlayGrid.Item key={supportedChain.name}>
+                <Image
+                  src={supportedChain.logoURL ?? ''}
+                  width={24}
+                  height={24}
+                  alt={supportedChain.name}
+                  className="rounded-full overflow-hidden border border-solid border-primary_line_light"
+                />
+              </OverlayGrid.Item>
+            ))}
           </OverlayGrid>
         );
 

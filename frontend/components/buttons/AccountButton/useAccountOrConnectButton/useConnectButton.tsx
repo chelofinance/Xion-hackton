@@ -9,7 +9,7 @@ import type { OnConnect } from '@/components/overlays/SelectWalletOverlay';
 import type { ButtonColor, ButtonStatus } from '@/components/Button/types';
 import type { ButtonProps } from '@/components/Button';
 
-const XionWalletConnectOverlay = lazy(() => import('@/components/overlays/XionWalletConnectOverlay'));
+// const XionWalletConnectOverlay = lazy(() => import('@/components/overlays/XionWalletConnectOverlay'));
 
 const useConnectButton = (): {
   connectModalButtonProps: Pick<ButtonProps, 'status' | 'color' | 'iconType' | 'label' | 'onClick'>;
@@ -34,10 +34,10 @@ const useConnectButton = (): {
   const openConnectModal = useCallback(async () => {
     await connectModal.open((props) => (
       <Suspense>
-        <XionWalletConnectOverlay {...props} id={connectModal.id} onConnect={onConnect} />
+        {/* <XionWalletConnectOverlay {...props} id={connectModal.id} onConnect={onConnect} /> */}
       </Suspense>
     ));
-  }, [connectModal, wallets, onConnect]);
+  }, [connectModal, onConnect]);
 
   const connectModalButtonProps = useMemo(() => {
     const label = 'Connect';

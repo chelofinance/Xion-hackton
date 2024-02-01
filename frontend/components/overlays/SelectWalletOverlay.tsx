@@ -8,7 +8,7 @@ import useUserAgent from '@/hooks/useUserAgent';
 import BottomSheet from '@/components/BottomSheet';
 import useConnect from '@/connection/useConnect';
 
-export type OnConnect = (args: { wallet: Wallet; }) => void;
+export type OnConnect = (args: { wallet: Wallet }) => void;
 
 type SelectWalletOverlayProps = Omit<AnimatedModalProps, 'ariaLabel'> & {
   wallets: readonly Wallet[];

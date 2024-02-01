@@ -15,15 +15,22 @@ const CARD_RADIUS_CLASS_DICT: Record<CardSize, string> = {
   md: 'rounded-card_md',
 };
 
-type CardProps = { children: ReactNode; color?: CardColor; size?: CardSize; className?: string; };
+type CardProps = { children: ReactNode; color?: CardColor; size?: CardSize; className?: string };
 
-const CardRefForwarder = ({ children, color = 'primary', size = 'md', className = '' }: CardProps, propRef?: ForwardedRef<HTMLElement>) => {
+const CardRefForwarder = (
+  { children, color = 'primary', size = 'md', className = '' }: CardProps,
+  propRef?: ForwardedRef<HTMLElement>
+) => {
   const bgClassName = CARD_BG_COLOR_DICT[color];
   const radiusClassName = CARD_RADIUS_CLASS_DICT[size];
 
   const ref = useMergeRefs([propRef]);
 
-  return <div ref={ref} className={`h-fit overflow-hidden ${bgClassName} ${radiusClassName} ${className}`}>{children}</div>;
+  return (
+    <div ref={ref} className={`h-fit overflow-hidden ${bgClassName} ${radiusClassName} ${className}`}>
+      {children}
+    </div>
+  );
 };
 
 const Card = forwardRef(CardRefForwarder);

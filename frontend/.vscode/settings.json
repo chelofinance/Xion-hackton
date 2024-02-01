@@ -4,5 +4,7 @@
 	"editor.codeActionsOnSave": {
 		"source.fixAll.eslint": true
 	},
-	"files.associations": { "*.scss": "postcss" }
+	"files.associations": {
+		"*.scss": "postcss"
+	}
 }

@@ -50,14 +50,15 @@ const AppFooter = () => {
         </article>
       </section>
 
-   
-
       <section className="flex items-center justify-between gap-x-4">
         <div className="flex items-center gap-x-2">
           <Link href="/">
             <AppLogo color="light" />
           </Link>
-          <A href="https://chelo.fi/" className="flex items-center gap-x-1 bg-ground text-primary px-2 py-1 rounded-full Font_caption_xs">
+          <A
+            href="https://chelo.fi/"
+            className="flex items-center gap-x-1 bg-ground text-primary px-2 py-1 rounded-full Font_caption_xs"
+          >
             <span>by</span>
             <CheloLabsLogo size="sm" />
             <span>Chelo Labs</span>

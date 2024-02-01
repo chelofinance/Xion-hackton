@@ -9,14 +9,13 @@ const TermsOfUse: NextPage = () => {
 
       <p>
         These Terms of Use (the &quot;Agreement&quot;) explain the terms and conditions by which you may access and use the
-        Products provided by Chelo Labs (referred to herein as &quot;Chelo Labs&quot;, &quot;Chelo&quot;,
-        &quot;we&quot;, &quot;our&quot;, or &quot;us&quot;). The Products shall include, but shall not necessarily be limited to,
-        (a) https://TBD, a website-hosted user interface (the &quot;Interface&quot; or &quot;App&quot;), (b) an
-        aggregator of various third-party non-fungible token (&quot;NFT&quot;) marketplaces (the &quot;NFT Marketplace
-        Aggregator&quot;) and (c) mobile application. You must read this Agreement carefully as it governs your use of the
-        Products. By accessing or using any of the Products, you signify that you have read, understand, and agree to be bound by
-        this Agreement in its entirety. If you do not agree, you are not authorized to access or use any of our Products and
-        should not use our Products.
+        Products provided by Chelo Labs (referred to herein as &quot;Chelo Labs&quot;, &quot;Chelo&quot;, &quot;we&quot;,
+        &quot;our&quot;, or &quot;us&quot;). The Products shall include, but shall not necessarily be limited to, (a) https://TBD,
+        a website-hosted user interface (the &quot;Interface&quot; or &quot;App&quot;), (b) an aggregator of various third-party
+        non-fungible token (&quot;NFT&quot;) marketplaces (the &quot;NFT Marketplace Aggregator&quot;) and (c) mobile application.
+        You must read this Agreement carefully as it governs your use of the Products. By accessing or using any of the Products,
+        you signify that you have read, understand, and agree to be bound by this Agreement in its entirety. If you do not agree,
+        you are not authorized to access or use any of our Products and should not use our Products.
       </p>
 
       <p>
@@ -43,8 +42,8 @@ const TermsOfUse: NextPage = () => {
 
       <p>
         The Interface provides a web or mobile-based means of access to (a) a decentralized protocol on various public
-        blockchains, including but not limited to Xion, that allows users to trade certain compatible digital assets and (b)
-        the NFT Marketplace Aggregator.
+        blockchains, including but not limited to Xion, that allows users to trade certain compatible digital assets and (b) the
+        NFT Marketplace Aggregator.
       </p>
 
       <h4>1.1 The NFT Marketplace Aggregator</h4>
@@ -110,10 +109,10 @@ const TermsOfUse: NextPage = () => {
 
       <h3>6. Ownership</h3>
       <p>
-        The Interface and the Apps are owned and operated by Chelo Labs. We or our licensors retain all right, title, and
-        interest in and to the Interface, the Apps and their content(the “Content”) and any trademarks, logos, or service marks
-        displayed on the Interface, the Apps or in the Content (the “Marks”). The Interface, the Apps, the Content, and the Marks
-        are protected by applicable intellectual property laws and international treaties. Except as expressly authorized by Chelo
+        The Interface and the Apps are owned and operated by Chelo Labs. We or our licensors retain all right, title, and interest
+        in and to the Interface, the Apps and their content(the “Content”) and any trademarks, logos, or service marks displayed
+        on the Interface, the Apps or in the Content (the “Marks”). The Interface, the Apps, the Content, and the Marks are
+        protected by applicable intellectual property laws and international treaties. Except as expressly authorized by Chelo
         Foundation you may not make use of the Interface, the Apps, the Content, and the Marks.
       </p>
 
@@ -124,10 +123,10 @@ const TermsOfUse: NextPage = () => {
         custodian of the digital tokens in your digital wallets, you shall bear all risk of loss of such digital tokens. You
         understand that Chelo Labs is not registered or licensed by the Commodity Futures Trading Commission, Securities and
         Exchange Commission, Financial Crimes Enforcement Network, or any financial regulatory authority, and that no financial
-        regulatory authority has reviewed or approved the Interface or the Apps. You further understand that Chelo Labs is
-        not acting as an investment adviser or commodity trading adviser to any person, does not offer securities services, and
-        that the contents of the Interface or the Apps do not constitute advice or recommendations concerning any commodity,
-        security or other asset.
+        regulatory authority has reviewed or approved the Interface or the Apps. You further understand that Chelo Labs is not
+        acting as an investment adviser or commodity trading adviser to any person, does not offer securities services, and that
+        the contents of the Interface or the Apps do not constitute advice or recommendations concerning any commodity, security
+        or other asset.
       </p>
 
       <h3>8. Risks Associated with Digital Tokens</h3>
@@ -136,18 +135,18 @@ const TermsOfUse: NextPage = () => {
         By accessing and using the Interface or the Apps, you represent that you understand the inherent risks associated with
         using cryptographic and blockchain-based systems, and that you have a working knowledge of the usage and intricacies of
         digital tokens such as bitcoin (BTC), ether (ETH), and other digital tokens such as those following the Xion Token
-        Standard (ERC-20). Chelo Labs does not control the underlying software protocols of any digital tokens accessible on
-        the Interface or the Apps. You agree that we are not responsible for the operation, functionality or security of the
+        Standard (ERC-20). Chelo Labs does not control the underlying software protocols of any digital tokens accessible on the
+        Interface or the Apps. You agree that we are not responsible for the operation, functionality or security of the
         underlying protocols and not liable for any loss of token value you may encounter due to any operating change, malfunction
         or failure of the underlying protocols. You further understand that the markets for these digital tokens are highly
         volatile, and that there are risks associated with digital tokens including (but not limited to) those related to
         adoption, speculation, technology, security, and regulation. You acknowledge that the cost and speed of transacting with
         cryptographic and blockchain-based systems such as Xion are variable and may increase dramatically at any time. You
         understand and agree to assume full responsibility for all of the risks of accessing and using the Interface or the Apps
-        and interacting with the Xion Blockchain, and agree that Chelo Labs is not responsible for any loss you may
-        experience as a result of these risks. We make no representation about the nature, quality, or legal categorization of the
-        token or associated project. You are responsible for doing your own research as well as ensuring that you may legally
-        transact in this token in the jurisdiction where you reside.
+        and interacting with the Xion Blockchain, and agree that Chelo Labs is not responsible for any loss you may experience as
+        a result of these risks. We make no representation about the nature, quality, or legal categorization of the token or
+        associated project. You are responsible for doing your own research as well as ensuring that you may legally transact in
+        this token in the jurisdiction where you reside.
       </p>
 
       <h3>9. Fees and Price Estimates</h3>
@@ -205,9 +204,9 @@ const TermsOfUse: NextPage = () => {
         Apps or the Content, and you rely on the Interface, the Apps, or the Content at your own risk. Any material obtained
         through the Interface is done at your own discretion and risk and you will be solely responsible for any damage to your
         computer or loss of data that results from the download of any material through the Interface. No advice or information,
-        whether oral or written, obtained by you from Chelo Labs or through or from the Interface will create any warranty
-        not expressly stated in these Terms. However, Chelo Labs does not disclaim any warranty or other right that Chelo
-        Foundation is prohibited from disclaiming under applicable law.
+        whether oral or written, obtained by you from Chelo Labs or through or from the Interface will create any warranty not
+        expressly stated in these Terms. However, Chelo Labs does not disclaim any warranty or other right that Chelo Foundation
+        is prohibited from disclaiming under applicable law.
       </p>
 
       <h3>14. Release of Claims</h3>
@@ -268,10 +267,10 @@ const TermsOfUse: NextPage = () => {
 
       <p>
         These Terms and any other agreements expressly incorporated by reference into these Terms, are the entire and exclusive
-        understanding and agreement between you and Chelo Labs regarding your use of the Interface. You may not assign or
-        transfer these Terms or your rights under these Terms, in whole or in part, by operation of law or otherwise, without our
-        prior written consent. We may assign these Terms at any time without notice or consent. The failure to require performance
-        of any provision will not affect our right to require performance at any other time after that, nor will a waiver by us of
+        understanding and agreement between you and Chelo Labs regarding your use of the Interface. You may not assign or transfer
+        these Terms or your rights under these Terms, in whole or in part, by operation of law or otherwise, without our prior
+        written consent. We may assign these Terms at any time without notice or consent. The failure to require performance of
+        any provision will not affect our right to require performance at any other time after that, nor will a waiver by us of
         any breach or default of these Terms, or any provision of these Terms, be a waiver of any subsequent breach or default or
         a waiver of the provision itself. Use of section headers in these Terms is for convenience only and will not have any
         impact on the interpretation of any provision. Throughout these Terms the use of the word “including” means “including but
@@ -282,8 +281,8 @@ const TermsOfUse: NextPage = () => {
       <h3>19. Governing Law</h3>
       <p>
         The interpretation and enforcement of these Terms, and any dispute related to these Terms or the Interface, will be
-        governed by and construed and enforced in accordance with the laws of the United Kingdom, as applicable, without regard
-        to conflict of law rules or principles that would cause the application of the laws of any other jurisdiction.
+        governed by and construed and enforced in accordance with the laws of the United Kingdom, as applicable, without regard to
+        conflict of law rules or principles that would cause the application of the laws of any other jurisdiction.
       </p>
     </Main>
   );

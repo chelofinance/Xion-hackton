@@ -48,12 +48,16 @@ const Container = ({ children, xUnitPx, isExpandable = false, className = '' }: 
         </li>
       ))}
 
-      {isExpandable && <span
-        aria-hidden
-        className={`absolute -inset-y-0.5 -left-1 z-[11] w-24 bg-primary_left_to_right ${leftShadowOpacityClassName}`}
-      ></span>}
+      {isExpandable && (
+        <span
+          aria-hidden
+          className={`absolute -inset-y-0.5 -left-1 z-[11] w-24 bg-primary_left_to_right ${leftShadowOpacityClassName}`}
+        ></span>
+      )}
 
-      {isExpandable && <span aria-hidden className={`absolute -inset-y-0.5 -right-1 z-[11] w-24 bg-primary_right_to_left`}></span>}
+      {isExpandable && (
+        <span aria-hidden className={`absolute -inset-y-0.5 -right-1 z-[11] w-24 bg-primary_right_to_left`}></span>
+      )}
 
       {isExpandable && (
         <Button

@@ -16,7 +16,16 @@ type CheloLabsLogoProps = {
 const CheloLabsLogo = ({ size = 'md' }: CheloLabsLogoProps) => {
   const imgSize = LOGO_SIZE_CLASS_DICT[size];
 
-  return <Image priority src={CHELO_LABS_LOGO.src} alt="App logo" width={imgSize.px} height={imgSize.px} className={imgSize.className} />;
+  return (
+    <Image
+      priority
+      src={CHELO_LABS_LOGO.src}
+      alt="App logo"
+      width={imgSize.px}
+      height={imgSize.px}
+      className={imgSize.className}
+    />
+  );
 };
 
 export default CheloLabsLogo;

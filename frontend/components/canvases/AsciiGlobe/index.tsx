@@ -18,7 +18,7 @@ const AsciiGlobe = ({ onRender, className = '' }: AsciiGlobeProps) => {
 
   useEffect(() => {
     if (isCreated) onRender?.();
-  }, [isCreated]);
+  }, [isCreated, onRender]);
 
   /**
    *
@@ -39,7 +39,7 @@ const AsciiGlobe = ({ onRender, className = '' }: AsciiGlobeProps) => {
         <pointLight position={[10, 10, 10]} />
         <pointLight color={new THREE.Color(0xffffff)} intensity={3} distance={0} decay={0} position={[-500, -500, -500]} />
 
-        <TorusMesh 
+        <TorusMesh
         //  onPointerEnter={isObejctInteractedEver ? undefined : persistInteractedObject}
         //  onPointerMove={moveObjectToCanvasPointer}
         />
@@ -53,7 +53,7 @@ const AsciiGlobe = ({ onRender, className = '' }: AsciiGlobeProps) => {
           fgColor="#EA580C"
           bgColor="transparent"
           characters=" .:-+*=%@#"
-          // invert={true}
+        // invert={true}
         />
       </Canvas>
     </div>

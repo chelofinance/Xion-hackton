@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useEffect } from 'react';
 import AnimatedModal from '@/components/AnimatedModal';
@@ -8,7 +8,7 @@ import useUserAgent from '@/hooks/useUserAgent';
 import BottomSheet from '@/components/BottomSheet';
 import { Abstraxion, useAbstraxionAccount } from '@burnt-labs/abstraxion';
 
-export type OnConnect = (args: { wallet: Wallet; }) => void;
+export type OnConnect = (args: { wallet: Wallet }) => void;
 
 type XionWalletConnectOverlayProps = Omit<AnimatedModalProps, 'ariaLabel'> & {
   onConnect: OnConnect;
@@ -21,16 +21,11 @@ const XionWalletConnectOverlay = (props: XionWalletConnectOverlayProps) => {
 
   useEffect(() => {
     if (xionAccount) {
-      console.log("xionAccount", xionAccount);
+      console.log('xionAccount', xionAccount);
     }
   }, [xionAccount]);
 
-  const Content = (
-    <Abstraxion
-        isOpen={isOpen}
-        onClose={onClose}
-    />
-  );
+  const Content = <Abstraxion isOpen={isOpen} onClose={onClose} />;
 
   const ARIA_LABEL = 'Select wallet';
 

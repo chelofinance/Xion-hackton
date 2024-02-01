@@ -45,7 +45,7 @@ const NFTs = ({ ownedNFTs, isOwnedNFTsLoading }: NFTsProps) => {
   const [hoveredNFT, setHoveredNFT] = useState<OwnedNFT>(ownedNFTs[0]);
   useEffect(() => {
     setHoveredNFT(ownedNFTs[0]);
-  }, [ownedNFTs[0]]);
+  }, [ownedNFTs]);
 
   const colorClassName = TEXT_COLOR_CLASS_DICT.on_primary;
 

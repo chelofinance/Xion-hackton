@@ -28,7 +28,11 @@ const Heading = ({ children, tagName, color = 'body', className = '' }: HeadingP
   const fontClassName = FONT_CLASS_DICT[tagName];
   const colorClassName = TEXT_COLOR_DICT[color];
 
-  return <HeadingElement className={`Component inline-flex ${colorClassName} ${fontClassName} ${className}`}>{children}</HeadingElement>;
+  return (
+    <HeadingElement className={`Component inline-flex ${colorClassName} ${fontClassName} ${className}`}>
+      {children}
+    </HeadingElement>
+  );
 };
 
 export default Heading;

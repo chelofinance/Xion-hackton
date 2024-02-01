@@ -35,10 +35,10 @@ const Home: NextPage = () => {
           <Heading tagName="h1" className="flex-col items-center mx-auto my-20 text-center">
             <span>Swap big, invest wide</span>
             <span>Cross-chain trades made easy</span>
-          </Heading> 
+          </Heading>
 
           <section className="space-y-4">
-            <VaultSearchTextInput 
+            <VaultSearchTextInput
               label="Search token name, symbol or address"
               placeholder="Search token name, symbol or address"
               errorMsg="Valid search value is required."
@@ -47,7 +47,13 @@ const Home: NextPage = () => {
 
             <div className="flex items-center justify-center gap-x-4">
               <span className="text-primary">or</span>
-              <Button color="primary" size="sm" label="Create multisig vault" iconType="arrow_forward" className="w-full md:w-fit" />
+              <Button
+                color="primary"
+                size="sm"
+                label="Create multisig vault"
+                iconType="arrow_forward"
+                className="w-full md:w-fit"
+              />
             </div>
           </section>
 

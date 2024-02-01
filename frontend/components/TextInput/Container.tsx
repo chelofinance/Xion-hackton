@@ -59,7 +59,9 @@ const Container = ({
   const heightClassName = 'h-[3.125rem] max-h-[3.125rem]';
   const borderClassName = '';
   const bgClassName = `backdrop-blur-2xl border border-solid ${
-    disabled ? 'border-disabled bg-disabled' : 'transition-colors Transition_500 border-primary_line_light bg-glass focus-within:bg-ground hover:bg-ground'
+    disabled
+      ? 'border-disabled bg-disabled'
+      : 'transition-colors Transition_500 border-primary_line_light bg-glass focus-within:bg-ground hover:bg-ground'
   }`;
   const iconColorClassName = 'text-caption_dark';
   const colorClassName = `placeholder:text-caption_dark text-black ${

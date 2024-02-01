@@ -13,19 +13,18 @@ const PrivacyPolicy: NextPage = () => {
       </p>
 
       <p>
-        This Privacy Policy (the &quot;Policy&quot;) explains how Chelo Labs (&quot;Chelo, the &quot;Team&quot;,
-        &quot;we&quot;, &quot;us&quot; or &quot;our&quot;) collects, uses, and shares data in connection with the Chelo web app
-        (TBD), www.TBD website and all of our other properties, products, and services (the
-        &quot;Services&quot;). Your use of the Services is subject to this Policy as well as our Terms of Use.
+        This Privacy Policy (the &quot;Policy&quot;) explains how Chelo Labs (&quot;Chelo, the &quot;Team&quot;, &quot;we&quot;,
+        &quot;us&quot; or &quot;our&quot;) collects, uses, and shares data in connection with the Chelo web app (TBD), www.TBD
+        website and all of our other properties, products, and services (the &quot;Services&quot;). Your use of the Services is
+        subject to this Policy as well as our Terms of Use.
       </p>
 
       <h3>High Level Summary</h3>
 
       <ul className="list-disc list-outside pl-4">
         <li>
-          Chelo Labs is not an incorporated company, but stands for a team based in the United Kingdom that operates
-          https://TBD among other products and services. Chelo Labs complies with UK laws and
-          regulations.
+          Chelo Labs is not an incorporated company, but stands for a team based in the United Kingdom that operates https://TBD
+          among other products and services. Chelo Labs complies with UK laws and regulations.
         </li>
 
         <br />
