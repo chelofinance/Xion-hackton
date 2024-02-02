@@ -57,79 +57,79 @@
 @layer utilities {
     /* typography - display */
     .Font_display_xs {
-        @apply text-5xl leading-tight font-semibold;
+        @apply font-primary text-5xl leading-tight font-semibold;
     }
 
     .Font_display_sm {
-        @apply text-6xl leading-tight font-semibold;
+        @apply font-primary text-6xl leading-tight font-semibold;
     }
 
     .Font_display_md {
-        @apply text-7xl leading-[5rem] font-semibold;
+        @apply font-primary text-7xl leading-[5rem] font-semibold;
     }
 
     .Font_display_lg {
-        @apply text-8xl leading-[6.5rem] font-semibold;
+        @apply font-primary text-8xl leading-[6.5rem] font-semibold;
     }
 
     /* typography - title */
     .Font_title_xs {
-        @apply text-base leading-tight font-semibold;
+        @apply font-primary text-base leading-tight font-semibold;
     }
 
     .Font_title_sm {
-        @apply text-lg leading-tight font-semibold;
+        @apply font-primary text-lg leading-tight font-semibold;
     }
 
     .Font_title_md {
-        @apply text-xl leading-tight font-semibold;
+        @apply font-primary text-xl leading-tight font-semibold;
     }
     
     /* typography - button */
     .Font_button_xs {
-        @apply text-xs leading-tight font-medium;
+        @apply font-primary text-xs leading-tight font-medium;
     }
 
     .Font_button_sm {
-        @apply text-sm leading-tight font-medium;
+        @apply font-primary text-sm leading-tight font-medium;
     }
 
     .Font_button_md {
-        @apply text-base leading-tight font-medium;
+        @apply font-primary text-base leading-tight font-medium;
     }
 
     .Font_button_lg {
-        @apply text-lg leading-tight font-medium;
+        @apply font-primary text-lg leading-tight font-medium;
     }
 
     .Font_button_xl {
-        @apply text-xl leading-tight font-medium;
+        @apply font-primary text-xl leading-tight font-medium;
     }
 
     /* typography - body */
     .Font_body_xs {
-        @apply text-xs leading-snug font-normal;
+        @apply font-primary text-xs leading-snug font-normal;
     }
     
     .Font_body_sm {
-        @apply text-sm leading-snug font-normal;
+        @apply font-primary text-sm leading-snug font-normal;
     }
 
     .Font_body_md {
-        @apply text-base leading-snug font-normal;
+        @apply font-primary text-base leading-snug font-normal;
     }
 
     .Font_body_lg {
-        @apply text-xl leading-snug font-normal;
+        @apply font-primary text-xl leading-snug font-normal;
     }
 
     /** typography - label */
     .Font_label_12px {
-        @apply text-xs leading-5 font-medium;
+        @apply font-primary text-xs leading-5 font-medium;
     }
 
     .Font_label_14px {
-        @apply text-[0.875rem] leading-5 font-medium;
+        @apply font-primary text-[0.875rem] leading-5 font-medium;
     }
 
     /** typography - data */
@@ -154,36 +154,36 @@
     }
 
     .Font_data_12px_unit {
-        @apply text-[0.625rem] leading-5 font-normal;
+        @apply font-primary text-[0.625rem] leading-5 font-normal;
     }
 
     .Font_data_14px_unit {
-        @apply text-[0.875rem] leading-5 font-normal;
+        @apply font-primary text-[0.875rem] leading-5 font-normal;
     }
 
     .Font_data_20px_unit {
-        @apply text-[0.875rem] leading-6 font-normal;
+        @apply font-primary text-[0.875rem] leading-6 font-normal;
     }
 
     .Font_data_32px_unit {
-        @apply text-2xl leading-10 font-normal;
+        @apply font-primary text-2xl leading-10 font-normal;
     }
 
     /* typography - caption */
     .Font_caption_xs {
-        @apply text-xs leading-snug font-normal;
+        @apply font-primary text-xs leading-snug font-normal;
     }
     
     .Font_caption_sm {
-        @apply text-sm leading-snug font-normal;
+        @apply font-primary text-sm leading-snug font-normal;
     }
 
     .Font_caption_md {
-        @apply text-base leading-snug font-normal;
+        @apply font-primary text-base leading-snug font-normal;
     }
 
     .Font_caption_lg {
-        @apply text-xl leading-snug font-normal;
+        @apply font-primary text-xl leading-snug font-normal;
     }
 
      /* padding */

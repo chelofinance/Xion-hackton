@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import useCoinLogoURL from './useCoinLogoURL';
 import { useCallback, useState } from 'react';
+import { TokenSymbols } from '@/constants/app';
 
 export type CoinSize = 'sm' | 'md' | 'lg' | 'xl';
 
@@ -12,7 +13,7 @@ const COIN_SIZE_DICT: Record<CoinSize, { px: number; className: string }> = {
 };
 
 type CoinProps = {
-  symbol?: string;
+  symbol?: TokenSymbols;
   size?: CoinSize;
   logoURL?: string;
 };

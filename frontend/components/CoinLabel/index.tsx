@@ -1,8 +1,9 @@
 import Coin from '@/components/Coin';
 import { COLOR_CLASS_DICT, CoinLabelColor, CoinLabelSize, SIZE_DICT } from './styles';
+import { TokenSymbols } from '@/constants/app';
 
 type CoinLabelProps = {
-  symbol?: string;
+  symbol?: TokenSymbols;
   description?: string;
   size?: CoinLabelSize;
   color?: CoinLabelColor;

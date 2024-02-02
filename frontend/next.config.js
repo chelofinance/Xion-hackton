@@ -33,6 +33,14 @@ const nextConfig = {
         protocol: 'https',
         hostname: 's2.coinmarketcap.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'images.talis.art',
+      },
+      {
+        protocol: 'https',
+        hostname: 'talis-protocol.mo.cloudinary.net',
+      },
       /**
        *
        * @todo remove this

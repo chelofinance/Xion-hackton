@@ -1,13 +1,18 @@
 import { atom } from 'jotai';
-import { LOCAL_STORAGE_KEYS } from '@/constants/app';
+import { LOCAL_STORAGE_KEYS, TokenSymbols } from '@/constants/app';
 import type { ConnectedWallet } from '@/types/wallet';
 import type { TokenData } from '@/data/types';
+import apolloClients, { type AppApolloClients } from '@/data/graphql/apolloClients';
+
+export const apolloClientsAtom = atom<AppApolloClients>(apolloClients);
 
 /**
  *
  * @description token symbol is used as key atm; should be replaced with contract address
  */
-export const allTokensDictAtom = atom<Record<string, TokenData>>({});
+export const allTokensDictAtom = atom<Record<TokenSymbols, TokenData>>({
+  [TokenSymbols.INJ]: { logoURI: 'https://injective.talis.art/svg/icons/inj.svg' },
+});
 
 const userWalletAtomOrigin = atom<ConnectedWallet | null>(null);
 

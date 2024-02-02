@@ -30,6 +30,10 @@ export const IS_DEV = process.env.NODE_ENV === 'development';
  * 
  * @description the below types are tmp for wireframing
  */
+export enum TokenSymbols {
+  INJ = 'INJ',
+}
+
 export type SupportedChain = {
   logoURL?: string;
   name: string;

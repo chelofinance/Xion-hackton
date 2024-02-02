@@ -101,10 +101,10 @@ const Icon = ({ type, size = 'md', className = '' }: IconProps) => {
   return (
     <IconContext.Provider
       value={{
-        className: `${sizeClassName} ${className}`,
+        className: '',
       }}
     >
-      <IconComponent />
+      <IconComponent className={`${sizeClassName} ${className}`} />
     </IconContext.Provider>
   );
 };

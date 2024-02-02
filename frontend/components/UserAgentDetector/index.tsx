@@ -10,7 +10,7 @@ const UserAgentDetector = () => {
 
   useEffect(() => {
     setUserAgentAtom(userAgent);
-  }, [userAgent, setUserAgentAtom]);
+  }, []);
 
   return null;
 };

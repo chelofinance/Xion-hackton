@@ -19,7 +19,10 @@ import AnalyticsProvider from '@/hooks/useAnalytics/AnalyticsProvider';
 import { googleAnalytics, mixpanel } from '@/constants/app';
 import GoogleAnalyticsReporter from '@/analytics/googleAnalytics/GoogleAnalyticsReporter';
 import MixPanelReporter from '@/analytics/mixpanel/MixPanelReporter';
-import { AbstraxionProvider } from '@burnt-labs/abstraxion';
+import GraphqlProvider from '@/data/graphql/GraphqlProvider';
+import { useAtom } from 'jotai';
+import { apolloClientsAtom } from '@/store/states';
+// import { AbstraxionProvider } from '@burnt-labs/abstraxion';
 
 const UserAgentDetector = dynamic(() => import('@/components/UserAgentDetector'), { ssr: false });
 
@@ -45,6 +48,8 @@ function MyApp({ Component, pageProps }: AppProps<{ dehydratedState: DehydratedS
       },
     });
   }
+
+  const [{ talisApolloClient }] = useAtom(apolloClientsAtom);
 
   return (
     <>
@@ -95,19 +100,21 @@ function MyApp({ Component, pageProps }: AppProps<{ dehydratedState: DehydratedS
               },
             ]}
           >
-            <QueryClientProvider client={queryClientRef.current}>
-              <Hydrate state={pageProps.dehydratedState}>
-                <AbstraxionProvider config={{ contracts: [] }}>
-                  <MetaDataUpdater />
-                  <UserAgentDetector />
-                  <ModalProvider>
-                    <AppHeader className="fixed top-0 left-0 right-0 z-navigation" />
-                    <Component {...pageProps} />
-                    <AppFooter />
-                  </ModalProvider>
-                </AbstraxionProvider>
-              </Hydrate>
-            </QueryClientProvider>
+            <GraphqlProvider apolloClient={talisApolloClient}>
+              <QueryClientProvider client={queryClientRef.current}>
+                <Hydrate state={pageProps.dehydratedState}>
+                  {/* <AbstraxionProvider config={{ contracts: [] }}> */}
+                    <MetaDataUpdater />
+                    <UserAgentDetector />
+                    <ModalProvider>
+                      <AppHeader className="fixed top-0 left-0 right-0 z-navigation" />
+                      <Component {...pageProps} />
+                      <AppFooter />
+                    </ModalProvider>
+                  {/* </AbstraxionProvider> */}
+                </Hydrate>
+              </QueryClientProvider>
+            </GraphqlProvider>
           </AnalyticsProvider>
         </Suspense>
       </SentryErrorBoundary>

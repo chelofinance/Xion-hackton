@@ -7,7 +7,7 @@ import { FORMAT_LOCALE_FALLBACK, MAX_DECIMALS } from '@/constants/app';
  */
 export type CurrencySymbol = '$';
 
-type FormatAmountOptions = {
+export type FormatAmountOptions = {
   currencySymbol?: CurrencySymbol;
   semiequate?: boolean;
   compact?: boolean;

@@ -28,7 +28,7 @@ export const TABLE_ROW_GRID_X_DICT: Record<TableStyle, string> = {
 };
 
 export const TABLE_ROW_GRID_Y_DICT: Record<TableStyle, string> = {
-  primary: 'min-h-[4.25rem] py-1',
+  primary: 'min-h-[4.25rem] py-2.5',
 };
 
 export const TABLE_CELL_GRID_X_DICT: Record<TableStyle, string> = {

@@ -5,7 +5,6 @@ import { formatUSD } from '@/utils/number';
 import { useMemo } from 'react';
 import BalanceTotal from './BalanceTotal';
 import NFTs from './NFTs';
-import Tokens from './Tokens';
 import Button from '@/components/Button';
 
 export type AccountOverlayProps = Omit<OverlayProps, 'ariaLabel'> & {
@@ -23,7 +22,6 @@ const useAccountOverlayElements = (props: AccountOverlayProps) => {
       <AccountAddress wallet={wallet} />
       <BalanceTotal formattedNumber={formattedTotalUSD} isLoading={false} />
       <NFTs ownedNFTs={[]} isOwnedNFTsLoading={false} />
-      <Tokens balances={[]} isBalanceLoading={false} />
     </div>
   );
 
