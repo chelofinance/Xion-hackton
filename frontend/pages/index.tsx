@@ -2,7 +2,7 @@ import type { NextPage } from 'next';
 import dynamic from 'next/dynamic';
 import { useState } from 'react';
 import Main from '@/components/Main';
-import VaultsTable from '@/components/tables/VaultsTable';
+import NFTsTable from '@/components/tables/NFTsTable';
 import MobileAppLaunchSection from '@/components/home/MobileAppLaunchSection';
 import useUserAgent from '@/hooks/useUserAgent';
 import Heading from '@/components/Heading';
@@ -86,7 +86,7 @@ const Home: NextPage = () => {
             </div>
           </section>
 
-          <VaultsTable tooltipLayer="base" className="mt-20 md:mx-page_x" />
+          <NFTsTable tooltipLayer="base" className="mt-20 md:mx-page_x" />
         </Main>
       )}
     </>
