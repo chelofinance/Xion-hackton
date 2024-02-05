@@ -56,7 +56,7 @@ Once you are happy with the content, you can compile it to wasm via:
 
 ```
 RUSTFLAGS='-C link-arg=-s' cargo wasm
-cp ../../target/wasm32-unknown-unknown/release/cw3_fixed_multisig.wasm .
+cp ../../target/wasm32-unknown-unknown/release/multisig.wasm ./cw3_fixed_multisig.wasm
 ls -l cw3_fixed_multisig.wasm
 sha256sum cw3_fixed_multisig.wasm
 ```
