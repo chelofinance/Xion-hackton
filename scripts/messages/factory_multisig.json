@@ -1,0 +1,25 @@
+{
+  "deploy_multisig_ica": {
+    "multisig_instantiate_msg": {
+      "voters": [
+        {
+          "addr": "xion18va0ce80rf9ptpdavqapfsu4xdajw8jsk9nsr5",
+          "weight": 100
+        }
+      ],
+      "threshold": {
+        "absolute_count": {
+          "weight": 1
+        }
+      },
+      "max_voting_period": {
+        "time": 7200
+      }
+    },
+    "channel_open_init_options": {
+      "connection_id": "connection-35",
+      "counterparty_connection_id": "connection-201"
+    },
+    "salt": "aa:)"
+  }
+}

@@ -14,6 +14,12 @@ const main = async () => {
     action: {type: "string", demandOption: true, alias: "a", desc: "action"},
 
     contract: {type: "string", demandOption: false, alias: "sc", desc: "contract"},
+    funds: {
+      type: "string",
+      demandOption: false,
+      alias: "f",
+      desc: "funds in native token amount",
+    },
     codeId: {type: "number", demandOption: false, desc: "code id of contract"},
     message: {type: "string", demandOption: false, desc: "message to send to contract"},
     label: {type: "string", demandOption: false, desc: "label of contract"},
