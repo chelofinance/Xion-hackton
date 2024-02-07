@@ -11,3 +11,11 @@ export const getContract = (relativePath: string) => {
     return null;
   }
 };
+
+export const toBase64 = (uintArray: Uint8Array) => {
+  const binaryString = uintArray.reduce((acc, byte) => {
+    return acc + String.fromCharCode(byte);
+  }, "");
+
+  return btoa(binaryString);
+};
