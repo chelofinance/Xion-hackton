@@ -1033,14 +1033,14 @@
     "@babel/helper-validator-identifier" "^7.22.5"
     to-fast-properties "^2.0.0"
 
-"@burnt-labs/abstraxion@^0.1.0-alpha.23":
-  version "0.1.0-alpha.24"
-  resolved "https://registry.yarnpkg.com/@burnt-labs/abstraxion/-/abstraxion-0.1.0-alpha.24.tgz#c7e31eb8aa520fdfb713b35d545a3363754d6500"
-  integrity sha512-yY9txg5wZVsA/4TY7NdHi+JLKpDKz/Tu513qVknvqMf1O3Z/EHIgLdw64NGy8Z5v3qm0AuUvXucVV8zTag312w==
+"@burnt-labs/abstraxion@^1.0.0-alpha.26":
+  version "1.0.0-alpha.26"
+  resolved "https://registry.yarnpkg.com/@burnt-labs/abstraxion/-/abstraxion-1.0.0-alpha.26.tgz#23f8136e70bcd708d6cdecdcf114523b9b1a828c"
+  integrity sha512-uCCf6D1Wwi1L/S1wTc/ZyrZYuLeBV7hlOvbW7Cnr531sYG8Gir3PVJqNpZ686Ahb7e9TtBpQIHXQ+AmbLhLv1g==
   dependencies:
-    "@burnt-labs/constants" "0.0.1-alpha.2"
-    "@burnt-labs/signers" "0.1.0-alpha.4"
-    "@burnt-labs/ui" "0.1.0-alpha.4"
+    "@burnt-labs/constants" "0.0.1-alpha.3"
+    "@burnt-labs/signers" "0.1.0-alpha.5"
+    "@burnt-labs/ui" "0.1.0-alpha.5"
     "@cosmjs/cosmwasm-stargate" "^0.31.3"
     "@cosmjs/proto-signing" "^0.31.3"
     "@cosmjs/stargate" "^0.31.3"
@@ -1050,15 +1050,15 @@
     graz "^0.0.51"
     jose "^5.1.3"
 
-"@burnt-labs/constants@0.0.1-alpha.2":
-  version "0.0.1-alpha.2"
-  resolved "https://registry.yarnpkg.com/@burnt-labs/constants/-/constants-0.0.1-alpha.2.tgz#09e0acc03da519bf16f73156204220b2eb45727c"
-  integrity sha512-6YHft+EDETput65txy3fcL5mtCI+efRGAzXsBOGKQ+/o4s6W+CRzFRYqjwrZIXLzdtzdD7zahhlA3Tfsq0U/EQ==
+"@burnt-labs/constants@0.0.1-alpha.3":
+  version "0.0.1-alpha.3"
+  resolved "https://registry.yarnpkg.com/@burnt-labs/constants/-/constants-0.0.1-alpha.3.tgz#c15cbe7a2d676d06094906009fc2a0353425f5f2"
+  integrity sha512-70lYZHbhYDnxumdzJPbJX9RvZighX40HFw3UJ7dIzTwgStlam52AhwXKPuoi26MKD+WakX44h+aRU56W0/1AbA==
 
-"@burnt-labs/signers@0.1.0-alpha.4":
-  version "0.1.0-alpha.4"
-  resolved "https://registry.yarnpkg.com/@burnt-labs/signers/-/signers-0.1.0-alpha.4.tgz#2123b77c0c29b6fa14362137fd47930856bd8fd7"
-  integrity sha512-U/ePHqne3SevFGu/j9/IDyzjUV9NtZguBe314NQzGeul1TRU9sLHK7MNvL3efXhCfWTvFVYvIrZShrLedb/4pw==
+"@burnt-labs/signers@0.1.0-alpha.5":
+  version "0.1.0-alpha.5"
+  resolved "https://registry.yarnpkg.com/@burnt-labs/signers/-/signers-0.1.0-alpha.5.tgz#619fb082c3e969c0174ace16e9136558864212bf"
+  integrity sha512-WMgVfnPznsNOwOGzrnfhpqfZLNg85or75hKFQFYYc9wNdUBCbSQ9RqiYkpfEYwuP/z7M8u/BjyWujUBSXurEoA==
   dependencies:
     "@apollo/client" "^3.8.8"
     "@cosmjs/amino" "^0.31.3"
@@ -1076,10 +1076,10 @@
     react-dom "^18.2.0"
     stytch "^9.0.6"
 
-"@burnt-labs/ui@0.1.0-alpha.4":
-  version "0.1.0-alpha.4"
-  resolved "https://registry.yarnpkg.com/@burnt-labs/ui/-/ui-0.1.0-alpha.4.tgz#dd38494c0eb4540430a26fbdcd0a71e665517254"
-  integrity sha512-9Scj6Io8nH56izPdP7TJEUeAkkMUTwSbfu3/0XHMvWPYvCBRhjOvi1esSiLKvo5inbaVGW5wubkdDwxgGkZPBQ==
+"@burnt-labs/ui@0.1.0-alpha.5":
+  version "0.1.0-alpha.5"
+  resolved "https://registry.yarnpkg.com/@burnt-labs/ui/-/ui-0.1.0-alpha.5.tgz#a7f287c7b3a2e42d6f698fcd48c97ad21bf0dbbf"
+  integrity sha512-Bdcr30AdYzOBsRJ3D0MWD5Gw7S16i9ninF1F7upeIbtMOh1rdnQb/VRknodvYGZKOxLv9qzwHr6kg5Vq6Okr0A==
   dependencies:
     "@radix-ui/react-dialog" "^1.0.5"
     "@types/react-dom" "^18.2.18"

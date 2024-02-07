@@ -22,7 +22,7 @@ import MixPanelReporter from '@/analytics/mixpanel/MixPanelReporter';
 import GraphqlProvider from '@/data/graphql/GraphqlProvider';
 import { useAtom } from 'jotai';
 import { apolloClientsAtom } from '@/store/states';
-// import { AbstraxionProvider } from '@burnt-labs/abstraxion';
+import { AbstraxionProvider } from '@burnt-labs/abstraxion';
 
 const UserAgentDetector = dynamic(() => import('@/components/UserAgentDetector'), { ssr: false });
 
@@ -103,7 +103,7 @@ function MyApp({ Component, pageProps }: AppProps<{ dehydratedState: DehydratedS
             <GraphqlProvider apolloClient={talisApolloClient}>
               <QueryClientProvider client={queryClientRef.current}>
                 <Hydrate state={pageProps.dehydratedState}>
-                  {/* <AbstraxionProvider config={{ contracts: [] }}> */}
+                  <AbstraxionProvider config={{ contracts: [] }}>
                     <MetaDataUpdater />
                     <UserAgentDetector />
                     <ModalProvider>
@@ -111,7 +111,7 @@ function MyApp({ Component, pageProps }: AppProps<{ dehydratedState: DehydratedS
                       <Component {...pageProps} />
                       <AppFooter />
                     </ModalProvider>
-                  {/* </AbstraxionProvider> */}
+                  </AbstraxionProvider>
                 </Hydrate>
               </QueryClientProvider>
             </GraphqlProvider>

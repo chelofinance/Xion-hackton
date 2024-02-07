@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.9.2",
-    "@burnt-labs/abstraxion": "^0.1.0-alpha.23",
+    "@burnt-labs/abstraxion": "^1.0.0-alpha.26",
     "@cosmjs/stargate": "^0.29.5",
     "@floating-ui/react": "^0.25.1",
     "@headlessui/react": "1.7.3",
