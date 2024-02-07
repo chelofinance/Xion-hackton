@@ -1,0 +1,15 @@
+{
+  "typeUrl": "/injective.wasmx.v1.MsgExecuteContractCompat",
+  "value": {
+    "sender": "inj15ppmvhw3cq8pge8yh8znvd66d3xm5jwvckqjknjwxyfwssf0l0gslpm46p",
+    "contract": "inj1l9nh9wv24fktjvclc4zgrgyzees7rwdtx45f54",
+    "msg": {
+      "buy_token": {
+        "token_id": "1",
+        "contract_address": "inj18fe9tnv4xqkh4hlugjwaw28ne9c08fvxk907ht",
+        "class_id": "injective"
+      }
+    },
+    "funds": "0inj"
+  }
+}

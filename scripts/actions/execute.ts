@@ -4,6 +4,7 @@ import {Coin} from "@cosmjs/amino";
 
 const execute: Action = async (action) => {
   const {args, client, accounts, network} = action;
+  console.log("EXECUTE", args.message);
 
   required(args, "contract");
   required(args, "message");
