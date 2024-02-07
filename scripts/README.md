@@ -15,15 +15,15 @@ yarn
 Then you must create a .env with your private mnemonic from your wallet. Check the .env.example.
 
 ```shell
-yarn start --action store --contract <path/to/wasm/file> --chain <chain_name>
+yarn start --action store --contract <path/to/wasm/file> --network <chain_name>
 ```
 
 ```shell
-yarn start --action instantiate --code-id <code_id> --message <init_message_json> --chain <chain_name>
+yarn start --action instantiate --code-id <code_id> --message <init_message_json> --network <chain_name>
 ```
 
 ```shell
-yarn start --action execute --contract <contract_address> --message <message> --chain <chain_name>
+yarn start --action execute --contract <contract_address> --message <message> --network <chain_name>
 ```
 
 Counter example:

@@ -4,6 +4,7 @@ import {EncodeObject, GeneratedType, Registry} from "@cosmjs/proto-signing";
 import {InjectiveWasmxV1Beta1Tx} from "@injectivelabs/core-proto-ts";
 import {defaultRegistryTypes as stargateTypes} from "@cosmjs/stargate";
 import {wasmTypes, IndexedTx, CosmWasmClient} from "@cosmjs/cosmwasm-stargate";
+import {required} from "../utils/args";
 
 //const MULTISIG = "xion1l9cd87pqvdjmspmktszx6f54kr7ezed5jp0y8uj2z7m6s459zaksukkszd";
 const INJECTIVE_CONTRACT_MSG_URI = "/injective.wasmx.v1.MsgExecuteContractCompat";
@@ -58,7 +59,7 @@ const produceProposal = (args: Parameters<Action>[0]["args"]) => {
       {
         wasm: {
           execute: {
-            contract_addr: "xion1e5hsdknjghh9gp5ep4u7g0qz0px2zvajwts7z95z09y3eupjfn7s78vmhj",
+            contract_addr: args.controller as string,
             msg: Buffer.from(JSON.stringify(controllerMessage)).toString("base64"),
             funds: [],
           },
@@ -79,6 +80,13 @@ const getProposalId = async (client: CosmWasmClient, txHash: string) => {
 
 const propose: Action = async (action) => {
   const {args, client} = action;
+
+  required(args, "contract");
+  required(args, "controller");
+  required(args, "message");
+  required(args, "network");
+
+
   const txList = [] as {transaction: string; height: number}[];
   const buildArgs = (msg: any) => ({...args, message: msg});
   const buildTxs = (action: any) => txList.push(action);

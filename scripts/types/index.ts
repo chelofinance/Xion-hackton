@@ -28,6 +28,7 @@ export type Arguments = {
   codeId?: number;
   message?: object;
   label?: string;
+  controller?: string;
 };
 
 export type Action = (args: {

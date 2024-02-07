@@ -1,4 +1,4 @@
-import fs, {readFileSync} from "fs";
+import {readFileSync} from "fs";
 import {DirectSecp256k1HdWallet, OfflineDirectSigner} from "@cosmjs/proto-signing";
 import {GasPrice, SigningStargateClient} from "@cosmjs/stargate";
 import {SigningCosmWasmClient} from "@cosmjs/cosmwasm-stargate";
@@ -12,6 +12,9 @@ export const loadMnemonic = (path: string) => {
 };
 
 export const loadSignerFromMnemonic = (network: NetworkConfig): Promise<OfflineDirectSigner> => {
+  if (!process.env.MNEMONIC) {
+    throw new Error("MNEMONIC environment variable is not set. See .env.sample.");
+  }
   return DirectSecp256k1HdWallet.fromMnemonic(process.env.MNEMONIC as string, {
     prefix: network.prefix,
   });

@@ -14,6 +14,7 @@ const main = async () => {
     action: {type: "string", demandOption: true, alias: "a", desc: "action"},
 
     contract: {type: "string", demandOption: false, alias: "sc", desc: "contract"},
+    controller: {type: "string", demandOption: false, alias: "ica", desc: "ica-controller"},
     funds: {
       type: "string",
       demandOption: false,
