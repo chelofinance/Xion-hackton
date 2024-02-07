@@ -1,9 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Abstraxion, useAbstraxionAccount, useAbstraxionSigningClient } from "@burnt-labs/abstraxion";
+import { Abstraxion, useAbstraxionAccount, useAbstraxionSigningClient, useModal } from "@burnt-labs/abstraxion";
 import { Button } from "@burnt-labs/ui";
 import type { ExecuteResult } from "@cosmjs/cosmwasm-stargate";
 import Contracts from "@/config/contracts.config";
+import { v4 as uuidv4 } from 'uuid';
 
 const contracts = Contracts["xion-testnet"];
 
@@ -11,11 +12,12 @@ export default function Page(): JSX.Element {
   const { data: account, isConnected } = useAbstraxionAccount();
   const { client } = useAbstraxionSigningClient();
 
-  const [isOpen, setIsOpen] = useState(false);
+  const [_, setIsOpen] = useModal();
   const [loading, setLoading] = useState(false);
   const [instantiateResult, setInstantiateResult] = useState<ExecuteResult | undefined>(undefined);
   const [memberAddresses, setMemberAddresses] = useState<string[]>(['xion1gh5hrkta3nze3yvut7u5507lxtje0ryz65zpzw']);
-  const [multisigAddresses, setMultisigAddresses] = useState<string[]>([]);
+  const [icaMultisigAddress, setIcaMultisigAddress] = useState<string>("");
+  const [proposalId, setProposalId] = useState<string>("");
 
   const blockExplorerUrl = `https://explorer.burnt.com/xion-testnet-1/tx/${instantiateResult?.transactionHash}`;
 
@@ -25,12 +27,51 @@ export default function Page(): JSX.Element {
     }
   }, [client]);
 
-  async function getGranter() {
+
+  async function createIcaMultisig() {
     setLoading(true);
 
+    const voters = memberAddresses.map((address) => ({ addr: address, weight: 1 }));
+
+    const msg = {
+      deploy_multisig_ica: {
+        multisig_instantiate_msg: {
+          voters,
+          threshold: {
+            absolute_count: {
+              weight: 1,
+            },
+          },
+          max_voting_period: {
+            time: 36000,
+          }
+        },
+        channel_open_init_options: {
+          connection_id: "connection-33",
+          counterparty_connection_id: "connection-198"
+        },
+        salt: uuidv4()
+      }
+    };
+
     try {
-      const granter = await client?.getAccount(account.bech32Address);
-      console.log("granter", granter);
+      const instantiateResponse = await client?.execute(
+        account.bech32Address,
+        contracts.icaFactory.address,
+        msg,
+        "auto",
+      );
+      console.log("instantiateResponse", instantiateResponse);
+      setInstantiateResult(instantiateResponse);
+
+      const instantiate_events = instantiateResponse?.events.filter(
+        (e: any) => e.type === "instantiate"
+      );
+      const ica_multisig_address = instantiate_events?.find(
+        (e: any) => e.attributes[0].value === "73")?.attributes[1].value;
+      console.log("ica_multisig_address", ica_multisig_address);
+
+      setIcaMultisigAddress(ica_multisig_address ? ica_multisig_address : "");
     } catch (error) {
       console.log("error", error);
       alert(error);
@@ -39,53 +80,86 @@ export default function Page(): JSX.Element {
     }
   }
 
-  async function createMultisig() {
+  async function createProposal() {
     setLoading(true);
 
-    const members = memberAddresses.map((address) => ({ addr: address, weight: 1 }));
-
     const msg = {
-      create_multisig: {
-        members,
-        threshold: {
-          absolute_count: {
-            weight: 1,
-          },
-        },
-        max_voting_period: {
-          time: 36000,
-        },
+      propose: {
+        title: "Test Proposal",
+        description: "This is a test proposal",
+        msgs: [], // ToDo: Add messages
       }
     };
 
     try {
-      const instantiateResponse = await client?.execute(
+      const executionResponse = await client?.execute(
         account.bech32Address,
-        contracts.nomosFactory.address,
+        icaMultisigAddress,
         msg,
         "auto",
       );
-      console.log("instantiateResponse", instantiateResponse);
-      setInstantiateResult(instantiateResponse);
+      console.log("executionResponse", executionResponse);
 
-      const create_wallet_events = instantiateResponse?.events.find(
-        (e: any) => e.type === "wasm-create_wallet"
+      const proposal_id = executionResponse?.events.find(
+        (e: any) => e.type === "wasm"
+      )?.attributes.find(
+        (a: any) => a.key === "proposal_id"
+      )?.value;
+      console.log("proposal_id", proposal_id);
+      setProposalId(proposal_id ? proposal_id : "");
+
+    } catch (error) {
+      console.log("error", error);
+      alert(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function voteProposal() {
+    setLoading(true);
+
+    const msg = {
+      vote: {
+        proposal_id: proposalId,
+        vote: {}, // ToDo: Add vote type
+      }
+    };
+
+    try {
+      const executionResponse = await client?.execute(
+        account.bech32Address,
+        icaMultisigAddress,
+        msg,
+        "auto",
       );
-      console.log(JSON.stringify(create_wallet_events));
+      console.log("executionResponse", executionResponse);
 
-      const create_membership_events = instantiateResponse?.events.find(
-        (e: any) => e.type === "wasm-create_membership"
+    } catch (error) {
+      console.log("error", error);
+      alert(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function executeProposal() {
+    setLoading(true);
+
+    const msg = {
+      execute: {
+        proposal_id: proposalId
+      }
+    };
+
+    try {
+      const executionResponse = await client?.execute(
+        account.bech32Address,
+        icaMultisigAddress,
+        msg,
+        "auto",
       );
-      console.log(JSON.stringify(create_membership_events));
-
-      const instantiate_events = instantiateResponse?.events.filter(
-        (e: any) => e.type === "instantiate"
-      );
-      console.log(JSON.stringify(instantiate_events));
-
-      setMultisigAddresses(instantiate_events?.map((e: any) => e.attributes[0].value) || []);
-
-      console.log(JSON.stringify(multisigAddresses));
+      console.log("executionResponse", executionResponse);
     } catch (error) {
       console.log("error", error);
       alert(error);
@@ -124,7 +198,7 @@ export default function Page(): JSX.Element {
       {client && (
         <form onSubmit={(e) => {
           e.preventDefault();
-          void createMultisig();
+          void createIcaMultisig();
         }} className="form">
           <label htmlFor="memberAddresses">Member Addresses</label>
           {memberAddresses.map((address, index) => (
@@ -172,13 +246,33 @@ export default function Page(): JSX.Element {
         <Button
           disabled={loading}
           fullWidth
-          onClick={getGranter}
+          onClick={createProposal}
           structure="base"
         >
-          {loading ? "LOADING..." : "Get Granter"}
+          {loading ? "LOADING..." : "Create Proposal"}
         </Button>
       )}
-      <Abstraxion isOpen={isOpen} onClose={() => setIsOpen(false)} />
+      {client && (
+        <Button
+          disabled={loading}
+          fullWidth
+          onClick={voteProposal}
+          structure="base"
+        >
+          {loading ? "LOADING..." : "Vote Proposal"}
+        </Button>
+      )}
+      {client && (
+        <Button
+          disabled={loading}
+          fullWidth
+          onClick={executeProposal}
+          structure="base"
+        >
+          {loading ? "LOADING..." : "Execute Proposal"}
+        </Button>
+      )}
+      <Abstraxion onClose={() => setIsOpen(false)} />
 
       {account && (
         <div className="info-container">
@@ -205,24 +299,23 @@ export default function Page(): JSX.Element {
           </div>
         </div>
       )}
-      {multisigAddresses.length > 0 && (
+      {icaMultisigAddress && (
         <div className="info-container">
           <div className="info-content">
             <p className="info-description">
               <span className="info-bold">Multisig Addresses</span>
             </p>
-            {multisigAddresses.map((address, index) => (
-              <div key={index} className="info-item">
-                <a
-                  className="info-link"
-                  href={`https://explorer.burnt.com/xion-testnet-1/account/${address}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {address}
-                </a>
-              </div>
-            ))}
+            <span className="info-value">{icaMultisigAddress}</span>
+          </div>
+        </div>
+      )}
+      {proposalId && (
+        <div className="info-container">
+          <div className="info-content">
+            <p className="info-description">
+              <span className="info-bold">Proposal ID</span>
+            </p>
+            <span className="info-value">{proposalId}</span>
           </div>
         </div>
       )}

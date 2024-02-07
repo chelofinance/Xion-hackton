@@ -2,8 +2,8 @@
 import "./globals.css";
 import { Inter } from "next/font/google";
 import { AbstraxionProvider } from "@burnt-labs/abstraxion";
-import "@burnt-labs/abstraxion/styles.css";
-import "@burnt-labs/ui/styles.css";
+import "@burnt-labs/abstraxion/dist/index.css";
+import "@burnt-labs/ui/dist/index.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
