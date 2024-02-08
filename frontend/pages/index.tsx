@@ -17,38 +17,38 @@ const AsciiGlobe = dynamic(() => import('@/components/canvases/AsciiGlobe'), {
 
 const Home: NextPage = () => {
   const { loading, error, data, refetch } = useQuery<any, QueryTalisTokensParams>(QUERY_TALIS_TOKENS, {
-    variables: { 
-      input: { 
-        limit: 12, 
-        offset: 0, 
-        sort: { 
+    variables: {
+      input: {
+        limit: 12,
+        offset: 0,
+        sort: {
           price: 1,
-        }, 
+        },
         filter: {
           privacy: {
-              eq: 'public',
+            eq: 'public',
           },
           onSale: {
-              eq: true,
+            eq: true,
           },
           isNsfw: {
-              eq: false,
+            eq: false,
           },
           auction_id: {
-              ge: 0,
+            ge: 0,
           },
           auctionEndTimestamp: {
-              ge: 1706847468919,
+            ge: 1706847468919,
           },
-        }, 
+        },
       },
     },
     pollInterval: undefined,
   });
 
-  console.log("loading", loading);
-  console.log("error", error);
-  console.log("data", data);
+  console.log('loading', loading);
+  console.log('error', error);
+  console.log('data', data);
 
   const { isMobile } = useUserAgent();
   const [isAppLaunched, setIsAppLaunched] = useState<boolean>(!isMobile);
@@ -76,13 +76,7 @@ const Home: NextPage = () => {
 
             <div className="flex items-center justify-center gap-x-4">
               <span className="text-primary">or</span>
-              <Button
-                color="primary"
-                size="sm"
-                label="Start trading"
-                iconType="arrow_forward"
-                className="w-full md:w-fit"
-              />
+              <Button color="primary" size="sm" label="Start trading" iconType="arrow_forward" className="w-full md:w-fit" />
             </div>
           </section>
 

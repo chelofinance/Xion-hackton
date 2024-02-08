@@ -27,7 +27,14 @@ type NFTsTableProps = {
   tooltipLayer: TooltipLayer;
 };
 
-const HOT_NFT_DEALS: { id: string; nftName: string; imgSrc: string; price: number; raisedAmountUSD: number; participants: number }[] = [
+const HOT_NFT_DEALS: {
+  id: string;
+  nftName: string;
+  imgSrc: string;
+  price: number;
+  raisedAmountUSD: number;
+  participants: number;
+}[] = [
   {
     id: 'MultiSig 1',
     nftName: 'Monkey - 2004(WOOD)',
@@ -65,25 +72,26 @@ const NFTsTable = ({ className = '', tooltipLayer }: NFTsTableProps) => {
         const nft = (
           <section className="w-32 flex flex-col items-stretch gap-y-2">
             <Card color="on_primary" className="w-32 h-32 flex items-center justify-center">
-              <Image src={item.imgSrc} width={128} height={128} alt="" className="object-cover"/>
+              <Image src={item.imgSrc} width={128} height={128} alt="" className="object-cover" />
             </Card>
 
             <div className="Font_label_14px text-body truncate">{item.nftName}</div>
           </section>
         );
 
-
         const price = item.price;
-        const priceFormatted = <CoinAmount size="md" color="body" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(12.23242, 2)} />;
+        const priceFormatted = (
+          <CoinAmount size="md" color="body" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(12.23242, 2)} />
+        );
 
         const raisedAmountUSD = item.raisedAmountUSD;
         const raisedAmountUSDFormatted = (
-          <ProgressBar 
-            currentNumber={raisedAmountUSD} 
-            targetNumber={price} 
+          <ProgressBar
+            currentNumber={raisedAmountUSD}
+            targetNumber={price}
             formatOptions={{ currencySymbol: '$' }}
             currentNumberCaption={`raised / ${formatUSD(price, { compact: true })}`}
-            className="!w-[300px]" 
+            className="!w-[300px]"
           />
         );
 

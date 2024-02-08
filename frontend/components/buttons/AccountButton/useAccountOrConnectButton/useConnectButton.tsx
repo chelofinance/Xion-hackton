@@ -35,7 +35,7 @@ const useConnectButton = (): {
     await connectModal.open((props) => (
       <Suspense>
         <XionWalletConnectOverlay {...props} id={connectModal.id} onConnect={onConnect} />
-        </Suspense>
+      </Suspense>
     ));
   }, [connectModal, onConnect]);
 
