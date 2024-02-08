@@ -17,6 +17,8 @@ export default function Page(): JSX.Element {
   const [instantiateResult, setInstantiateResult] = useState<ExecuteResult | undefined>(undefined);
   const [memberAddresses, setMemberAddresses] = useState<string[]>(['xion1gh5hrkta3nze3yvut7u5507lxtje0ryz65zpzw']);
   const [icaMultisigAddress, setIcaMultisigAddress] = useState<string>("");
+  const [icaControllerAddress, setIcaControllerAddress] = useState<string>("");
+  const [icaAccountAddress, setIcaAccountAddress] = useState<string>("");
   const [proposalId, setProposalId] = useState<string>("");
 
   const blockExplorerUrl = `https://explorer.burnt.com/xion-testnet-1/tx/${instantiateResult?.transactionHash}`;
@@ -27,6 +29,14 @@ export default function Page(): JSX.Element {
     }
   }, [client]);
 
+  async function getContractState(ica_controller_address: string) {
+    const contract_state = await client?.queryContractSmart(ica_controller_address, { get_contract_state: {} });
+    console.log("contract_state", contract_state);
+
+    const ica_account_address = contract_state?.contract_state?.address;
+    setIcaAccountAddress(ica_account_address ? ica_account_address : "");
+    return contract_state;
+  }
 
   async function createIcaMultisig() {
     setLoading(true);
@@ -47,8 +57,8 @@ export default function Page(): JSX.Element {
           }
         },
         channel_open_init_options: {
-          connection_id: "connection-33",
-          counterparty_connection_id: "connection-198"
+          connection_id: "connection-39",
+          counterparty_connection_id: "connection-207"
         },
         salt: uuidv4()
       }
@@ -67,11 +77,28 @@ export default function Page(): JSX.Element {
       const instantiate_events = instantiateResponse?.events.filter(
         (e: any) => e.type === "instantiate"
       );
-      const ica_multisig_address = instantiate_events?.find(
-        (e: any) => e.attributes[0].value === "73")?.attributes[1].value;
-      console.log("ica_multisig_address", ica_multisig_address);
 
+      const ica_multisig_address = instantiate_events
+        ?.find((e) => e.attributes.find(attr => attr.key === "code_id" && attr.value === "73"))
+        ?.attributes.find(attr => attr.key === "_contract_address")?.value;
+      console.log("ica_multisig_address:", ica_multisig_address);
       setIcaMultisigAddress(ica_multisig_address ? ica_multisig_address : "");
+
+
+      const ica_controller_address = instantiate_events
+        ?.find((e) => e.attributes.find(attr => attr.key === "code_id" && attr.value === "59"))
+        ?.attributes.find(attr => attr.key === "_contract_address")?.value;
+      console.log("ica_controller_address:", ica_controller_address);
+      setIcaControllerAddress(ica_controller_address ? ica_controller_address : "");
+
+      if (ica_controller_address) {
+        const contract_state = await getContractState(ica_controller_address);
+        alert(`Contract State: ${JSON.stringify(contract_state)}`)
+      } else {
+        alert("No ICA Controller Address found");
+      }
+
+
     } catch (error) {
       console.log("error", error);
       alert(error);
@@ -227,7 +254,11 @@ export default function Page(): JSX.Element {
           }}>
             Add New
           </button>
-          <Button type="submit" disabled={loading} fullWidth structure="base">
+          <Button
+            disabled={loading}
+            fullWidth
+            type="submit"
+            structure="base">
             {loading ? "LOADING..." : "Create Multisig"}
           </Button>
         </form>

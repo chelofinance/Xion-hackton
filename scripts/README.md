@@ -29,7 +29,7 @@ yarn start --action execute --contract <contract_address> --message <message> --
 Counter example:
 
 ```shell
-yarn start --action execute --contract xion1x3sxr4wmug78yha27p6wpftt848x4nf6nhg2hfjvk89u2v8qr4hqyxc8ud --message '{"increment": {}}' --chain xion-testnet
+yarn start --action execute --contract xion1x3sxr4wmug78yha27p6wpftt848x4nf6nhg2hfjvk89u2v8qr4hqyxc8ud --message '{"increment": {}}' --network xion-testnet
 
-yarn start --action query --contract xion1x3sxr4wmug78yha27p6wpftt848x4nf6nhg2hfjvk89u2v8qr4hqyxc8ud --message '{"get_count":{}}' --chain xion-testnet
+yarn start --action query --contract xion1x3sxr4wmug78yha27p6wpftt848x4nf6nhg2hfjvk89u2v8qr4hqyxc8ud --message '{"get_count":{}}' --network xion-testnet
 ```
