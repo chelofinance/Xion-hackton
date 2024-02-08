@@ -7,8 +7,8 @@ import type { AnimatedModalProps } from '@/components/AnimatedModal/Container';
 import useUserAgent from '@/hooks/useUserAgent';
 import BottomSheet from '@/components/BottomSheet';
 import { Abstraxion, useAbstraxionAccount, useModal as useAbstraxionModal } from '@burnt-labs/abstraxion';
-import "@burnt-labs/ui/dist/index.css";
-import "@burnt-labs/abstraxion/dist/index.css";
+import '@burnt-labs/ui/dist/index.css';
+import '@burnt-labs/abstraxion/dist/index.css';
 import WaitingSymbol from '../WaitingSymbol';
 import Image from 'next/image';
 import BURNT_LABS_LOGO_URL from '@/resources/logos/burnt_logo.svg';
@@ -51,22 +51,24 @@ const XionWalletConnectOverlay = (props: XionWalletConnectOverlayProps) => {
     }
   }, [xionAccount]);
 
-  const Content = <div>
-    <div className="flex flex-col items-center gap-y-6">
-      <div className="flex flex-col items-center gap-y-3 text-ground">
-        <div className="Font_body_md">Redirecting to login</div>
-        <WaitingSymbol color="white" />
+  const Content = (
+    <div>
+      <div className="flex flex-col items-center gap-y-6">
+        <div className="flex flex-col items-center gap-y-3 text-ground">
+          <div className="Font_body_md">Redirecting to login</div>
+          <WaitingSymbol color="white" />
+        </div>
+
+        <div className="flex items-center gap-x-1 Font_caption_xs text-primary bg-ground rounded-full px-3 py-1.5">
+          <span>Powered by</span>
+          <Image src={BURNT_LABS_LOGO_URL} width={20} height={20} alt="Abstraxion" />
+          <span>Abstraxion</span>
+        </div>
       </div>
 
-      <div className="flex items-center gap-x-1 Font_caption_xs text-primary bg-ground rounded-full px-3 py-1.5">
-        <span>Powered by</span>
-        <Image src={BURNT_LABS_LOGO_URL} width={20} height={20} alt="Abstraxion" />
-        <span>Abstraxion</span>
-      </div>
+      <Abstraxion onClose={onCloseAbstraxion} />
     </div>
-
-    <Abstraxion onClose={onCloseAbstraxion} />
-  </div>;
+  );
 
   const ARIA_LABEL = 'Select wallet';
 
