@@ -2,9 +2,9 @@
 import { useEffect, useState } from "react";
 import { Abstraxion, useAbstraxionAccount, useAbstraxionSigningClient, useModal } from "@burnt-labs/abstraxion";
 import { Button } from "@burnt-labs/ui";
-import type { ExecuteResult } from "@cosmjs/cosmwasm-stargate";
 import Contracts from "@/config/contracts.config";
 import { v4 as uuidv4 } from 'uuid';
+import { createIcaMultisig, createProposal, executeProposal, getBalance, voteProposal } from "./utils";
 
 const contracts = Contracts["xion-testnet"];
 
@@ -14,206 +14,69 @@ export default function Page(): JSX.Element {
 
   const [_, setIsOpen] = useModal();
   const [loading, setLoading] = useState(false);
-  const [instantiateResult, setInstantiateResult] = useState<ExecuteResult | undefined>(undefined);
-  const [memberAddresses, setMemberAddresses] = useState<string[]>(['xion1gh5hrkta3nze3yvut7u5507lxtje0ryz65zpzw']);
+  const [abstractAddress, setAbstractAddress] = useState<string>("");
+  const [memberAddresses, setMemberAddresses] = useState<string[]>([]);
   const [icaMultisigAddress, setIcaMultisigAddress] = useState<string>("");
   const [icaControllerAddress, setIcaControllerAddress] = useState<string>("");
   const [icaAccountAddress, setIcaAccountAddress] = useState<string>("");
   const [proposalId, setProposalId] = useState<string>("");
 
-  const blockExplorerUrl = `https://explorer.burnt.com/xion-testnet-1/tx/${instantiateResult?.transactionHash}`;
-
   useEffect(() => {
-    if (client) {
-      console.log("client", client);
+    async function fetchData() {
+      if (client) {
+        console.log("client", client);
+        const abstract_addr = await getAbstractAddress();
+        setAbstractAddress(abstract_addr);
+        setMemberAddresses(abstract_addr ? [abstract_addr] : []);
+      }
     }
+
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [client]);
 
-  async function getContractState(ica_controller_address: string) {
-    const contract_state = await client?.queryContractSmart(ica_controller_address, { get_contract_state: {} });
-    console.log("contract_state", contract_state);
-
-    const ica_account_address = contract_state?.contract_state?.address;
-    setIcaAccountAddress(ica_account_address ? ica_account_address : "");
-    return contract_state;
+  async function getAbstractAddress() {
+    const abstractAccount = await client?.getAccount(account.bech32Address);
+    return abstractAccount?.address || "";
   }
 
-  async function createIcaMultisig() {
+  async function createIcaMultisigHandler() {
     setLoading(true);
-
-    const voters = memberAddresses.map((address) => ({ addr: address, weight: 1 }));
-
-    const msg = {
-      deploy_multisig_ica: {
-        multisig_instantiate_msg: {
-          voters,
-          threshold: {
-            absolute_count: {
-              weight: 1,
-            },
-          },
-          max_voting_period: {
-            time: 36000,
-          }
-        },
-        channel_open_init_options: {
-          connection_id: "connection-39",
-          counterparty_connection_id: "connection-207"
-        },
-        salt: uuidv4()
-      }
-    };
-
-    try {
-      const instantiateResponse = await client?.execute(
-        account.bech32Address,
-        contracts.icaFactory.address,
-        msg,
-        "auto",
-      );
-      console.log("instantiateResponse", instantiateResponse);
-      setInstantiateResult(instantiateResponse);
-
-      const instantiate_events = instantiateResponse?.events.filter(
-        (e: any) => e.type === "instantiate"
-      );
-
-      const ica_multisig_address = instantiate_events
-        ?.find((e) => e.attributes.find(attr => attr.key === "code_id" && attr.value === "73"))
-        ?.attributes.find(attr => attr.key === "_contract_address")?.value;
-      console.log("ica_multisig_address:", ica_multisig_address);
-      setIcaMultisigAddress(ica_multisig_address ? ica_multisig_address : "");
-
-
-      const ica_controller_address = instantiate_events
-        ?.find((e) => e.attributes.find(attr => attr.key === "code_id" && attr.value === "59"))
-        ?.attributes.find(attr => attr.key === "_contract_address")?.value;
-      console.log("ica_controller_address:", ica_controller_address);
-      setIcaControllerAddress(ica_controller_address ? ica_controller_address : "");
-
-      if (ica_controller_address) {
-        const contract_state = await getContractState(ica_controller_address);
-        alert(`Contract State: ${JSON.stringify(contract_state)}`)
-      } else {
-        alert("No ICA Controller Address found");
-      }
-
-
-    } catch (error) {
-      console.log("error", error);
-      alert(error);
-    } finally {
-      setLoading(false);
-    }
+    const multisig_creation_response = await createIcaMultisig(client, account, contracts.icaFactory.address, memberAddresses);
+    setIcaMultisigAddress(multisig_creation_response ? multisig_creation_response.ica_multisig_address : "");
+    setIcaControllerAddress(multisig_creation_response ? multisig_creation_response.ica_controller_address : "");
+    setIcaAccountAddress(multisig_creation_response ? multisig_creation_response.ica_account_address : "");
+    setLoading(false);
   }
 
-  async function createProposal() {
+  async function createProposalHandler() {
     setLoading(true);
-
-    const msg = {
-      propose: {
-        title: "Test Proposal",
-        description: "This is a test proposal",
-        msgs: [], // ToDo: Add messages
-      }
-    };
-
-    try {
-      const executionResponse = await client?.execute(
-        account.bech32Address,
-        icaMultisigAddress,
-        msg,
-        "auto",
-      );
-      console.log("executionResponse", executionResponse);
-
-      const proposal_id = executionResponse?.events.find(
-        (e: any) => e.type === "wasm"
-      )?.attributes.find(
-        (a: any) => a.key === "proposal_id"
-      )?.value;
-      console.log("proposal_id", proposal_id);
-      setProposalId(proposal_id ? proposal_id : "");
-
-    } catch (error) {
-      console.log("error", error);
-      alert(error);
-    } finally {
-      setLoading(false);
-    }
+    const response = await createProposal(client, account, icaMultisigAddress);
+    console.log("response", response);
+    setProposalId(response ? response.proposal_id : "");
+    setLoading(false);
   }
 
-  async function voteProposal() {
+  async function voteProposalHandler(vote: any) {
     setLoading(true);
-
-    const msg = {
-      vote: {
-        proposal_id: proposalId,
-        vote: {}, // ToDo: Add vote type
-      }
-    };
-
-    try {
-      const executionResponse = await client?.execute(
-        account.bech32Address,
-        icaMultisigAddress,
-        msg,
-        "auto",
-      );
-      console.log("executionResponse", executionResponse);
-
-    } catch (error) {
-      console.log("error", error);
-      alert(error);
-    } finally {
-      setLoading(false);
-    }
+    const response = await voteProposal(client, account, icaMultisigAddress, proposalId, vote);
+    console.log("response", response);
+    setLoading(false);
   }
 
-  async function executeProposal() {
+
+  async function executeProposalHandler() {
     setLoading(true);
-
-    const msg = {
-      execute: {
-        proposal_id: proposalId
-      }
-    };
-
-    try {
-      const executionResponse = await client?.execute(
-        account.bech32Address,
-        icaMultisigAddress,
-        msg,
-        "auto",
-      );
-      console.log("executionResponse", executionResponse);
-    } catch (error) {
-      console.log("error", error);
-      alert(error);
-    } finally {
-      setLoading(false);
-    }
+    const response = await executeProposal(client, account, icaMultisigAddress, proposalId);
+    console.log("response", response);
+    setLoading(false);
   }
 
-  async function getBalances() {
+  async function getBalanceHandler() {
     setLoading(true);
-
-    try {
-      const accountBalance = await client?.getBalance(
-        account.bech32Address,
-        "uxion"
-      );
-      console.log("accountBalance", accountBalance);
-
-      alert(
-        `Account Balance: ${accountBalance?.amount} ${accountBalance?.denom}`
-      );
-    } catch (error) {
-      console.log("error", error);
-      alert(error);
-    } finally {
-      setLoading(false);
-    }
+    const response = await getBalance(client, abstractAddress);
+    console.log("response", response);
+    setLoading(false);
   }
 
   return (
@@ -222,11 +85,8 @@ export default function Page(): JSX.Element {
       <Button fullWidth onClick={() => setIsOpen(true)} structure="base">
         {account.bech32Address ? <div>VIEW ACCOUNT</div> : "CONNECT"}
       </Button>
-      {client && (
-        <form onSubmit={(e) => {
-          e.preventDefault();
-          void createIcaMultisig();
-        }} className="form">
+      {client && !icaMultisigAddress && (
+        <div>
           <label htmlFor="memberAddresses">Member Addresses</label>
           {memberAddresses.map((address, index) => (
             <div key={index} className="input-group">
@@ -249,55 +109,56 @@ export default function Page(): JSX.Element {
               </button>
             </div>
           ))}
-          <button type="button" onClick={() => {
+          <Button onClick={() => {
             setMemberAddresses([...memberAddresses, ""]);
           }}>
             Add New
-          </button>
+          </Button>
+
           <Button
             disabled={loading}
             fullWidth
-            type="submit"
+            onClick={createIcaMultisigHandler}
             structure="base">
             {loading ? "LOADING..." : "Create Multisig"}
           </Button>
-        </form>
+        </div>
       )}
-      {client && (
+      {abstractAddress && (
         <Button
           disabled={loading}
           fullWidth
-          onClick={getBalances}
+          onClick={getBalanceHandler}
           structure="base"
         >
           {loading ? "LOADING..." : "Get Balances"}
         </Button>
       )}
-      {client && (
+      {icaMultisigAddress && (
         <Button
           disabled={loading}
           fullWidth
-          onClick={createProposal}
+          onClick={createProposalHandler}
           structure="base"
         >
           {loading ? "LOADING..." : "Create Proposal"}
         </Button>
       )}
-      {client && (
+      {proposalId && (
         <Button
           disabled={loading}
           fullWidth
-          onClick={voteProposal}
+          onClick={voteProposalHandler}
           structure="base"
         >
           {loading ? "LOADING..." : "Vote Proposal"}
         </Button>
       )}
-      {client && (
+      {proposalId && (
         <Button
           disabled={loading}
           fullWidth
-          onClick={executeProposal}
+          onClick={executeProposalHandler}
           structure="base"
         >
           {loading ? "LOADING..." : "Execute Proposal"}
@@ -305,31 +166,15 @@ export default function Page(): JSX.Element {
       )}
       <Abstraxion onClose={() => setIsOpen(false)} />
 
-      {account && (
+      {abstractAddress && (
         <div className="info-container">
           <div className="info-header">
-            <span className="info-label">Grantee:</span>
-            <span className="info-value">{account.bech32Address}</span>
+            <span className="info-label">Granter:</span>
+            <span className="info-value">{abstractAddress}</span>
           </div>
         </div>
       )}
-      {instantiateResult && (
-        <div className="info-container">
-          <div className="info-content">
-            <p className="info-description">
-              <span className="info-bold">Transaction Hash</span>
-            </p>
-            <a
-              className="info-link"
-              href={blockExplorerUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {instantiateResult.transactionHash}
-            </a>
-          </div>
-        </div>
-      )}
+
       {icaMultisigAddress && (
         <div className="info-container">
           <div className="info-content">
