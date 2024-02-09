@@ -1,0 +1,13 @@
+{
+  "typeUrl": "/cosmos.bank.v1beta1.MsgSend",
+  "value": {
+    "fromAddress": "inj1q75sh38n4arnfck26gmuer6qvqqk7w2vajvm7qv9863xzmnj3z0q77zmsh",
+    "toAddress": "inj1d4anv54sal5ae4mjy0eqmvvpfc0j0u9mn3u905",
+    "amount": [
+      {
+        "denom": "inj",
+        "amount": "12345"
+      }
+    ]
+  }
+}

@@ -5,15 +5,15 @@
     "contract": "inj1qt5ztu5l3cdkcwzsv2pe9u2mk3fq56rdckr0r7",
     "msg": {
       "buy_token": {
-        "token_id": "1",
+        "token_id": "0",
         "contract_address": "inj1v3gg98tu6u7wq3a5dtzk97avk5rp97srz47wrs",
         "class_id": "injective"
       }
     },
     "funds": [
       {
-        "amount": "1000000000000000",
-        "denom": "inj"
+        "denom": "inj",
+        "amount": "100000000000000000inj"
       }
     ]
   }

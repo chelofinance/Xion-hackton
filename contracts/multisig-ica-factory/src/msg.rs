@@ -39,4 +39,15 @@ pub enum ExecuteMsg {
 /// The messages to query this contract.
 #[cw_serde]
 #[derive(QueryResponses)]
-pub enum QueryMsg {}
+pub enum QueryMsg {
+    ///
+    #[returns(CallbacksResponses)]
+    QueryCallbacks(),
+}
+
+///
+#[cw_serde]
+pub struct CallbacksResponses {
+    ///
+    pub list: Vec<String>,
+}

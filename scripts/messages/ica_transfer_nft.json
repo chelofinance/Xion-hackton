@@ -1,0 +1,14 @@
+{
+  "typeUrl": "/cosmwasm.wasm.v1.MsgExecuteContract",
+  "value": {
+    "sender": "inj1q75sh38n4arnfck26gmuer6qvqqk7w2vajvm7qv9863xzmnj3z0q77zmsh",
+    "contract": "inj1v3gg98tu6u7wq3a5dtzk97avk5rp97srz47wrs",
+    "msg": {
+      "transfer_nft": {
+        "recipient": "inj1d4anv54sal5ae4mjy0eqmvvpfc0j0u9mn3u905",
+        "token_id": "1"
+      }
+    },
+    "funds": []
+  }
+}
