@@ -2,6 +2,7 @@ import {Action} from "../types";
 import store from "./store";
 import execute from "./execute";
 import propose_ica from "./propose_ica";
+import propose_ica_wasm from "./propose_ica_wasm";
 import create_channel from "./create_channel";
 //import injective_execute from "./injective_execute";
 import instantiate from "./instantiate";
@@ -14,4 +15,5 @@ export const actions: Record<string, Action> = {
   query,
   propose_ica,
   create_channel,
+  propose_ica_wasm,
 };
