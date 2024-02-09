@@ -1,5 +1,7 @@
 'use client';
 
+import '@burnt-labs/ui/dist/index.css';
+import '@burnt-labs/abstraxion/dist/index.css';
 import '@/styles/globals.css';
 import type { AppProps } from 'next/app';
 import { DehydratedState, Hydrate, QueryClient, QueryClientProvider, useQueryErrorResetBoundary } from '@tanstack/react-query';

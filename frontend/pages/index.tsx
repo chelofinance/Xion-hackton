@@ -76,7 +76,7 @@ const Home: NextPage = () => {
 
             <div className="flex items-center justify-center gap-x-4">
               <span className="text-primary">or</span>
-              <Button color="primary" size="sm" label="Start trading" iconType="arrow_forward" className="w-full md:w-fit" />
+              <Button color="primary" size="sm" label="Create vault" iconType="arrow_forward" className="w-full md:w-fit" />
             </div>
           </section>
 
