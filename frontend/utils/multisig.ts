@@ -1,4 +1,4 @@
-// Utils functions for the app
+// This is a copy from /demp/app/utils.tsx
 
 import { v4 as uuidv4 } from "uuid";
 
