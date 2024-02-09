@@ -1,6 +1,7 @@
 // Utils functions for the app
 
 import { v4 as uuidv4 } from "uuid";
+import { produceProposalMsg } from "./propose";
 
 async function getContractState(client: any, ica_controller_address: string) {
     const contract_state = await client?.queryContractSmart(ica_controller_address, { get_contract_state: {} });
@@ -92,13 +93,27 @@ function generateIcaMsg(msg: any) {
 }
 
 
-export async function createProposal(client: any, account: any, icaMultisigAddress: string) {
-
-    const msg = {}
-    const ibcMsg = generateIcaMsg(msg);
+export async function createProposal(client: any, account: any, msg: any, icaMultisigAddress: string, icaControllerAddress: string, icaAccountAddress: string) {
 
     console.log("icaMultisigAddress", icaMultisigAddress);
+    console.log("icaControllerAddress", icaControllerAddress);
+
+    msg = {
+        typeUrl: "/injective.wasmx.v1.MsgExecuteContractCompat",
+        value: {
+            "contract": "inj1l9nh9wv24fktjvclc4zgrgyzees7rwdtx45f54", // ToDo - What is this?
+            "funds": "0inj",
+            msg,
+            "sender": "inj15ppmvhw3cq8pge8yh8znvd66d3xm5jwvckqjknjwxyfwssf0l0gslpm46p" // ToDo - What is this?
+        }
+    }
+
+    const ibcMsg = {
+        propose: produceProposalMsg(msg, icaControllerAddress)
+    }
+
     console.log("ibcMsg", JSON.stringify(ibcMsg));
+
     try {
         const executionResponse = await client?.execute(
             account.bech32Address,

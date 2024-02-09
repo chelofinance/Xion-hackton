@@ -19,6 +19,7 @@ export default function Page(): JSX.Element {
   const [icaControllerAddress, setIcaControllerAddress] = useState<string>("");
   const [icaAccountAddress, setIcaAccountAddress] = useState<string>("");
   const [proposals, setProposals] = useState<any[]>([]);
+  const [proposalJson, setProposalJson] = useState("{}");
 
   useEffect(() => {
     async function fetchData() {
@@ -29,7 +30,8 @@ export default function Page(): JSX.Element {
         setMemberAddresses(abstract_addr ? [abstract_addr] : []);
 
         // For testing, let's hardcode the multisig. Ideally this should be the last created one.
-        setIcaMultisigAddress(contracts.hardcodedMultisigs[0]);
+        setIcaMultisigAddress(contracts.hardcodedIcaMultisig.address);
+        setIcaAccountAddress(contracts.hardcodedIcaController.address);
 
         getProposalListHandler();
         console.log("isConnected", isConnected);
@@ -57,7 +59,7 @@ export default function Page(): JSX.Element {
 
   async function createProposalHandler() {
     setLoading(true);
-    const response = await createProposal(client, account, icaMultisigAddress);
+    const response = await createProposal(client, account, JSON.parse(proposalJson), icaMultisigAddress, icaControllerAddress, icaAccountAddress);
     console.log("response", response);
 
     await getProposalListHandler();
@@ -166,14 +168,23 @@ export default function Page(): JSX.Element {
         </Button>
       )}
       {icaMultisigAddress && (
-        <Button
-          disabled={loading}
-          fullWidth
-          onClick={createProposalHandler}
-          structure="base"
-        >
-          {loading ? "LOADING..." : "Create Proposal"}
-        </Button>
+        <div>
+          <label htmlFor="proposal">Proposal</label>
+          <textarea
+            value={"{}"}
+            onChange={(e) => {
+              setProposalJson(e.target.value);
+            }}
+          />
+          <Button
+            disabled={loading}
+            fullWidth
+            onClick={createProposalHandler}
+            structure="base"
+          >
+            {loading ? "LOADING..." : "Create Proposal"}
+          </Button>
+        </div>
       )}
       {icaMultisigAddress && (
         <div className="info-container">
