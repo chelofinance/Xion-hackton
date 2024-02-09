@@ -9,16 +9,18 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@burnt-labs/abstraxion": "^0.1.0-alpha.23",
-    "@burnt-labs/ui": "^0.1.0-alpha.4",
+    "@burnt-labs/abstraxion": "^1.0.0-alpha.26",
+    "@burnt-labs/ui": "^0.1.0-alpha.5",
     "next": "^14.0.4",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/uuid": "^9.0.8",
     "@typescript-eslint/eslint-plugin": "^6.19.1",
     "@typescript-eslint/parser": "^6.19.1",
     "autoprefixer": "^10.0.1",
