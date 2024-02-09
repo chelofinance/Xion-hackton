@@ -746,6 +746,7 @@ dependencies = [
  "multisig",
  "schemars",
  "serde",
+ "serde-json-wasm 1.0.1",
  "thiserror",
 ]
 

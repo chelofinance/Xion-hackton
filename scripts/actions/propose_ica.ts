@@ -5,8 +5,9 @@ import {InjectiveWasmxV1Beta1Tx} from "@injectivelabs/core-proto-ts";
 import {defaultRegistryTypes as stargateTypes} from "@cosmjs/stargate";
 import {wasmTypes, IndexedTx, CosmWasmClient} from "@cosmjs/cosmwasm-stargate";
 
-//const MULTISIG = "xion1l9cd87pqvdjmspmktszx6f54kr7ezed5jp0y8uj2z7m6s459zaksukkszd";
+//const MULTISIG = "xion14j3nqj4glkfl8lzvc422x03yvwwc9k82jkuwjzys6mdzysw7zpjq6aenzr";
 const INJECTIVE_CONTRACT_MSG_URI = "/injective.wasmx.v1.MsgExecuteContractCompat";
+const WASM_CONTRACT_MSG_URI = "/cosmwasm.wasm.v1.MsgExecuteContract";
 const executeType = InjectiveWasmxV1Beta1Tx.MsgExecuteContractCompat as GeneratedType;
 const registry = new Registry([
   [INJECTIVE_CONTRACT_MSG_URI, executeType],
@@ -21,6 +22,19 @@ const buildInjectiveContractMsg = ({value}: EncodeObject) => {
     value: {
       sender: value.sender,
       contract: value.contract,
+      msg: JSON.stringify(message),
+      funds: value.funds,
+    },
+  };
+};
+
+const buildWasmContractMsg = ({value}: EncodeObject) => {
+  const message = value.msg;
+  return {
+    typeUrl: WASM_CONTRACT_MSG_URI,
+    value: {
+      sender: value.sender,
+      contract: value.contract,
       msg: Buffer.from(JSON.stringify(message)).toString("base64"),
       funds: value.funds,
     },
@@ -29,10 +43,13 @@ const buildInjectiveContractMsg = ({value}: EncodeObject) => {
 
 const produceProposal = (args: Parameters<Action>[0]["args"]) => {
   const msg = args.message as EncodeObject;
-  const encodedMsg =
-    msg.typeUrl === INJECTIVE_CONTRACT_MSG_URI
-      ? registry.encode(buildInjectiveContractMsg(msg))
-      : registry.encode(msg);
+  let encodedMsg;
+  if (msg.typeUrl === INJECTIVE_CONTRACT_MSG_URI)
+    encodedMsg = registry.encode(buildInjectiveContractMsg(msg));
+  else if (msg.typeUrl === WASM_CONTRACT_MSG_URI)
+    encodedMsg = registry.encode(buildWasmContractMsg(msg));
+  else encodedMsg = registry.encode(msg);
+
   const controllerMessage = {
     send_cosmos_msgs: {
       messages: [
@@ -46,11 +63,8 @@ const produceProposal = (args: Parameters<Action>[0]["args"]) => {
       packet_memo: "packet meme by 0xR360",
     },
   };
-  console.log(
-    controllerMessage.send_cosmos_msgs.messages,
-    controllerMessage.send_cosmos_msgs.messages[0].stargate.value
-  );
 
+  console.log(JSON.stringify(controllerMessage));
   return {
     title: "ICA transaction",
     description: "some desc :)",
@@ -58,7 +72,7 @@ const produceProposal = (args: Parameters<Action>[0]["args"]) => {
       {
         wasm: {
           execute: {
-            contract_addr: "xion1e5hsdknjghh9gp5ep4u7g0qz0px2zvajwts7z95z09y3eupjfn7s78vmhj",
+            contract_addr: "xion1sc37w8thh9szjl74y8cje59z0amh6wra7lpmfs30lel9r2wrpa9spfcy90",
             msg: Buffer.from(JSON.stringify(controllerMessage)).toString("base64"),
             funds: [],
           },
@@ -77,7 +91,7 @@ const getProposalId = async (client: CosmWasmClient, txHash: string) => {
   return proposal_id;
 };
 
-const propose: Action = async (action) => {
+const propose_ica: Action = async (action) => {
   const {args, client} = action;
   const txList = [] as {transaction: string; height: number}[];
   const buildArgs = (msg: any) => ({...args, message: msg});
@@ -94,6 +108,7 @@ const propose: Action = async (action) => {
 
   const proposal_id = Number(await getProposalId(client, txList[0].transaction));
 
+  console.log("EXECUTE");
   buildTxs(
     await execute({
       ...action,
@@ -110,4 +125,4 @@ const propose: Action = async (action) => {
   };
 };
 
-export default propose;
+export default propose_ica;

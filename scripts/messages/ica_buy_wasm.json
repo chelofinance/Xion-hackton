@@ -1,5 +1,5 @@
 {
-  "typeUrl": "/injective.wasmx.v1.MsgExecuteContractCompat",
+  "typeUrl": "/cosmwasm.wasm.v1.MsgExecuteContract",
   "value": {
     "sender": "inj1q75sh38n4arnfck26gmuer6qvqqk7w2vajvm7qv9863xzmnj3z0q77zmsh",
     "contract": "inj1qt5ztu5l3cdkcwzsv2pe9u2mk3fq56rdckr0r7",
@@ -10,6 +10,11 @@
         "class_id": "injective"
       }
     },
-    "funds": "100000000000000000inj"
+    "funds": [
+      {
+        "denom": "inj",
+        "amount": "100000000000000000inj"
+      }
+    ]
   }
 }
