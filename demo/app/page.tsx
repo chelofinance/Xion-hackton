@@ -1,9 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Abstraxion, useAbstraxionAccount, useAbstraxionSigningClient } from "@burnt-labs/abstraxion";
+import { Abstraxion, useAbstraxionAccount, useAbstraxionSigningClient, useModal } from "@burnt-labs/abstraxion";
 import { Button } from "@burnt-labs/ui";
-import type { ExecuteResult } from "@cosmjs/cosmwasm-stargate";
 import Contracts from "@/config/contracts.config";
+import { v4 as uuidv4 } from 'uuid';
+import { createIcaMultisig, createProposal, executeProposal, getBalance, voteProposal } from "./utils";
 
 const contracts = Contracts["xion-testnet"];
 
@@ -11,108 +12,71 @@ export default function Page(): JSX.Element {
   const { data: account, isConnected } = useAbstraxionAccount();
   const { client } = useAbstraxionSigningClient();
 
-  const [isOpen, setIsOpen] = useState(false);
+  const [_, setIsOpen] = useModal();
   const [loading, setLoading] = useState(false);
-  const [instantiateResult, setInstantiateResult] = useState<ExecuteResult | undefined>(undefined);
-  const [memberAddresses, setMemberAddresses] = useState<string[]>(['xion1gh5hrkta3nze3yvut7u5507lxtje0ryz65zpzw']);
-  const [multisigAddresses, setMultisigAddresses] = useState<string[]>([]);
-
-  const blockExplorerUrl = `https://explorer.burnt.com/xion-testnet-1/tx/${instantiateResult?.transactionHash}`;
+  const [abstractAddress, setAbstractAddress] = useState<string>("");
+  const [memberAddresses, setMemberAddresses] = useState<string[]>([]);
+  const [icaMultisigAddress, setIcaMultisigAddress] = useState<string>("");
+  const [icaControllerAddress, setIcaControllerAddress] = useState<string>("");
+  const [icaAccountAddress, setIcaAccountAddress] = useState<string>("");
+  const [proposalId, setProposalId] = useState<string>("");
 
   useEffect(() => {
-    if (client) {
-      console.log("client", client);
+    async function fetchData() {
+      if (client) {
+        console.log("client", client);
+        const abstract_addr = await getAbstractAddress();
+        setAbstractAddress(abstract_addr);
+        setMemberAddresses(abstract_addr ? [abstract_addr] : []);
+      }
     }
+
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [client]);
 
-  async function getGranter() {
-    setLoading(true);
-
-    try {
-      const granter = await client?.getAccount(account.bech32Address);
-      console.log("granter", granter);
-    } catch (error) {
-      console.log("error", error);
-      alert(error);
-    } finally {
-      setLoading(false);
-    }
+  async function getAbstractAddress() {
+    const abstractAccount = await client?.getAccount(account.bech32Address);
+    return abstractAccount?.address || "";
   }
 
-  async function createMultisig() {
+  async function createIcaMultisigHandler() {
     setLoading(true);
-
-    const members = memberAddresses.map((address) => ({ addr: address, weight: 1 }));
-
-    const msg = {
-      create_multisig: {
-        members,
-        threshold: {
-          absolute_count: {
-            weight: 1,
-          },
-        },
-        max_voting_period: {
-          time: 36000,
-        },
-      }
-    };
-
-    try {
-      const instantiateResponse = await client?.execute(
-        account.bech32Address,
-        contracts.nomosFactory.address,
-        msg,
-        "auto",
-      );
-      console.log("instantiateResponse", instantiateResponse);
-      setInstantiateResult(instantiateResponse);
-
-      const create_wallet_events = instantiateResponse?.events.find(
-        (e: any) => e.type === "wasm-create_wallet"
-      );
-      console.log(JSON.stringify(create_wallet_events));
-
-      const create_membership_events = instantiateResponse?.events.find(
-        (e: any) => e.type === "wasm-create_membership"
-      );
-      console.log(JSON.stringify(create_membership_events));
-
-      const instantiate_events = instantiateResponse?.events.filter(
-        (e: any) => e.type === "instantiate"
-      );
-      console.log(JSON.stringify(instantiate_events));
-
-      setMultisigAddresses(instantiate_events?.map((e: any) => e.attributes[0].value) || []);
-
-      console.log(JSON.stringify(multisigAddresses));
-    } catch (error) {
-      console.log("error", error);
-      alert(error);
-    } finally {
-      setLoading(false);
-    }
+    const multisig_creation_response = await createIcaMultisig(client, account, contracts.icaFactory.address, memberAddresses);
+    setIcaMultisigAddress(multisig_creation_response ? multisig_creation_response.ica_multisig_address : "");
+    setIcaControllerAddress(multisig_creation_response ? multisig_creation_response.ica_controller_address : "");
+    setIcaAccountAddress(multisig_creation_response ? multisig_creation_response.ica_account_address : "");
+    setLoading(false);
   }
 
-  async function getBalances() {
+  async function createProposalHandler() {
     setLoading(true);
+    const response = await createProposal(client, account, icaMultisigAddress);
+    console.log("response", response);
+    setProposalId(response ? response.proposal_id : "");
+    setLoading(false);
+  }
 
-    try {
-      const accountBalance = await client?.getBalance(
-        account.bech32Address,
-        "uxion"
-      );
-      console.log("accountBalance", accountBalance);
+  async function voteProposalHandler(vote: any) {
+    setLoading(true);
+    const response = await voteProposal(client, account, icaMultisigAddress, proposalId, vote);
+    console.log("response", response);
+    setLoading(false);
+  }
 
-      alert(
-        `Account Balance: ${accountBalance?.amount} ${accountBalance?.denom}`
-      );
-    } catch (error) {
-      console.log("error", error);
-      alert(error);
-    } finally {
-      setLoading(false);
-    }
+
+  async function executeProposalHandler() {
+    setLoading(true);
+    const response = await executeProposal(client, account, icaMultisigAddress, proposalId);
+    console.log("response", response);
+    setLoading(false);
+  }
+
+  async function getBalanceHandler() {
+    setLoading(true);
+    const response = await getBalance(client, abstractAddress);
+    console.log("response", response);
+    setLoading(false);
   }
 
   return (
@@ -121,11 +85,8 @@ export default function Page(): JSX.Element {
       <Button fullWidth onClick={() => setIsOpen(true)} structure="base">
         {account.bech32Address ? <div>VIEW ACCOUNT</div> : "CONNECT"}
       </Button>
-      {client && (
-        <form onSubmit={(e) => {
-          e.preventDefault();
-          void createMultisig();
-        }} className="form">
+      {client && !icaMultisigAddress && (
+        <div>
           <label htmlFor="memberAddresses">Member Addresses</label>
           {memberAddresses.map((address, index) => (
             <div key={index} className="input-group">
@@ -148,81 +109,89 @@ export default function Page(): JSX.Element {
               </button>
             </div>
           ))}
-          <button type="button" onClick={() => {
+          <Button onClick={() => {
             setMemberAddresses([...memberAddresses, ""]);
           }}>
             Add New
-          </button>
-          <Button type="submit" disabled={loading} fullWidth structure="base">
+          </Button>
+
+          <Button
+            disabled={loading}
+            fullWidth
+            onClick={createIcaMultisigHandler}
+            structure="base">
             {loading ? "LOADING..." : "Create Multisig"}
           </Button>
-        </form>
+        </div>
       )}
-      {client && (
+      {abstractAddress && (
         <Button
           disabled={loading}
           fullWidth
-          onClick={getBalances}
+          onClick={getBalanceHandler}
           structure="base"
         >
           {loading ? "LOADING..." : "Get Balances"}
         </Button>
       )}
-      {client && (
+      {icaMultisigAddress && (
         <Button
           disabled={loading}
           fullWidth
-          onClick={getGranter}
+          onClick={createProposalHandler}
           structure="base"
         >
-          {loading ? "LOADING..." : "Get Granter"}
+          {loading ? "LOADING..." : "Create Proposal"}
         </Button>
       )}
-      <Abstraxion isOpen={isOpen} onClose={() => setIsOpen(false)} />
+      {proposalId && (
+        <Button
+          disabled={loading}
+          fullWidth
+          onClick={voteProposalHandler}
+          structure="base"
+        >
+          {loading ? "LOADING..." : "Vote Proposal"}
+        </Button>
+      )}
+      {proposalId && (
+        <Button
+          disabled={loading}
+          fullWidth
+          onClick={executeProposalHandler}
+          structure="base"
+        >
+          {loading ? "LOADING..." : "Execute Proposal"}
+        </Button>
+      )}
+      <Abstraxion onClose={() => setIsOpen(false)} />
 
-      {account && (
+      {abstractAddress && (
         <div className="info-container">
           <div className="info-header">
-            <span className="info-label">Grantee:</span>
-            <span className="info-value">{account.bech32Address}</span>
+            <span className="info-label">Granter:</span>
+            <span className="info-value">{abstractAddress}</span>
           </div>
         </div>
       )}
-      {instantiateResult && (
-        <div className="info-container">
-          <div className="info-content">
-            <p className="info-description">
-              <span className="info-bold">Transaction Hash</span>
-            </p>
-            <a
-              className="info-link"
-              href={blockExplorerUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {instantiateResult.transactionHash}
-            </a>
-          </div>
-        </div>
-      )}
-      {multisigAddresses.length > 0 && (
+
+      {icaMultisigAddress && (
         <div className="info-container">
           <div className="info-content">
             <p className="info-description">
               <span className="info-bold">Multisig Addresses</span>
             </p>
-            {multisigAddresses.map((address, index) => (
-              <div key={index} className="info-item">
-                <a
-                  className="info-link"
-                  href={`https://explorer.burnt.com/xion-testnet-1/account/${address}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {address}
-                </a>
-              </div>
-            ))}
+            <span className="info-value">{icaMultisigAddress}</span>
+          </div>
+        </div>
+      )}
+      {proposalId && (
+        <div className="info-container">
+          <div className="info-content">
+            <p className="info-description">
+              <span className="info-bold">Proposal ID</span>
+            </p>
+            <span className="info-value">{proposalId}</span>
           </div>
         </div>
       )}

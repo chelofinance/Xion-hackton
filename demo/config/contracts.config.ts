@@ -4,6 +4,9 @@ export type Contracts = {
     };
     nomosFactory: {
         address: string;
+    };
+    icaFactory: {
+        address: string;
     }
 };
 
@@ -16,6 +19,9 @@ const contracts: Record<SupportedNetworks, Contracts> = {
         },
         nomosFactory: {
             address: "xion1jyrjanlg6mvna42rur559t8rcscrjfrayz4flasfymyvpzvkgefs9mnylc"
+        },
+        icaFactory: {
+            address: "xion1n7p3k5ffmj4upmfuhhak6yua5psfwcsh6ejevwh53s2nj8y8sg2sdexzp9"
         }
     }
 }
