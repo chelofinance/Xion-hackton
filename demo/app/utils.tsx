@@ -85,7 +85,7 @@ function generateIcaMsg(msg: any) {
         propose: {
             title: "Test Proposal",
             description: "This is a test proposal",
-            msgs: msg ? [msg] : [], // ToDo: Add messages
+            msgs: Object.keys(msg).length === 0 ? [] : [msg], // ToDo: Add messages
         }
     };
     return ibcMsg;
@@ -97,8 +97,8 @@ export async function createProposal(client: any, account: any, icaMultisigAddre
     const msg = {}
     const ibcMsg = generateIcaMsg(msg);
 
-    console.log("ibcMsg", JSON.stringify(ibcMsg));
     console.log("icaMultisigAddress", icaMultisigAddress);
+    console.log("ibcMsg", JSON.stringify(ibcMsg));
     try {
         const executionResponse = await client?.execute(
             account.bech32Address,
@@ -161,10 +161,30 @@ export async function executeProposal(client: any, account: any, icaMultisigAddr
             "auto",
         );
         console.log("executionResponse", executionResponse);
+        return executionResponse
     } catch (error) {
         console.log("error", error);
         alert(error);
     }
+}
+
+export async function getProposalList(client: any, icaMultisigAddress: string) {
+    const msg = {
+        list_proposals: {}
+    };
+
+    try {
+        const queryResponse = await client?.queryContractSmart(
+            icaMultisigAddress,
+            msg
+        );
+        console.log("queryResponse", queryResponse);
+        return queryResponse;
+    } catch (error) {
+        console.log("error", error);
+        alert(error);
+    }
+    return [];
 }
 
 export async function getBalance(client: any, address: string) {

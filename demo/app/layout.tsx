@@ -13,7 +13,7 @@ export default function RootLayout({ children }: { children: React.ReactNode; })
   return (
     <html lang="en">
       <body className={inter.className}>
-        <AbstraxionProvider config={{ contracts: [contracts.icaFactory.address] }} > {children} </AbstraxionProvider>
+        <AbstraxionProvider config={{ contracts: [contracts.icaFactory.address].concat(contracts.hardcodedMultisigs) }} > {children} </AbstraxionProvider>
       </body>
     </html>
   );
