@@ -15,19 +15,21 @@ yarn
 Then you must create a .env with your private mnemonic from your wallet. Check the .env.example.
 
 ```shell
-yarn start --action store --contract <path/to/wasm/file> --chain <chain_name>
+yarn start --action store --contract <path/to/wasm/file> --network <chain_name>
 ```
 
 ```shell
-yarn start --action instantiate --code-id <code_id> --message <init_message_json> --chain <chain_name>
+yarn start --action instantiate --code-id <code_id> --message <init_message_json> --network <chain_name>
 ```
 
 ```shell
-yarn start --action execute --contract <contract_address> --message <message> --chain <chain_name>
+yarn start --action execute --contract <contract_address> --message <message> --network <chain_name>
 ```
 
 Counter example:
 
 ```shell
-yarn start --action query --contract neutron1zf2tdlq9pn8jq680rlsgwtsgljt54ctu0ulj8cm4s6r93mdmjuwqpurmf4 --message '{"count":{}}' --chain neutron-testnet
+yarn start --action execute --contract xion1x3sxr4wmug78yha27p6wpftt848x4nf6nhg2hfjvk89u2v8qr4hqyxc8ud --message '{"increment": {}}' --network xion-testnet
+
+yarn start --action query --contract xion1x3sxr4wmug78yha27p6wpftt848x4nf6nhg2hfjvk89u2v8qr4hqyxc8ud --message '{"get_count":{}}' --network xion-testnet
 ```
