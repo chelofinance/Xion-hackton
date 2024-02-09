@@ -5,7 +5,7 @@ export type CardColor = 'primary' | 'on_primary' | 'glass';
 export type CardSize = 'sm' | 'md';
 
 const CARD_BG_COLOR_DICT: Record<CardColor, string> = {
-  primary: 'bg-primary text-primary',
+  primary: 'bg-primary text-white',
   on_primary: 'bg-ground text-ground',
   glass: 'Bg_glass border border-solid border-primary_line_light',
 };

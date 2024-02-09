@@ -9,6 +9,7 @@ import Image from 'next/image';
 import ProgressBar from '@/components/ProgressBar';
 import CoinAmount from '@/components/CoinAmount';
 import { TokenSymbols } from '@/constants/app';
+import NFTTumbnail from '@/components/NFTThumbnail';
 
 type NFTsTableRow = {
   id: string;
@@ -69,15 +70,7 @@ const NFTsTable = ({ className = '', tooltipLayer }: NFTsTableProps) => {
 
         const nftName = item.nftName;
 
-        const nft = (
-          <section className="w-32 flex flex-col items-stretch gap-y-2">
-            <Card color="on_primary" className="w-32 h-32 flex items-center justify-center">
-              <Image src={item.imgSrc} width={128} height={128} alt="" className="object-cover" />
-            </Card>
-
-            <div className="Font_label_14px text-body truncate">{item.nftName}</div>
-          </section>
-        );
+        const nft = <NFTTumbnail imgSrc={item.imgSrc} name={item.nftName} />;
 
         const price = item.price;
         const priceFormatted = (

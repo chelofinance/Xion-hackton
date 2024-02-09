@@ -1,6 +1,6 @@
 import type { NextPage } from 'next';
 import dynamic from 'next/dynamic';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Main from '@/components/Main';
 import NFTsTable from '@/components/tables/NFTsTable';
 import MobileAppLaunchSection from '@/components/home/MobileAppLaunchSection';
@@ -8,47 +8,47 @@ import useUserAgent from '@/hooks/useUserAgent';
 import Heading from '@/components/Heading';
 import VaultSearchTextInput from '@/components/form-presets/VaultSearchTextInput';
 import Button from '@/components/Button';
-import QUERY_TALIS_TOKENS, { type QueryTalisTokensParams } from '@/data/graphql/queries/queryTalisTokens';
-import { useQuery } from '@apollo/client';
+// import QUERY_TALIS_TOKENS, { type QueryTalisTokensParams } from '@/data/graphql/queries/queryTalisTokens';
+// import { useQuery } from '@apollo/client';
 
 const AsciiGlobe = dynamic(() => import('@/components/canvases/AsciiGlobe'), {
   ssr: false,
 });
 
 const Home: NextPage = () => {
-  const { loading, error, data, refetch } = useQuery<any, QueryTalisTokensParams>(QUERY_TALIS_TOKENS, {
-    variables: {
-      input: {
-        limit: 12,
-        offset: 0,
-        sort: {
-          price: 1,
-        },
-        filter: {
-          privacy: {
-            eq: 'public',
-          },
-          onSale: {
-            eq: true,
-          },
-          isNsfw: {
-            eq: false,
-          },
-          auction_id: {
-            ge: 0,
-          },
-          auctionEndTimestamp: {
-            ge: 1706847468919,
-          },
-        },
-      },
-    },
-    pollInterval: undefined,
-  });
+  // const { loading, error, data, refetch } = useQuery<any, QueryTalisTokensParams>(QUERY_TALIS_TOKENS, {
+  //   variables: {
+  //     input: {
+  //       limit: 12,
+  //       offset: 0,
+  //       sort: {
+  //         price: 1,
+  //       },
+  //       filter: {
+  //         privacy: {
+  //           eq: 'public',
+  //         },
+  //         onSale: {
+  //           eq: true,
+  //         },
+  //         isNsfw: {
+  //           eq: false,
+  //         },
+  //         auction_id: {
+  //           ge: 0,
+  //         },
+  //         auctionEndTimestamp: {
+  //           ge: 1706847468919,
+  //         },
+  //       },
+  //     },
+  //   },
+  //   pollInterval: undefined,
+  // });
 
-  console.log('loading', loading);
-  console.log('error', error);
-  console.log('data', data);
+  // console.log('loading', loading);
+  // console.log('error', error);
+  // console.log('data', data);
 
   const { isMobile } = useUserAgent();
   const [isAppLaunched, setIsAppLaunched] = useState<boolean>(!isMobile);
