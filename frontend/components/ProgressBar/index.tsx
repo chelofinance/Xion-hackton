@@ -1,5 +1,6 @@
 import { FormatAmountOptions, formatNumber } from '@/utils/number';
 import { useMemo } from 'react';
+import CaptionAmount from '../CaptionAmount';
 
 type ProgressBarProps = {
   currentNumber: number;
@@ -19,8 +20,9 @@ const ProgressBar = ({ currentNumber, targetNumber, currentNumberCaption, format
 
   return (
     <div className={`${className} w-full flex flex-col items-end gap-y-2`}>
-      <div className="w-full flex items-baseline justify-between gap-x-1 text-body">
-        <span className="Font_data_12px_num text-caption">{percentageFormatted}%</span>
+      <div className="w-full flex items-baseline justify-end gap-x-2 text-body">
+        {/* <CaptionAmount size="sm" formattedAmount={`${percentageFormatted}%`} /> */}
+
         <div className="flex items-baseline gap-x-1">
           <span className="Font_data_16px_num">{currentNumberFormatted}</span>
           {currentNumberCaption && <span className="Font_caption_xs">{currentNumberCaption}</span>}

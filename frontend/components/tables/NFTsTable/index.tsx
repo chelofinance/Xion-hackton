@@ -10,6 +10,7 @@ import ProgressBar from '@/components/ProgressBar';
 import CoinAmount from '@/components/CoinAmount';
 import { TokenSymbols } from '@/constants/app';
 import NFTTumbnail from '@/components/NFTThumbnail';
+import CaptionAmount from '@/components/CaptionAmount';
 
 type NFTsTableRow = {
   id: string;
@@ -74,7 +75,10 @@ const NFTsTable = ({ className = '', tooltipLayer }: NFTsTableProps) => {
 
         const price = item.price;
         const priceFormatted = (
-          <CoinAmount size="md" color="body" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(12.23242, 2)} />
+          <div className="flex flex-col gap-y-1 items-end">
+            <CoinAmount size="md" color="body" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(1112.23242, 2)} />
+            <CaptionAmount size="sm" formattedAmount={formatUSD(121313111.311, { compact: true })} />
+          </div>
         );
 
         const raisedAmountUSD = item.raisedAmountUSD;
@@ -82,8 +86,8 @@ const NFTsTable = ({ className = '', tooltipLayer }: NFTsTableProps) => {
           <ProgressBar
             currentNumber={raisedAmountUSD}
             targetNumber={price}
-            formatOptions={{ currencySymbol: '$' }}
-            currentNumberCaption={`raised / ${formatUSD(price, { compact: true })}`}
+            formatOptions={{ currencySymbol: '$', compact: true}}
+            currentNumberCaption="raised"
             className="!w-[300px]"
           />
         );
@@ -124,17 +128,8 @@ const NFTsTable = ({ className = '', tooltipLayer }: NFTsTableProps) => {
             type: 'jsx',
             sortValue: 'nftName',
             sortType: 'string',
-            widthRatio: 20,
             loaderType: 'coin_label',
-          },
-          {
-            label: 'Participants',
-            value: 'participantsFormatted',
-            type: 'number',
-            align: 'right',
-            sortValue: 'participants',
-            sortType: 'number',
-            // widthRatio: 36,
+            // widthRatio: 20,
           },
           {
             label: 'Fixed Price',
@@ -143,6 +138,17 @@ const NFTsTable = ({ className = '', tooltipLayer }: NFTsTableProps) => {
             align: 'right',
             sortValue: 'price',
             sortType: 'number',
+            widthRatio: 20,
+          },
+          {
+            label: 'Participants',
+            value: 'participantsFormatted',
+            type: 'number',
+            align: 'right',
+            sortValue: 'participants',
+            sortType: 'number',
+            widthRatio: 20,
+            // widthRatio: 36,
           },
           {
             label: 'Raised Amount',

@@ -1,6 +1,4 @@
 import NumberText, { type NumberTextSize } from '@/components/NumberText';
-import CoinLabel from '@/components/CoinLabel';
-import { CoinLabelSize } from '@/components/CoinLabel/styles';
 import { TextColor } from '@/components/styles';
 import { TokenSymbols } from '@/constants/app';
 import Coin, { type CoinSize } from '@/components/Coin';

@@ -15,7 +15,7 @@ export type TextInputProps = Omit<
   form: HTMLFormElement | null;
   type: TextInputType;
   label: string;
-  errorMsg?: string;
+  getErrorMsg?: (value: string) => string | null;
   initialValue?: string;
   className?: string;
   onChange?: (value: string, isValid: boolean) => void;
@@ -29,22 +29,35 @@ const Container = ({
   className = '',
   onChange,
   label,
-  errorMsg,
+  getErrorMsg,
   ...args
 }: TextInputProps) => {
+  const { required } = args;
+
   const [value, setValue] = useState<string>(initialValue ?? '');
   const debouncedValue = useDebounce(value, 500);
 
   const [isValid, setIsValid] = useState<boolean>(true);
 
   useEffect(() => {
-    if (debouncedValue === '') {
+    if (!required && debouncedValue === '') {
       setIsValid(true);
       return;
     }
 
-    setIsValid(form?.checkValidity() ?? true);
-  }, [form, debouncedValue]);
+    const errorMsg =  getErrorMsg?.(debouncedValue);
+    if (errorMsg === null) {
+      setIsValid(true);
+      return;
+    }
+
+    if (errorMsg === undefined && form?.checkValidity() !== false) {
+      setIsValid(true);
+      return;
+    }
+
+    setIsValid(false);
+  }, [form, getErrorMsg, debouncedValue]);
 
   useEffect(() => {
     onChange?.(debouncedValue, isValid);
@@ -58,10 +71,10 @@ const Container = ({
 
   const heightClassName = 'h-[3.125rem] max-h-[3.125rem]';
   const borderClassName = '';
-  const bgClassName = `backdrop-blur-2xl border border-solid ${
+  const bgClassName = `border border-solid ${
     disabled
       ? 'border-disabled bg-disabled'
-      : 'transition-colors Transition_500 border-primary_line_light bg-glass focus-within:bg-ground hover:bg-ground'
+      : 'bg-ground transition-colors Transition_500 border-primary_line_light bg-glass focus-within:bg-white hover:bg-white'
   }`;
   const iconColorClassName = 'text-caption_dark';
   const colorClassName = `placeholder:text-caption_dark text-black ${
@@ -97,9 +110,9 @@ const Container = ({
         />
       </div>
 
-      <div id={errorBoxId} role="alert" hidden={isValid} className="text-semantic_danger Font_caption_sm mt-2 animate-fade_in">
-        {errorMsg}
-      </div>
+      {!isValid && <div id={errorBoxId} role="alert" hidden={isValid} className="text-semantic_danger Font_caption_sm animate-fade_in pt-2">
+        {getErrorMsg?.(debouncedValue)}
+      </div>}
     </div>
   );
 };

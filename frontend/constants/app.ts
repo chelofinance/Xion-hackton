@@ -35,6 +35,10 @@ export enum SupportedChains {
   XION_TESTNET = 'xion-testnet',
 };
 
+export enum AllChains {
+  INJECTIVE_TESTNET = 'Injective Testnet',
+}
+
 export const chainConfigMap: Record<SupportedChains, ContractsDict> = {
   [SupportedChains.XION_TESTNET]: {
       cw3FixedMultisig: {

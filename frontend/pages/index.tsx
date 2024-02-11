@@ -1,6 +1,6 @@
 import type { NextPage } from 'next';
 import dynamic from 'next/dynamic';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Main from '@/components/Main';
 import NFTsTable from '@/components/tables/NFTsTable';
 import MobileAppLaunchSection from '@/components/home/MobileAppLaunchSection';
@@ -8,6 +8,8 @@ import useUserAgent from '@/hooks/useUserAgent';
 import Heading from '@/components/Heading';
 import VaultSearchTextInput from '@/components/form-presets/VaultSearchTextInput';
 import Button from '@/components/Button';
+import { useRouter } from 'next/router';
+
 // import QUERY_TALIS_TOKENS, { type QueryTalisTokensParams } from '@/data/graphql/queries/queryTalisTokens';
 // import { useQuery } from '@apollo/client';
 
@@ -53,6 +55,9 @@ const Home: NextPage = () => {
   const { isMobile } = useUserAgent();
   const [isAppLaunched, setIsAppLaunched] = useState<boolean>(!isMobile);
 
+  const router = useRouter();
+  const onClickCreateVault = useCallback(() => router.push('/create-vault'), []);
+
   return (
     <>
       <AsciiGlobe className={`fixed inset-0 ${isAppLaunched ? 'hidden md:block' : ''}`} />
@@ -70,13 +75,13 @@ const Home: NextPage = () => {
             <VaultSearchTextInput
               label="Search NFT name, or address"
               placeholder="Search NFT name, or address"
-              errorMsg="Valid search value is required."
+              getErrorMsg={() => "Valid search value is required."}
               className="w-[40%] mx-auto"
             />
 
             <div className="flex items-center justify-center gap-x-4">
               <span className="text-primary">or</span>
-              <Button color="primary" size="sm" label="Create vault" iconType="arrow_forward" className="w-full md:w-fit" />
+              <Button color="primary" size="sm" label="Create vault" iconType="arrow_forward" className="w-full md:w-fit" onClick={onClickCreateVault} />
             </div>
           </section>
 

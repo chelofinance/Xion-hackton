@@ -171,19 +171,35 @@
 
     /* typography - caption */
     .Font_caption_xs {
-        @apply font-primary text-xs leading-snug font-normal;
+        @apply font-primary text-xs leading-snug font-light;
     }
     
     .Font_caption_sm {
-        @apply font-primary text-sm leading-snug font-normal;
+        @apply font-primary text-sm leading-snug font-light;
     }
 
     .Font_caption_md {
-        @apply font-primary text-base leading-snug font-normal;
+        @apply font-primary text-base leading-snug font-light;
     }
 
     .Font_caption_lg {
-        @apply font-primary text-xl leading-snug font-normal;
+        @apply font-primary text-xl leading-snug font-light;
+    }
+
+    .Font_caption_xs_num {
+        @apply font-num text-xs leading-snug font-light;
+    }
+
+    .Font_caption_sm_num {
+        @apply font-num text-sm leading-snug font-light;
+    }
+
+    .Font_caption_md_num {
+        @apply font-num text-base leading-snug font-light;
+    }
+
+    .Font_caption_lg_num {
+        @apply font-num text-xl leading-snug font-light;
     }
 
      /* padding */
