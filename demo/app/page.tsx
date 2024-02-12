@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Abstraxion, useAbstraxionAccount, useAbstraxionSigningClient, useModal } from "@burnt-labs/abstraxion";
 import { Button } from "@burnt-labs/ui";
 import Contracts from "@/config/contracts.config";
-import { createIcaMultisig, createProposal, executeProposal, getBalance, getProposalList, voteProposal } from "./utils";
+import { createIcaMultisig, createProposal, executeProposal, getBalance, getContractState, getProposalList, voteProposal } from "./utils";
 
 const contracts = Contracts["xion-testnet"];
 
@@ -19,28 +19,64 @@ export default function Page(): JSX.Element {
   const [icaControllerAddress, setIcaControllerAddress] = useState<string>("");
   const [icaAccountAddress, setIcaAccountAddress] = useState<string>("");
   const [proposals, setProposals] = useState<any[]>([]);
-  const [proposalJson, setProposalJson] = useState("{}");
+  const [proposalJson, setProposalJson] = useState(JSON.stringify({
+    "typeUrl": "/cosmos.bank.v1beta1.MsgSend",
+    "value": {
+      "fromAddress": icaAccountAddress,
+      "toAddress": icaAccountAddress, // To the same address for testing
+      "amount": [
+        {
+          "denom": "inj",
+          "amount": "12345"
+        }
+      ]
+    }
+  }));
 
   useEffect(() => {
     async function fetchData() {
       if (client) {
         console.log("client", client);
+        console.log("isConnected", isConnected);
+
         const abstract_addr = await getAbstractAddress();
         setAbstractAddress(abstract_addr);
         setMemberAddresses(abstract_addr ? [abstract_addr] : []);
 
         // For testing, let's hardcode the multisig. Ideally this should be the last created one.
         setIcaMultisigAddress(contracts.hardcodedIcaMultisig.address);
-        setIcaAccountAddress(contracts.hardcodedIcaController.address);
+        setIcaControllerAddress(contracts.hardcodedIcaController.address);
 
-        getProposalListHandler();
-        console.log("isConnected", isConnected);
       }
     }
 
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [client]);
+
+  useEffect(() => {
+    async function fetchData() {
+      if (icaMultisigAddress) {
+        getProposalListHandler();
+      }
+    }
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [icaMultisigAddress])
+
+
+  useEffect(() => {
+    async function fetchData() {
+      if (icaControllerAddress) {
+        const { contract_state, ica_account_address } = await getContractState(client, icaControllerAddress);
+        setIcaAccountAddress(ica_account_address)
+        console.log("contract_state", contract_state)
+      }
+    }
+
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [icaControllerAddress])
 
   async function getAbstractAddress() {
     const abstractAccount = await client?.getAccount(account.bech32Address);
@@ -52,7 +88,6 @@ export default function Page(): JSX.Element {
     const multisig_creation_response = await createIcaMultisig(client, account, contracts.icaFactory.address, memberAddresses);
     setIcaMultisigAddress(multisig_creation_response ? multisig_creation_response.ica_multisig_address : "");
     setIcaControllerAddress(multisig_creation_response ? multisig_creation_response.ica_controller_address : "");
-    setIcaAccountAddress(multisig_creation_response ? multisig_creation_response.ica_account_address : "");
     setLoading(false);
     // logoutAbstraxion();
   }
@@ -171,9 +206,14 @@ export default function Page(): JSX.Element {
         <div>
           <label htmlFor="proposal">Proposal</label>
           <textarea
-            value={"{}"}
+            value={proposalJson}
             onChange={(e) => {
               setProposalJson(e.target.value);
+            }}
+            style={{
+              color: 'black',
+              width: '100%',
+              height: '100%'
             }}
           />
           <Button
@@ -186,6 +226,16 @@ export default function Page(): JSX.Element {
           </Button>
         </div>
       )}
+      {abstractAddress && (
+        <div className="info-container">
+          <div className="info-content">
+            <p className="info-description">
+              <span className="info-bold">Granter Addresses</span>
+            </p>
+            <span className="info-value">{abstractAddress}</span>
+          </div>
+        </div>
+      )}
       {icaMultisigAddress && (
         <div className="info-container">
           <div className="info-content">
@@ -196,7 +246,27 @@ export default function Page(): JSX.Element {
           </div>
         </div>
       )}
-      {proposals && (
+      {icaControllerAddress && (
+        <div className="info-container">
+          <div className="info-content">
+            <p className="info-description">
+              <span className="info-bold">ICA Controller Addresses</span>
+            </p>
+            <span className="info-value">{icaControllerAddress}</span>
+          </div>
+        </div>
+      )}
+      {icaAccountAddress && (
+        <div className="info-container">
+          <div className="info-content">
+            <p className="info-description">
+              <span className="info-bold">ICA Account Addresses</span>
+            </p>
+            <span className="info-value">{icaAccountAddress}</span>
+          </div>
+        </div>
+      )}
+      {proposals.length > 0 && (
         <table>
           <caption>Proposal Details</caption>
           <thead>
@@ -243,15 +313,6 @@ export default function Page(): JSX.Element {
         </Button>
       )}
       <Abstraxion onClose={() => setIsOpen(false)} />
-
-      {abstractAddress && (
-        <div className="info-container">
-          <div className="info-header">
-            <span className="info-label">Granter:</span>
-            <span className="info-value">{abstractAddress}</span>
-          </div>
-        </div>
-      )}
     </main>
   );
 }

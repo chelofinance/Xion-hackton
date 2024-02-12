@@ -1,12 +1,10 @@
-import execute from "./execute";
-import { Action } from "../types";
 import { EncodeObject, GeneratedType, Registry } from "@cosmjs/proto-signing";
 import { InjectiveWasmxV1Beta1Tx } from "@injectivelabs/core-proto-ts";
 import { defaultRegistryTypes as stargateTypes } from "@cosmjs/stargate";
 import { wasmTypes, IndexedTx, CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
-import { required } from "../utils/args";
 
 export const INJECTIVE_CONTRACT_MSG_URI = "/injective.wasmx.v1.MsgExecuteContractCompat";
+export const WASM_CONTRACT_MSG_URI = "/cosmwasm.wasm.v1.MsgExecuteContract";
 const executeType = InjectiveWasmxV1Beta1Tx.MsgExecuteContractCompat as GeneratedType;
 
 
@@ -25,17 +23,33 @@ const buildInjectiveContractMsg = ({ value }: EncodeObject) => {
     value: {
       sender: value.sender,
       contract: value.contract,
+      msg: JSON.stringify(message),
+      funds: value.funds,
+    },
+  };
+};
+
+const buildWasmContractMsg = ({ value }: EncodeObject) => {
+  const message = value.msg;
+  return {
+    typeUrl: WASM_CONTRACT_MSG_URI,
+    value: {
+      sender: value.sender,
+      contract: value.contract,
       msg: Buffer.from(JSON.stringify(message)).toString("base64"),
       funds: value.funds,
     },
   };
 };
 
-export const produceProposalMsg = (msg: EncodeObject, icaControllerAddress: string) => {
-  const encodedMsg =
-    msg.typeUrl === INJECTIVE_CONTRACT_MSG_URI
-      ? registry.encode(buildInjectiveContractMsg(msg))
-      : registry.encode(msg);
+export const produceProposal = (msg: EncodeObject, icaControllerAddress: string) => {
+  let encodedMsg;
+  if (msg.typeUrl === INJECTIVE_CONTRACT_MSG_URI)
+    encodedMsg = registry.encode(buildInjectiveContractMsg(msg));
+  else if (msg.typeUrl === WASM_CONTRACT_MSG_URI)
+    encodedMsg = registry.encode(buildWasmContractMsg(msg));
+  else encodedMsg = registry.encode(msg);
+
   const controllerMessage = {
     send_cosmos_msgs: {
       messages: [
@@ -54,6 +68,7 @@ export const produceProposalMsg = (msg: EncodeObject, icaControllerAddress: stri
     controllerMessage.send_cosmos_msgs.messages[0].stargate.value
   );
 
+  console.log(JSON.stringify(controllerMessage));
   return {
     title: "ICA transaction",
     description: "some desc :)",

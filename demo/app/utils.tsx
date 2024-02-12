@@ -1,9 +1,9 @@
 // Utils functions for the app
 
 import { v4 as uuidv4 } from "uuid";
-import { produceProposalMsg, INJECTIVE_CONTRACT_MSG_URI } from "./propose";
+import { produceProposal, INJECTIVE_CONTRACT_MSG_URI } from "./propose";
 
-async function getContractState(client: any, ica_controller_address: string) {
+export async function getContractState(client: any, ica_controller_address: string) {
     const contract_state = await client?.queryContractSmart(ica_controller_address, { get_contract_state: {} });
     console.log("contract_state", contract_state);
 
@@ -29,8 +29,8 @@ export async function createIcaMultisig(client: any, account: any, ica_factory: 
                 }
             },
             channel_open_init_options: {
-                connection_id: "connection-39",
-                counterparty_connection_id: "connection-207"
+                connection_id: "connection-40",
+                counterparty_connection_id: "connection-208"
             },
             salt: uuidv4()
         }
@@ -39,8 +39,6 @@ export async function createIcaMultisig(client: any, account: any, ica_factory: 
 
     let ica_multisig_address = "";
     let ica_controller_address = "";
-    let contract_state = {};
-    let ica_account_address = "";
 
     try {
         const instantiateResponse = await client?.execute(
@@ -66,13 +64,7 @@ export async function createIcaMultisig(client: any, account: any, ica_factory: 
             ?.attributes.find((attr: any) => attr.key === "_contract_address")?.value;
         console.log("ica_controller_address:", ica_controller_address);
 
-        if (ica_controller_address) {
-            const { contract_state, ica_account_address } = await getContractState(client, ica_controller_address);
-            alert(`Contract State: ${JSON.stringify(contract_state)}`)
-        } else {
-            alert("No ICA Controller Address found");
-        }
-        return { ica_multisig_address, ica_controller_address, contract_state, ica_account_address };
+        return { ica_multisig_address, ica_controller_address };
 
     } catch (error) {
         console.log("error", error);
@@ -93,24 +85,14 @@ function generateIcaMsg(msg: any) {
 }
 
 
-export async function createProposal(client: any, account: any, transactionMsg: any, icaMultisigAddress: string, icaControllerAddress: string, icaAccountAddress: string) {
+export async function createProposal(client: any, account: any, injectiveMsg: any, icaMultisigAddress: string, icaControllerAddress: string, icaAccountAddress: string) {
 
     console.log("icaMultisigAddress", icaMultisigAddress);
     console.log("icaControllerAddress", icaControllerAddress);
     console.log("icaAccountAddress", icaAccountAddress);
 
-    const injectiveMsg = {
-        typeUrl: INJECTIVE_CONTRACT_MSG_URI,
-        value: {
-            contract: icaAccountAddress, // ToDo - What is this?
-            funds: "0inj",
-            msg: transactionMsg,
-            sender: "inj15ppmvhw3cq8pge8yh8znvd66d3xm5jwvckqjknjwxyfwssf0l0gslpm46p" // ToDo - What is this?
-        }
-    }
-
     const proposalMsg = {
-        propose: produceProposalMsg(injectiveMsg, icaControllerAddress)
+        propose: produceProposal(injectiveMsg, icaControllerAddress)
     }
 
 
