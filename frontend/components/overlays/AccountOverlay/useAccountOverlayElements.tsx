@@ -6,6 +6,7 @@ import { useMemo } from 'react';
 import BalanceTotal from './BalanceTotal';
 import NFTs from './NFTs';
 import Button from '@/components/Button';
+import useBalance from '@/hooks/useBalance';
 
 export type AccountOverlayProps = Omit<OverlayProps, 'ariaLabel'> & {
   wallet: ConnectedWallet;
@@ -14,6 +15,9 @@ export type AccountOverlayProps = Omit<OverlayProps, 'ariaLabel'> & {
 
 const useAccountOverlayElements = (props: AccountOverlayProps) => {
   const { wallet, onWillDisconnect } = props;
+  const balance = useBalance(wallet);
+
+  console.log('balance', balance);
 
   const formattedTotalUSD = useMemo(() => formatUSD(0), []);
 

@@ -1,48 +1,28 @@
-import { Suspense, lazy, useCallback, useMemo } from 'react';
-import { useAtom } from 'jotai';
-import { userWalletAtom } from '@/store/states';
-import useModal from '@/hooks/useModal';
-import useWallets from '@/connection/useWallets';
-import useAutoConnect from '@/connection/useAutoConnect';
+import { useMemo } from 'react';
 import type { IconType } from '@/components/Icon';
-import type { OnConnect } from '@/components/overlays/SelectWalletOverlay';
 import type { ButtonColor, ButtonStatus } from '@/components/Button/types';
 import type { ButtonProps } from '@/components/Button';
-
-const XionWalletConnectOverlay = lazy(() => import('@/components/overlays/XionWalletConnectOverlay'));
+import useConnect from '@/connection/useConnect';
+import { abstraxion } from '@/constants/wallet';
 
 const useConnectButton = (): {
   connectModalButtonProps: Pick<ButtonProps, 'status' | 'color' | 'iconType' | 'label' | 'onClick'>;
-  connectModal: ReturnType<typeof useModal>;
+  // connectModal: ReturnType<typeof useModal>;
+  connectModal: null;
 } => {
-  const wallets = useWallets();
+  // const wallets = useWallets();
 
-  const [, setUserWallet] = useAtom(userWalletAtom);
+  // const [, setUserWallet] = useAtom(userWalletAtom);
 
-  const { isConnecting } = useAutoConnect(wallets);
-  // const isConnecting = false;
-
-  const connectModal = useModal();
-
-  const onConnect: OnConnect = useCallback(
-    ({ wallet }) => {
-      setUserWallet(wallet);
-    },
-    [setUserWallet]
-  );
-
-  const openConnectModal = useCallback(async () => {
-    await connectModal.open((props) => (
-      <Suspense>
-        <XionWalletConnectOverlay {...props} id={connectModal.id} onConnect={onConnect} />
-      </Suspense>
-    ));
-  }, [connectModal, onConnect]);
+  // const { isConnecting } = useAutoConnect(Object.values(wallets));
+  const { connect, connectingWallet } = useConnect();
 
   const connectModalButtonProps = useMemo(() => {
+  const isConnecting = !!connectingWallet;
+
     const label = 'Connect';
-    const onClick = openConnectModal;
-    const status: ButtonStatus = isConnecting || connectModal.isOpen ? 'processing' : 'enabled';
+    const onClick = () => connect(abstraxion);
+    const status: ButtonStatus = isConnecting ? 'processing' : 'enabled';
     const color: ButtonColor = 'primary';
     const iconType: IconType = 'login';
 
@@ -53,11 +33,11 @@ const useConnectButton = (): {
       label,
       onClick,
     };
-  }, [openConnectModal, isConnecting, connectModal.isOpen]);
+  }, [connectingWallet, connect]);
 
   return {
     connectModalButtonProps,
-    connectModal,
+    connectModal: null,
   };
 };
 

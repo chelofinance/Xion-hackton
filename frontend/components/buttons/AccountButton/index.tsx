@@ -9,8 +9,8 @@ const AccountButton = ({ size, className = '' }: { size?: ButtonSize; className?
     <Button
       size={size}
       className={`min-w-[11.875rem] ${className}`}
-      aria-expanded={modal.isOpen}
-      aria-controls={modal.id}
+      aria-expanded={modal?.isOpen}
+      aria-controls={modal?.id}
       {...buttonProps}
     />
   );

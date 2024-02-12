@@ -17,12 +17,7 @@ const useAutoConnect = (wallets: readonly Wallet[]) => {
       const connectedWallet = await connect(wallet);
       if (!connectedWallet) return;
 
-      const { type, name, logoURL } = connectedWallet;
-      setUserWallet({
-        type,
-        name,
-        logoURL,
-      });
+      setUserWallet(connectedWallet);
     },
     [connect, setUserWallet]
   );

@@ -10,16 +10,16 @@ import { Abstraxion, useModal as useAbstraxionModal } from '@burnt-labs/abstraxi
 import WaitingSymbol from '../WaitingSymbol';
 import Image from 'next/image';
 import BURNT_LABS_LOGO_URL from '@/resources/logos/burnt_logo.svg';
+import { abstraxion } from '@/constants/wallet';
 
 export type OnConnect = (args: { wallet: Wallet }) => void;
 
 type XionWalletConnectOverlayProps = Omit<AnimatedModalProps, 'ariaLabel'> & {
-  onConnect: OnConnect;
+  onConnect?: OnConnect;
 };
 
 const XionWalletConnectOverlay = (props: XionWalletConnectOverlayProps) => {
   const { onConnect, onClose, isOpen } = props;
-
 
   const [, setShowAbstraxion] = useAbstraxionModal();
 

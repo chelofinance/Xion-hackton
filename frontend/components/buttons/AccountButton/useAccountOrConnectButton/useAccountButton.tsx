@@ -4,64 +4,58 @@ import { userWalletAtom } from '@/store/states';
 import useModal from '@/hooks/useModal';
 import type { IconType } from '@/components/Icon';
 import type { OnConnect } from '@/components/overlays/SelectWalletOverlay';
-import type { ButtonColor, ButtonStatus } from '@/components/Button/types';
+import type { ButtonColor, ButtonStatus, ButtonType } from '@/components/Button/types';
 import type { ButtonProps } from '@/components/Button';
-import { useAbstraxionAccount } from '@burnt-labs/abstraxion';
+import { shortenAddress } from '@/utils/text';
 
-const XionWalletConnectOverlay = lazy(() => import('@/components/overlays/XionWalletConnectOverlay'));
+const AccountOverlay = lazy(() => import('@/components/overlays/AccountOverlay'));
+
 
 const useAccountButton = (): {
   accountButtonProps: Pick<ButtonProps, 'status' | 'color' | 'iconType' | 'label' | 'onClick'> | null;
   accountModal: ReturnType<typeof useModal> | null;
 } => {
-  // const wallets = useWallets();
+  const [userWallet, setUserWallet] = useAtom(userWalletAtom);
 
-  const [, setUserWallet] = useAtom(userWalletAtom);
-
-  // const { isConnecting } = useAutoConnect(wallets);
-  // // const isConnecting = false;
-
-  const { data: xionAccount, isConnected: isXionAcccountConnected } = useAbstraxionAccount();
-
-  useEffect(() => {
-    console.log('xionAccount', xionAccount);
-    console.log('isXionAcccountConnected', isXionAcccountConnected);
-}, [xionAccount, isXionAcccountConnected]);
+  const disconnect = useCallback(() => {
+    setUserWallet(null);
+  }, []);
 
   const accountModal = useModal();
 
-  const onConnect: OnConnect = useCallback(
-    ({ wallet }) => {
-      setUserWallet(wallet);
-    },
-    [setUserWallet]
-  );
-
   const openAccountModal = useCallback(async () => {
+    if (userWallet === null) return;
+
     await accountModal.open((props) => (
       <Suspense>
-        <XionWalletConnectOverlay {...props} id={accountModal.id} onConnect={onConnect} />
+        <AccountOverlay wallet={userWallet} onWillDisconnect={() => {
+          const { onClose } = props;
+          disconnect();
+          onClose();
+        }} {...props} />
       </Suspense>
     ));
-  }, [accountModal, onConnect]);
+  }, [userWallet, disconnect, accountModal]);
 
   const accountButtonProps = useMemo(() => {
-    if (!isXionAcccountConnected) return null;
+    if (userWallet === null) return null;
 
-    const label = xionAccount.bech32Address;
+    const label = shortenAddress(userWallet.address);
     const onClick = openAccountModal;
-    const status: ButtonStatus = 'enabled';
     const color: ButtonColor = 'primary';
+    const type: ButtonType = 'outline';
+    const status: ButtonStatus = 'enabled';
     const iconType: IconType = 'login';
 
     return {
       status,
       color,
+      type,
       iconType,
       label,
       onClick,
     };
-  }, [openAccountModal, accountModal.isOpen, xionAccount.bech32Address, isXionAcccountConnected]);
+  }, [openAccountModal, accountModal.isOpen, userWallet]);
 
   return {
     accountButtonProps,

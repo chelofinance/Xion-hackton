@@ -5,7 +5,7 @@ import useAccountButton from './useAccountButton';
 
 const useAccountOrConnectButton = (): {
   buttonProps: Pick<ButtonProps, 'status' | 'color' | 'iconType' | 'label' | 'onClick'>;
-  modal: ReturnType<typeof useModal>;
+  modal: ReturnType<typeof useModal> | null;
 } => {
   const { accountButtonProps, accountModal } = useAccountButton();
   const { connectModalButtonProps, connectModal } = useConnectButton();

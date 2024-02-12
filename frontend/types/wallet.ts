@@ -1,19 +1,19 @@
+import type { Account } from "@cosmjs/stargate";
 
-export type WalletType = 'xion';
+export type WalletType = 'abstraxion';
 
 export type Wallet = Readonly<{
   type: WalletType;
   name: string;
   logoURL: string;
   // getConnector: () => Promise<Connector | null>;
-  onNoConnector: () => void;
+  onNoConnector?: () => void;
   isComing?: boolean;
 }>;
 
 export type ConnectedWallet = Readonly<
-  Omit<Wallet, 'getConnector' | 'onNoConnector'> 
-  // & {
-  //   account: EthAccount;
-  //   connector: Connector;
-  // }
+  Omit<Wallet, 'onNoConnector'> 
+  & {
+    account: Account;
+  }
 >;
