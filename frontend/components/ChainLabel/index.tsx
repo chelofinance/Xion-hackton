@@ -49,20 +49,23 @@ const ChainLabel = ({ chain, color = 'body', size = 'md', logoURL: injectedLogoU
   const sizeClassName = ChainLabel_SIZE_DICT[size].className;
   const opacityClassName = `transition-opacity ${isLoaded ? 'opacity-100' : 'opacity-0'}`;
 
-  const Logo = !isError && renderingLogoURL ? (
-    <Image
-      alt={`${chain} logo`}
-      src={renderingLogoURL}
-      {...pxSizes}
-      className={`rounded-full ${sizeClassName} ${opacityClassName}`}
-      onLoadingComplete={onLoaded}
-      onError={onError}
-    />
-  ) : (
-    <div aria-hidden className={`${sizeClassName} rounded-full animate-pulse`}></div>
-  );
+  const Logo =
+    !isError && renderingLogoURL ? (
+      <Image
+        alt={`${chain} logo`}
+        src={renderingLogoURL}
+        {...pxSizes}
+        className={`rounded-full ${sizeClassName} ${opacityClassName}`}
+        onLoadingComplete={onLoaded}
+        onError={onError}
+      />
+    ) : (
+      <div aria-hidden className={`${sizeClassName} rounded-full animate-pulse`}></div>
+    );
 
-  return logoOnly ? Logo : (
+  return logoOnly ? (
+    Logo
+  ) : (
     <div className="flex items-center gap-x-2">
       {Logo}
       <div className={`Font_label_14px ${colorClassName}`}>{chain}</div>

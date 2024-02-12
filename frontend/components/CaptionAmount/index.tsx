@@ -16,9 +16,7 @@ export type CaptionAmountProps = {
 const CaptionAmount = ({ formattedAmount, size, amountUnit }: CaptionAmountProps) => {
   const fontSizeClassName = TEXT_SIZE_MAPPING_DICT[size];
 
-  return (
-    <span className={`text-caption ${fontSizeClassName}`}>{formattedAmount}</span>
-  );
+  return <span className={`text-caption ${fontSizeClassName}`}>{formattedAmount}</span>;
 };
 
 export default CaptionAmount;

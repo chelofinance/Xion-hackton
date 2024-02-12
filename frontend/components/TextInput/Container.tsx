@@ -45,7 +45,7 @@ const Container = ({
       return;
     }
 
-    const errorMsg =  getErrorMsg?.(debouncedValue);
+    const errorMsg = getErrorMsg?.(debouncedValue);
     if (errorMsg === null) {
       setIsValid(true);
       return;
@@ -110,9 +110,11 @@ const Container = ({
         />
       </div>
 
-      {!isValid && <div id={errorBoxId} role="alert" hidden={isValid} className="text-semantic_danger Font_caption_sm animate-fade_in pt-2">
-        {getErrorMsg?.(debouncedValue)}
-      </div>}
+      {!isValid && (
+        <div id={errorBoxId} role="alert" hidden={isValid} className="text-semantic_danger Font_caption_sm animate-fade_in pt-2">
+          {getErrorMsg?.(debouncedValue)}
+        </div>
+      )}
     </div>
   );
 };

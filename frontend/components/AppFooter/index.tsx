@@ -30,7 +30,7 @@ const AppFooter = () => {
               type="email"
               label="Email to subscribe news"
               placeholder="Your email address"
-              getErrorMsg={() => "Valid email address is required."}
+              getErrorMsg={() => 'Valid email address is required.'}
               disabled
             />
             <Button color="on_primary" label="Subscribe" iconType="email" status="disabled" className="w-full md:w-fit" />

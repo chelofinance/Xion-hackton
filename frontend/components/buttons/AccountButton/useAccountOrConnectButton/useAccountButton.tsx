@@ -10,7 +10,6 @@ import { shortenAddress } from '@/utils/text';
 
 const AccountOverlay = lazy(() => import('@/components/overlays/AccountOverlay'));
 
-
 const useAccountButton = (): {
   accountButtonProps: Pick<ButtonProps, 'status' | 'color' | 'iconType' | 'label' | 'onClick'> | null;
   accountModal: ReturnType<typeof useModal> | null;
@@ -28,11 +27,15 @@ const useAccountButton = (): {
 
     await accountModal.open((props) => (
       <Suspense>
-        <AccountOverlay wallet={userWallet} onWillDisconnect={() => {
-          const { onClose } = props;
-          disconnect();
-          onClose();
-        }} {...props} />
+        <AccountOverlay
+          wallet={userWallet}
+          onWillDisconnect={() => {
+            const { onClose } = props;
+            disconnect();
+            onClose();
+          }}
+          {...props}
+        />
       </Suspense>
     ));
   }, [userWallet, disconnect, accountModal]);

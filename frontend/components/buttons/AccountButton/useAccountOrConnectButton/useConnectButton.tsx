@@ -18,7 +18,7 @@ const useConnectButton = (): {
   const { connect, connectingWallet } = useConnect();
 
   const connectModalButtonProps = useMemo(() => {
-  const isConnecting = !!connectingWallet;
+    const isConnecting = !!connectingWallet;
 
     const label = 'Connect';
     const onClick = () => connect(abstraxion);

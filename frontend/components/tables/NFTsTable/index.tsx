@@ -86,7 +86,7 @@ const NFTsTable = ({ className = '', tooltipLayer }: NFTsTableProps) => {
           <ProgressBar
             currentNumber={raisedAmountUSD}
             targetNumber={price}
-            formatOptions={{ currencySymbol: '$', compact: true}}
+            formatOptions={{ currencySymbol: '$', compact: true }}
             currentNumberCaption="raised"
             className="!w-[300px]"
           />
