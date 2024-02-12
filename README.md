@@ -52,7 +52,7 @@ yarn start --action query --contract neutron1zf2tdlq9pn8jq680rlsgwtsgljt54ctu0ul
 
 ### Xion addresses
 
-- factory: xion1n7p3k5ffmj4upmfuhhak6yua5psfwcsh6ejevwh53s2nj8y8sg2sdexzp9
+- factory: xion1tcx0s55pp5z7c938smnxn6e9d06mcdf0xpsrp85lyhmmwnfd0u5smetrhy
 
 - example multisig: xion1gs82e4l37phcp8hx4lj95tcqt3af4y5vnweypx9l3tklg7n6cr4qmtz0pj
 

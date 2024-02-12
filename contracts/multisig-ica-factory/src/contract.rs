@@ -2,10 +2,10 @@
 
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
-use cosmwasm_std::{Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult};
+use cosmwasm_std::{to_json_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult};
 
 use crate::error::ContractError;
-use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
+use crate::msg::{CallbacksResponses, ExecuteMsg, InstantiateMsg, QueryMsg};
 use crate::state;
 
 // version info for migration info
@@ -61,8 +61,18 @@ pub fn execute(
 
 /// Handles the query of the contract.
 #[cfg_attr(not(feature = "library"), entry_point)]
-pub fn query(_deps: Deps, _env: Env, _msg: QueryMsg) -> StdResult<Binary> {
-    unimplemented!()
+pub fn query(_deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
+    match msg {
+        QueryMsg::QueryCallbacks() => to_json_binary(&query_callbacks(_deps)?),
+    }
+}
+
+fn query_callbacks(deps: Deps) -> StdResult<CallbacksResponses> {
+    let state = state::STATE.load(deps.storage)?;
+
+    Ok(CallbacksResponses {
+        list: state.callbacks,
+    })
 }
 
 mod execute {
@@ -135,12 +145,21 @@ mod execute {
             return Err(ContractError::Unauthorized);
         }
 
+        let mut state = state::STATE.load(deps.storage)?;
+        let mut callbacks = state.callbacks;
+
+        callbacks
+            .push(serde_json_wasm::to_string(&callback_msg).unwrap_or("error parsing".to_string()));
+        state.callbacks = callbacks;
+
         // TODO: handle the callback messages?
         match callback_msg {
             IcaControllerCallbackMsg::OnChannelOpenAckCallback { .. } => {}
             IcaControllerCallbackMsg::OnAcknowledgementPacketCallback { .. } => {}
             IcaControllerCallbackMsg::OnTimeoutPacketCallback { .. } => {}
         }
+
+        state::STATE.save(deps.storage, &state)?;
 
         Ok(Response::default())
     }
