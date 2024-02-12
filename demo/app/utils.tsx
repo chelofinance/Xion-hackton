@@ -1,8 +1,9 @@
 // Utils functions for the app
 
 import { v4 as uuidv4 } from "uuid";
+import { produceProposal, INJECTIVE_CONTRACT_MSG_URI } from "./propose";
 
-async function getContractState(client: any, ica_controller_address: string) {
+export async function getContractState(client: any, ica_controller_address: string) {
     const contract_state = await client?.queryContractSmart(ica_controller_address, { get_contract_state: {} });
     console.log("contract_state", contract_state);
 
@@ -28,8 +29,8 @@ export async function createIcaMultisig(client: any, account: any, ica_factory: 
                 }
             },
             channel_open_init_options: {
-                connection_id: "connection-39",
-                counterparty_connection_id: "connection-207"
+                connection_id: "connection-40",
+                counterparty_connection_id: "connection-208"
             },
             salt: uuidv4()
         }
@@ -38,8 +39,6 @@ export async function createIcaMultisig(client: any, account: any, ica_factory: 
 
     let ica_multisig_address = "";
     let ica_controller_address = "";
-    let contract_state = {};
-    let ica_account_address = "";
 
     try {
         const instantiateResponse = await client?.execute(
@@ -65,13 +64,7 @@ export async function createIcaMultisig(client: any, account: any, ica_factory: 
             ?.attributes.find((attr: any) => attr.key === "_contract_address")?.value;
         console.log("ica_controller_address:", ica_controller_address);
 
-        if (ica_controller_address) {
-            const { contract_state, ica_account_address } = await getContractState(client, ica_controller_address);
-            alert(`Contract State: ${JSON.stringify(contract_state)}`)
-        } else {
-            alert("No ICA Controller Address found");
-        }
-        return { ica_multisig_address, ica_controller_address, contract_state, ica_account_address };
+        return { ica_multisig_address, ica_controller_address };
 
     } catch (error) {
         console.log("error", error);
@@ -85,25 +78,31 @@ function generateIcaMsg(msg: any) {
         propose: {
             title: "Test Proposal",
             description: "This is a test proposal",
-            msgs: msg ? [msg] : [], // ToDo: Add messages
+            msgs: Object.keys(msg).length === 0 ? [] : [msg], // ToDo: Add messages
         }
     };
     return ibcMsg;
 }
 
 
-export async function createProposal(client: any, account: any, icaMultisigAddress: string) {
+export async function createProposal(client: any, account: any, injectiveMsg: any, icaMultisigAddress: string, icaControllerAddress: string, icaAccountAddress: string) {
 
-    const msg = {}
-    const ibcMsg = generateIcaMsg(msg);
-
-    console.log("ibcMsg", JSON.stringify(ibcMsg));
     console.log("icaMultisigAddress", icaMultisigAddress);
+    console.log("icaControllerAddress", icaControllerAddress);
+    console.log("icaAccountAddress", icaAccountAddress);
+
+    const proposalMsg = {
+        propose: produceProposal(injectiveMsg, icaControllerAddress)
+    }
+
+
+    console.log("proposalMsg", proposalMsg);
+
     try {
         const executionResponse = await client?.execute(
             account.bech32Address,
             icaMultisigAddress,
-            ibcMsg,
+            proposalMsg,
             "auto",
         );
         console.log("executionResponse", executionResponse);
@@ -161,10 +160,30 @@ export async function executeProposal(client: any, account: any, icaMultisigAddr
             "auto",
         );
         console.log("executionResponse", executionResponse);
+        return executionResponse
     } catch (error) {
         console.log("error", error);
         alert(error);
     }
+}
+
+export async function getProposalList(client: any, icaMultisigAddress: string) {
+    const msg = {
+        list_proposals: {}
+    };
+
+    try {
+        const queryResponse = await client?.queryContractSmart(
+            icaMultisigAddress,
+            msg
+        );
+        console.log("queryResponse", queryResponse);
+        return queryResponse;
+    } catch (error) {
+        console.log("error", error);
+        alert(error);
+    }
+    return [];
 }
 
 export async function getBalance(client: any, address: string) {

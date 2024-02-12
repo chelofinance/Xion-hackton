@@ -7,7 +7,13 @@ export type Contracts = {
     };
     icaFactory: {
         address: string;
-    }
+    };
+    hardcodedIcaMultisig: {
+        address: string;
+    };
+    hardcodedIcaController: {
+        address: string;
+    };
 };
 
 export type SupportedNetworks = "xion-testnet";
@@ -21,8 +27,15 @@ const contracts: Record<SupportedNetworks, Contracts> = {
             address: "xion1jyrjanlg6mvna42rur559t8rcscrjfrayz4flasfymyvpzvkgefs9mnylc"
         },
         icaFactory: {
-            address: "xion1n7p3k5ffmj4upmfuhhak6yua5psfwcsh6ejevwh53s2nj8y8sg2sdexzp9"
+            address: "xion1tcx0s55pp5z7c938smnxn6e9d06mcdf0xpsrp85lyhmmwnfd0u5smetrhy"
+        },
+        hardcodedIcaMultisig: {
+            address: "xion1aewsem6mhjzgn35aqdaasppmr7m9as5jlzypw0e2x4k554lmd2sse4q3dr"
+        },
+        hardcodedIcaController: {
+            address: "xion1mgq8p7gkel8ttehar9u042q658y2pfhr7p8mfcjtrk6uqtgl3wzs864nud"
         }
+
     }
 }
 
