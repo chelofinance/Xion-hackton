@@ -6,18 +6,21 @@ const ICON_COLOR_CLASS_DICT: Record<ButtonType, Record<ButtonColor | 'disabled',
     primary: 'bg-white text-primary',
     on_primary: 'bg-primary text-white',
     secondary: 'bg-white text-secondary',
+    on_secondary: 'bg-secondary text-white',
     disabled: 'bg-white text-disabled',
   },
   outline: {
     primary: 'text-primary border border-solid border-primary',
     on_primary: 'text-white border border-solid border-white',
     secondary: 'text-secondary border border-solid border-secondary',
+    on_secondary: 'text-white border border-solid border-secondary',
     disabled: 'text-disabled',
   },
   text: {
     primary: 'text-primary',
     on_primary: 'text-white',
     secondary: 'text-secondary',
+    on_secondary: 'text-white',
     disabled: 'text-disabled',
   },
 };
@@ -27,16 +30,19 @@ const ICON_INVERT_COLOR_CLASS_DICT: Record<ButtonType, Record<ButtonColor, strin
     primary: 'bg-primary text-white',
     on_primary: 'bg-white text-primary',
     secondary: 'bg-secondary text-white',
+    on_secondary: 'bg-white text-secondary',
   },
   outline: {
     primary: 'text-primary border border-solid border-primary',
     on_primary: 'text-white border border-solid border-white',
     secondary: 'text-secondary border border-solid border-secondary',
+    on_secondary: 'text-white border border-solid border-secondary',
   },
   text: {
     primary: 'text-primary',
     on_primary: 'text-white',
     secondary: 'text-secondary',
+    on_secondary: 'text-white',
   },
 };
 

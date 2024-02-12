@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import useCoinLogoURL from './useCoinLogoURL';
+import useCoinLogoURL from '@/components/useCoinLogoURL';
 import { useCallback, useState } from 'react';
 import { TokenSymbols } from '@/constants/app';
 

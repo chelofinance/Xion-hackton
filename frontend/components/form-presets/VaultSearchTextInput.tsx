@@ -37,7 +37,7 @@ const VaultSearchTextInput = ({
   className?: string;
   label: string;
   placeholder: string;
-  errorMsg?: string;
+  getErrorMsg?: () => string | null;
 }) => {
   const form = useRef<HTMLFormElement>(null);
 

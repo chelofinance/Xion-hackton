@@ -1,26 +1,8 @@
-import { useCallback, useMemo } from 'react';
-import { useAtom } from 'jotai';
-import type { Wallet } from '@/types/wallet';
-import { userWalletAtom } from '@/store/states';
+import type { Wallet, WalletType } from '@/types/wallet';
+import { wallets } from '@/constants/wallet';
 
-const useWallets = (): readonly Wallet[] => {
-  const [, setUserWallet] = useAtom(userWalletAtom);
-
-  const resetUserWallet = useCallback(() => setUserWallet(null), [setUserWallet]);
-
-  const xion: Wallet = useMemo(
-    () => ({
-      type: 'xion',
-      name: 'Xion',
-      logoURL: '',
-      onNoConnector: () => {
-        window.open('https://dashboard.burnt.com/', '_blank');
-      },
-    }),
-    [resetUserWallet]
-  );
-
-  return [xion];
+const useWallets = (): Record<WalletType, Wallet> => {
+  return wallets;
 };
 
 export default useWallets;

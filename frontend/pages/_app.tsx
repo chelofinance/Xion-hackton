@@ -1,5 +1,7 @@
 'use client';
 
+import '@burnt-labs/ui/dist/index.css';
+import '@burnt-labs/abstraxion/dist/index.css';
 import '@/styles/globals.css';
 import type { AppProps } from 'next/app';
 import { DehydratedState, Hydrate, QueryClient, QueryClientProvider, useQueryErrorResetBoundary } from '@tanstack/react-query';
@@ -16,7 +18,7 @@ import useSetupTokens from '@/hooks/useSetupTokens';
 import dynamic from 'next/dynamic';
 import AppFooter from '@/components/AppFooter';
 import AnalyticsProvider from '@/hooks/useAnalytics/AnalyticsProvider';
-import { googleAnalytics, mixpanel } from '@/constants/app';
+import { abstraxionProviderConfig, googleAnalytics, mixpanel } from '@/constants/app';
 import GoogleAnalyticsReporter from '@/analytics/googleAnalytics/GoogleAnalyticsReporter';
 import MixPanelReporter from '@/analytics/mixpanel/MixPanelReporter';
 import GraphqlProvider from '@/data/graphql/GraphqlProvider';
@@ -103,7 +105,7 @@ function MyApp({ Component, pageProps }: AppProps<{ dehydratedState: DehydratedS
             <GraphqlProvider apolloClient={talisApolloClient}>
               <QueryClientProvider client={queryClientRef.current}>
                 <Hydrate state={pageProps.dehydratedState}>
-                  <AbstraxionProvider config={{ contracts: [] }}>
+                  <AbstraxionProvider config={abstraxionProviderConfig}>
                     <MetaDataUpdater />
                     <UserAgentDetector />
                     <ModalProvider>

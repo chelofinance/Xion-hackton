@@ -6,23 +6,20 @@ import type { Wallet } from '@/types/wallet';
 import type { AnimatedModalProps } from '@/components/AnimatedModal/Container';
 import useUserAgent from '@/hooks/useUserAgent';
 import BottomSheet from '@/components/BottomSheet';
-import { Abstraxion, useAbstraxionAccount, useModal as useAbstraxionModal } from '@burnt-labs/abstraxion';
-import '@burnt-labs/ui/dist/index.css';
-import '@burnt-labs/abstraxion/dist/index.css';
+import { Abstraxion, useModal as useAbstraxionModal } from '@burnt-labs/abstraxion';
 import WaitingSymbol from '../WaitingSymbol';
 import Image from 'next/image';
 import BURNT_LABS_LOGO_URL from '@/resources/logos/burnt_logo.svg';
+import { abstraxion } from '@/constants/wallet';
 
 export type OnConnect = (args: { wallet: Wallet }) => void;
 
 type XionWalletConnectOverlayProps = Omit<AnimatedModalProps, 'ariaLabel'> & {
-  onConnect: OnConnect;
+  onConnect?: OnConnect;
 };
 
 const XionWalletConnectOverlay = (props: XionWalletConnectOverlayProps) => {
   const { onConnect, onClose, isOpen } = props;
-
-  const { data: xionAccount } = useAbstraxionAccount();
 
   const [, setShowAbstraxion] = useAbstraxionModal();
 
@@ -43,13 +40,7 @@ const XionWalletConnectOverlay = (props: XionWalletConnectOverlayProps) => {
   const onCloseAbstraxion = useCallback(() => {
     setShowAbstraxion(false);
     onClose();
-  }, [onClose]);
-
-  useEffect(() => {
-    if (xionAccount) {
-      console.log('xionAccount', xionAccount);
-    }
-  }, [xionAccount]);
+  }, [setShowAbstraxion, onClose]);
 
   const Content = (
     <div>

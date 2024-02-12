@@ -6,6 +6,7 @@ const TEXT_COLOR_DICT: Record<CardColor, string> = {
   primary: 'text-ground',
   on_primary: 'text-primary',
   glass: 'text-primary',
+  secondary: 'text-white',
 };
 
 type CardLinkProps = LinkProps & {
