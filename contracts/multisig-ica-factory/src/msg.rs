@@ -3,6 +3,7 @@
 //! This module defines the messages the contract receives.
 
 use cosmwasm_schema::{cw_serde, QueryResponses};
+use cosmwasm_std::Addr;
 use cw_ica_controller::{
     // this is a macro to insert `ReceiveIcaCallback` into the `ExecuteMsg`
     helpers::ica_callback_execute,
@@ -43,6 +44,21 @@ pub enum QueryMsg {
     ///
     #[returns(CallbacksResponses)]
     QueryCallbacks(),
+
+    /// get multisigs created
+    #[returns(MultisigsResponses)]
+    QueryMultisigs(),
+
+    /// get ica controller given multisig
+    #[returns(ICAControllerResponse)]
+    QueryControllerByMultisig(Addr),
+}
+
+/// response to multisigs created
+#[cw_serde]
+pub struct MultisigsResponses {
+    /// multisigs created
+    pub multisigs: Vec<String>,
 }
 
 ///
@@ -50,4 +66,11 @@ pub enum QueryMsg {
 pub struct CallbacksResponses {
     ///
     pub list: Vec<String>,
+}
+
+///
+#[cw_serde]
+pub struct ICAControllerResponse {
+    ///
+    pub controller: String,
 }
