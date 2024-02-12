@@ -59,9 +59,9 @@ export default function Page(): JSX.Element {
 
   async function createProposalHandler() {
     setLoading(true);
+
     const response = await createProposal(client, account, JSON.parse(proposalJson), icaMultisigAddress, icaControllerAddress, icaAccountAddress);
     console.log("response", response);
-
     await getProposalListHandler();
 
     setLoading(false);

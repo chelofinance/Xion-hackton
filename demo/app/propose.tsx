@@ -6,7 +6,7 @@ import { defaultRegistryTypes as stargateTypes } from "@cosmjs/stargate";
 import { wasmTypes, IndexedTx, CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 import { required } from "../utils/args";
 
-const INJECTIVE_CONTRACT_MSG_URI = "/injective.wasmx.v1.MsgExecuteContractCompat";
+export const INJECTIVE_CONTRACT_MSG_URI = "/injective.wasmx.v1.MsgExecuteContractCompat";
 const executeType = InjectiveWasmxV1Beta1Tx.MsgExecuteContractCompat as GeneratedType;
 
 
@@ -70,54 +70,3 @@ export const produceProposalMsg = (msg: EncodeObject, icaControllerAddress: stri
     ],
   };
 };
-
-const getProposalId = async (client: CosmWasmClient, txHash: string) => {
-  const tx = await client.getTx(txHash);
-  const proposalEv = tx?.events.find((ev) => ev.type === "wasm") as IndexedTx["events"][0];
-  const proposal_id = proposalEv?.attributes.find((attr) => attr.key === "proposal_id")
-    ?.value as string;
-
-  return proposal_id;
-};
-
-const propose: Action = async (action) => {
-  const { args, client } = action;
-
-  required(args, "contract");
-  required(args, "controller");
-  required(args, "message");
-  required(args, "network");
-
-
-  const txList = [] as { transaction: string; height: number }[];
-  const buildArgs = (msg: any) => ({ ...args, message: msg });
-  const buildTxs = (action: any) => txList.push(action);
-
-  buildTxs(
-    await execute({
-      ...action,
-      args: buildArgs({
-        propose: produceProposalMsg(args.message as EncodeObject, args.controller as string),
-      }),
-    })
-  );
-
-  const proposal_id = Number(await getProposalId(client, txList[0].transaction));
-
-  buildTxs(
-    await execute({
-      ...action,
-      args: buildArgs({
-        execute: {
-          proposal_id,
-        },
-      }),
-    })
-  );
-
-  return {
-    transactions: txList,
-  };
-};
-
-export default propose;

@@ -1,7 +1,7 @@
 // Utils functions for the app
 
 import { v4 as uuidv4 } from "uuid";
-import { produceProposalMsg } from "./propose";
+import { produceProposalMsg, INJECTIVE_CONTRACT_MSG_URI } from "./propose";
 
 async function getContractState(client: any, ica_controller_address: string) {
     const contract_state = await client?.queryContractSmart(ica_controller_address, { get_contract_state: {} });
@@ -93,32 +93,34 @@ function generateIcaMsg(msg: any) {
 }
 
 
-export async function createProposal(client: any, account: any, msg: any, icaMultisigAddress: string, icaControllerAddress: string, icaAccountAddress: string) {
+export async function createProposal(client: any, account: any, transactionMsg: any, icaMultisigAddress: string, icaControllerAddress: string, icaAccountAddress: string) {
 
     console.log("icaMultisigAddress", icaMultisigAddress);
     console.log("icaControllerAddress", icaControllerAddress);
+    console.log("icaAccountAddress", icaAccountAddress);
 
-    msg = {
-        typeUrl: "/injective.wasmx.v1.MsgExecuteContractCompat",
+    const injectiveMsg = {
+        typeUrl: INJECTIVE_CONTRACT_MSG_URI,
         value: {
-            "contract": "inj1l9nh9wv24fktjvclc4zgrgyzees7rwdtx45f54", // ToDo - What is this?
-            "funds": "0inj",
-            msg,
-            "sender": "inj15ppmvhw3cq8pge8yh8znvd66d3xm5jwvckqjknjwxyfwssf0l0gslpm46p" // ToDo - What is this?
+            contract: icaAccountAddress, // ToDo - What is this?
+            funds: "0inj",
+            msg: transactionMsg,
+            sender: "inj15ppmvhw3cq8pge8yh8znvd66d3xm5jwvckqjknjwxyfwssf0l0gslpm46p" // ToDo - What is this?
         }
     }
 
-    const ibcMsg = {
-        propose: produceProposalMsg(msg, icaControllerAddress)
+    const proposalMsg = {
+        propose: produceProposalMsg(injectiveMsg, icaControllerAddress)
     }
 
-    console.log("ibcMsg", JSON.stringify(ibcMsg));
+
+    console.log("proposalMsg", proposalMsg);
 
     try {
         const executionResponse = await client?.execute(
             account.bech32Address,
             icaMultisigAddress,
-            ibcMsg,
+            proposalMsg,
             "auto",
         );
         console.log("executionResponse", executionResponse);
