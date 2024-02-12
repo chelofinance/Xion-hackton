@@ -1,6 +1,5 @@
 import type { NextPage } from 'next';
 import Main from '@/components/Main';
-import NFTsTable from '@/components/tables/NFTsTable';
 import Heading from '@/components/Heading';
 import NFTTumbnail from '@/components/NFTThumbnail';
 import Card from '@/components/Card';
@@ -9,7 +8,6 @@ import CoinAmount from '@/components/CoinAmount';
 import { AllChains, TokenSymbols } from '@/constants/app';
 import Button, { ButtonProps } from '@/components/Button';
 import ProgressBar from '@/components/ProgressBar';
-import TextInput from '@/components/TextInput';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import CaptionAmount from '@/components/CaptionAmount';
 import ChainLabel from '@/components/ChainLabel';
@@ -168,12 +166,11 @@ const RaisingVault: NextPage = () => {
                     <div className="w-1/3 h-[3.125rem] flex items-center Font_label_14px whitespace-nowrap">Deposit amount</div>
 
                     <AmountInput
-                      form={form.current}
-                      type="number"
                       required
-                      min="0"
+                      form={form.current}
+                      label="Deposit amount"
                       placeholder="0.0"
-                      initialValue={depositAmount.toString()}
+                      initialValue={depositAmount}
                       getErrorMsg={getDepositAmountErrorMsg}
                       onChange={onChange}
                     />
