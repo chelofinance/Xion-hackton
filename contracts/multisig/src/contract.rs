@@ -83,9 +83,9 @@ fn add_member(
 ) -> Result<Response, ContractError> {
     let fee_amount = fee.amount.u128();
 
-    let mut weight = u64::try_from(fee_amount / 10000).unwrap();
-    if weight >= 20 {
-        weight = 20;
+    let mut weight = u64::try_from(fee_amount / 1000000000000000).unwrap();
+    if weight > 100 {
+        weight = 100;
     }
 
     let key = deps.api.addr_validate(&address.to_string())?;
