@@ -1,12 +1,17 @@
 import { EncodeObject, GeneratedType, Registry } from "@cosmjs/proto-signing";
 import { InjectiveWasmxV1Beta1Tx } from "@injectivelabs/core-proto-ts";
 import { defaultRegistryTypes as stargateTypes } from "@cosmjs/stargate";
-import { wasmTypes, IndexedTx, CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
+import {
+  wasmTypes,
+  IndexedTx,
+  CosmWasmClient,
+} from "@cosmjs/cosmwasm-stargate";
 
-export const INJECTIVE_CONTRACT_MSG_URI = "/injective.wasmx.v1.MsgExecuteContractCompat";
+export const INJECTIVE_CONTRACT_MSG_URI =
+  "/injective.wasmx.v1.MsgExecuteContractCompat";
 export const WASM_CONTRACT_MSG_URI = "/cosmwasm.wasm.v1.MsgExecuteContract";
-const executeType = InjectiveWasmxV1Beta1Tx.MsgExecuteContractCompat as GeneratedType;
-
+const executeType =
+  InjectiveWasmxV1Beta1Tx.MsgExecuteContractCompat as GeneratedType;
 
 const allTypes: Array<[string, GeneratedType]> = [
   [INJECTIVE_CONTRACT_MSG_URI, executeType],
@@ -14,7 +19,7 @@ const allTypes: Array<[string, GeneratedType]> = [
   ...wasmTypes,
 ];
 
-const registry = new Registry(allTypes)
+const registry = new Registry(allTypes);
 
 const buildInjectiveContractMsg = ({ value }: EncodeObject) => {
   const message = value.msg;
@@ -42,7 +47,10 @@ const buildWasmContractMsg = ({ value }: EncodeObject) => {
   };
 };
 
-export const produceProposal = (msg: EncodeObject, icaControllerAddress: string) => {
+export const produceProposal = (
+  msg: EncodeObject,
+  icaControllerAddress: string
+) => {
   let encodedMsg;
   if (msg.typeUrl === INJECTIVE_CONTRACT_MSG_URI)
     encodedMsg = registry.encode(buildInjectiveContractMsg(msg));
@@ -77,8 +85,55 @@ export const produceProposal = (msg: EncodeObject, icaControllerAddress: string)
         wasm: {
           execute: {
             contract_addr: icaControllerAddress,
-            msg: Buffer.from(JSON.stringify(controllerMessage)).toString("base64"),
+            msg: Buffer.from(JSON.stringify(controllerMessage)).toString(
+              "base64"
+            ),
             funds: [],
+          },
+        },
+      },
+    ],
+  };
+};
+
+export const addMemberProposal = (
+  memberAddress: string,
+  amount: string,
+  multisigAddress: string
+) => {
+  const encodeMessage = (message: object) => {
+    return Buffer.from(JSON.stringify(message)).toString("base64");
+  };
+
+  const fee = {
+    amount,
+    denom: "uxion",
+  };
+
+  const addMemberMessage = encodeMessage({
+    add_member: {
+      address: memberAddress,
+      fee: {
+        amount,
+        denom: "uxion",
+      },
+    },
+  });
+
+  return {
+    title: "Add Member",
+    description: "Add Member)",
+    msgs: [
+      {
+        wasm: {
+          execute: {
+            contract_addr: multisigAddress,
+            msg: Buffer.from(JSON.stringify(addMemberMessage)).toString(
+              "base64"
+            ),
+            funds: [
+              fee
+            ],
           },
         },
       },

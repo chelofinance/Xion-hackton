@@ -1,7 +1,7 @@
 // Utils functions for the app
 
 import { v4 as uuidv4 } from "uuid";
-import { produceProposal, INJECTIVE_CONTRACT_MSG_URI } from "./propose";
+import { produceProposal, addMemberProposal, INJECTIVE_CONTRACT_MSG_URI } from "./propose";
 import Contracts from "@/config/contracts.config";
 
 const contracts = Contracts["xion-testnet"];
@@ -106,7 +106,6 @@ export async function createProposal(client: any, account: any, injectiveMsg: an
         propose: produceProposal(injectiveMsg, icaControllerAddress)
     }
 
-
     console.log("proposalMsg", proposalMsg);
 
     try {
@@ -209,6 +208,43 @@ export async function getBalance(client: any, address: string) {
             `Account Balance: ${accountBalance?.amount} ${accountBalance?.denom}`
         );
         return accountBalance;
+    } catch (error) {
+        console.log("error", error);
+        alert(error);
+    }
+}
+
+
+export async function addMember(client: any, 
+    account: any, 
+    memberAddress: string, 
+    amount: string,
+    multisigAddress: string) {
+
+
+    const proposalMsg = {
+        propose: addMemberProposal(memberAddress, amount, multisigAddress)
+    }
+
+    console.log("proposalMsg", proposalMsg);
+
+    try {
+        const executionResponse = await client?.execute(
+            account.bech32Address,
+            multisigAddress,
+            proposalMsg,
+            "auto",
+        );
+        console.log("executionResponse", executionResponse);
+
+        const proposal_id = executionResponse?.events.find(
+            (e: any) => e.type === "wasm"
+        )?.attributes.find(
+            (a: any) => a.key === "proposal_id"
+        )?.value;
+        console.log("proposal_id", proposal_id);
+        return { proposal_id };
+
     } catch (error) {
         console.log("error", error);
         alert(error);

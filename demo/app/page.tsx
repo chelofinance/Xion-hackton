@@ -1,9 +1,19 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Abstraxion, useAbstraxionAccount, useAbstraxionSigningClient, useModal } from "@burnt-labs/abstraxion";
+import {
+  Abstraxion,
+  useAbstraxionAccount,
+  useAbstraxionSigningClient,
+  useModal,
+} from "@burnt-labs/abstraxion";
 import { Button } from "@burnt-labs/ui";
 import Contracts from "@/config/contracts.config";
-import { createIcaMultisig, createProposal, executeProposal, getBalance, getIcaAccountAddress, getIcaControllerAddress, getProposalList, voteProposal } from "./utils";
+import {
+  createIcaMultisig, createProposal, executeProposal, getBalance, 
+  getIcaAccountAddress, getIcaControllerAddress, getProposalList, 
+  voteProposal, addMember
+} from "./utils";
+
 
 const contracts = Contracts["xion-testnet"];
 
@@ -13,6 +23,7 @@ export default function Page(): JSX.Element {
 
   const [_, setIsOpen] = useModal();
   const [loading, setLoading] = useState(false);
+  const [addMemberLoading, setAddMemberLoading] = useState(false);
   const [abstractAddress, setAbstractAddress] = useState<string>("");
   const [memberAddresses, setMemberAddresses] = useState<string[]>([]);
   const [icaMultisigAddress, setIcaMultisigAddress] = useState<string>("");
@@ -20,19 +31,24 @@ export default function Page(): JSX.Element {
   const [channelInitInfo, setChannelInitInfo] = useState<any>({});
   const [icaAccountAddress, setIcaAccountAddress] = useState<string>("");
   const [proposals, setProposals] = useState<any[]>([]);
-  const [proposalJson, setProposalJson] = useState(JSON.stringify({
-    "typeUrl": "/cosmos.bank.v1beta1.MsgSend",
-    "value": {
-      "fromAddress": icaAccountAddress,
-      "toAddress": icaAccountAddress, // To the same address for testing
-      "amount": [
-        {
-          "denom": "inj",
-          "amount": "12345"
-        }
-      ]
-    }
-  }));
+  const [proposalJson, setProposalJson] = useState(
+    JSON.stringify({
+      typeUrl: "/cosmos.bank.v1beta1.MsgSend",
+      value: {
+        fromAddress: icaAccountAddress,
+        toAddress: icaAccountAddress, // To the same address for testing
+        amount: [
+          {
+            denom: "inj",
+            amount: "12345",
+          },
+        ],
+      },
+    })
+  );
+
+  const [newMemberAddress, setNewMemberAddress] = useState<string>("");
+  const [feeAmount, setFeeAmount] = useState<string>("0");
 
   useEffect(() => {
     async function fetchData() {
@@ -63,15 +79,14 @@ export default function Page(): JSX.Element {
     }
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [icaMultisigAddress])
-
+  }, [icaMultisigAddress]);
 
   useEffect(() => {
     if (icaControllerAddress) {
       getIcaAccountAddressHandler();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [icaControllerAddress])
+  }, [icaControllerAddress]);
 
   async function getAbstractAddress() {
     const abstractAccount = await client?.getAccount(account.bech32Address);
@@ -99,7 +114,14 @@ export default function Page(): JSX.Element {
   async function createProposalHandler() {
     setLoading(true);
 
-    const response = await createProposal(client, account, JSON.parse(proposalJson), icaMultisigAddress, icaControllerAddress, icaAccountAddress);
+    const response = await createProposal(
+      client,
+      account,
+      JSON.parse(proposalJson),
+      icaMultisigAddress,
+      icaControllerAddress,
+      icaAccountAddress
+    );
     console.log("response", response);
     await getProposalListHandler();
 
@@ -108,7 +130,13 @@ export default function Page(): JSX.Element {
 
   async function voteProposalHandler(proposalId: any, vote: any) {
     setLoading(true);
-    const response = await voteProposal(client, account, icaMultisigAddress, proposalId, vote);
+    const response = await voteProposal(
+      client,
+      account,
+      icaMultisigAddress,
+      proposalId,
+      vote
+    );
     console.log("response", response);
     setLoading(false);
   }
@@ -134,7 +162,12 @@ export default function Page(): JSX.Element {
 
   async function executeProposalHandler(proposalId: any) {
     setLoading(true);
-    const response = await executeProposal(client, account, icaMultisigAddress, proposalId);
+    const response = await executeProposal(
+      client,
+      account,
+      icaMultisigAddress,
+      proposalId
+    );
     console.log("response", response);
     await getProposalListHandler();
     setLoading(false);
@@ -145,6 +178,21 @@ export default function Page(): JSX.Element {
     const response = await getBalance(client, abstractAddress);
     console.log("response", response);
     setLoading(false);
+  }
+
+  async function addMemberHandler() {
+    setAddMemberLoading(true);
+
+    const response = await addMember(client, 
+      account, 
+      newMemberAddress, 
+      feeAmount,
+      icaMultisigAddress)
+
+    console.log("response", response);
+    await getProposalListHandler();
+    setNewMemberAddress("");
+    setAddMemberLoading(false);
   }
 
   return (
@@ -168,18 +216,23 @@ export default function Page(): JSX.Element {
                 }}
                 className="text-input"
               />
-              <button type="button" onClick={() => {
-                const updatedAddresses = [...memberAddresses];
-                updatedAddresses.splice(index, 1);
-                setMemberAddresses(updatedAddresses);
-              }}>
+              <button
+                type="button"
+                onClick={() => {
+                  const updatedAddresses = [...memberAddresses];
+                  updatedAddresses.splice(index, 1);
+                  setMemberAddresses(updatedAddresses);
+                }}
+              >
                 Remove
               </button>
             </div>
           ))}
-          <Button onClick={() => {
-            setMemberAddresses([...memberAddresses, ""]);
-          }}>
+          <Button
+            onClick={() => {
+              setMemberAddresses([...memberAddresses, ""]);
+            }}
+          >
             Add New
           </Button>
 
@@ -187,7 +240,8 @@ export default function Page(): JSX.Element {
             disabled={loading}
             fullWidth
             onClick={createIcaMultisigHandler}
-            structure="base">
+            structure="base"
+          >
             {loading ? "LOADING..." : "Create Multisig"}
           </Button>
         </div>
@@ -204,26 +258,60 @@ export default function Page(): JSX.Element {
       )}
       {icaMultisigAddress && (
         <div>
-          <label htmlFor="proposal">Proposal</label>
-          <textarea
-            value={proposalJson}
+          <div>
+            <label htmlFor="proposal">Proposal</label>
+            <textarea
+              value={proposalJson}
+              onChange={(e) => {
+                setProposalJson(e.target.value);
+              }}
+              style={{
+                color: "black",
+                width: "100%",
+                height: "100%",
+              }}
+            />
+            <Button
+              disabled={loading}
+              fullWidth
+              onClick={createProposalHandler}
+              structure="base"
+            >
+              {loading ? "LOADING..." : "Create Proposal"}
+            </Button>
+          </div>
+          <div>
+          <br/>
+          <h3>Add New Member</h3>
+            Address: 
+            <input type="text" name="new_member_address" 
+            value={newMemberAddress}
             onChange={(e) => {
-              setProposalJson(e.target.value);
+              setNewMemberAddress(e.target.value);
             }}
             style={{
-              color: 'black',
-              width: '100%',
-              height: '100%'
+              color: "black",
             }}
-          />
-          <Button
-            disabled={loading}
-            fullWidth
-            onClick={createProposalHandler}
-            structure="base"
-          >
-            {loading ? "LOADING..." : "Create Proposal"}
-          </Button>
+            />
+            <br/>
+            Fee: <br/><input type="text" name="fee_amount" 
+            style={{
+              color: "black",
+            }}
+            value={feeAmount}
+            onChange={(e) => {
+              setFeeAmount(e.target.value);
+            }} /> uxion <br/>
+            <br/>
+            <Button
+              disabled={addMemberLoading}
+              fullWidth
+              onClick={addMemberHandler}
+              structure="base"
+            >
+              {addMemberLoading ? "LOADING..." : "Add Member"}
+            </Button>
+          </div>
         </div>
       )}
       {abstractAddress && (
@@ -301,15 +389,24 @@ export default function Page(): JSX.Element {
                 <td>{proposal.description}</td>
                 <td>{proposal.status}</td>
                 <td>
-                  <button disabled={loading} onClick={() => voteProposalHandler(proposal.id, true)}>
+                  <button
+                    disabled={loading}
+                    onClick={() => voteProposalHandler(proposal.id, true)}
+                  >
                     {loading ? "LOADING..." : "Yes"}
                   </button>
-                  <button disabled={loading} onClick={() => voteProposalHandler(proposal.id, false)}>
+                  <button
+                    disabled={loading}
+                    onClick={() => voteProposalHandler(proposal.id, false)}
+                  >
                     {loading ? "LOADING..." : "No"}
                   </button>
                 </td>
                 <td>
-                  <button disabled={loading} onClick={() => executeProposalHandler(proposal.id)}>
+                  <button
+                    disabled={loading}
+                    onClick={() => executeProposalHandler(proposal.id)}
+                  >
                     {loading ? "LOADING..." : "Execute"}
                   </button>
                 </td>
