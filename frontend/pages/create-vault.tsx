@@ -6,12 +6,12 @@ import NFTTumbnail from '@/components/NFTThumbnail';
 import Card from '@/components/Card';
 import {formatNumber, formatUSD} from '@/utils/number';
 import CoinAmount from '@/components/CoinAmount';
-import {TokenSymbols} from '@/constants/app';
+import {AppChains, TokenSymbols} from '@/constants/app';
 import Button from '@/components/Button';
 import {ButtonStatus} from '@/components/Button/types';
 import {useAbstraxionAccount, useAbstraxionSigningClient} from '@burnt-labs/abstraxion';
 import {createIcaMultisig} from '@/utils/multisig';
-import {chainConfigMap, SupportedChains} from '@/constants/app';
+import {chainConfigMap} from '@/constants/app';
 
 const NFT_DETAIL: {
   id: string;
@@ -43,7 +43,7 @@ const CreateVault: NextPage = () => {
       const ica_multisig_address_response = await createIcaMultisig(
         client,
         account,
-        chainConfigMap[SupportedChains.XION_TESTNET].icaFactory.address,
+        chainConfigMap[AppChains.XION_TESTNET].icaFactory.address,
         [abstractAccount?.address || '']
       );
       setVault(ica_multisig_address_response?.ica_multisig_address);

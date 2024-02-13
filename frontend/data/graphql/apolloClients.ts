@@ -56,7 +56,6 @@ const getApolloClient = (httpURI: string, jwt?: string): ApolloClient<Normalized
   });
 
   return client;
-  return null;
 }
 
 const apolloClients: AppApolloClients = {

@@ -11,7 +11,7 @@ import Button from '@/components/Button';
 import {ButtonStatus} from '@/components/Button/types';
 import {useAbstraxionAccount, useAbstraxionSigningClient} from '@burnt-labs/abstraxion';
 import {createProposal} from '@/utils/multisig';
-import {chainConfigMap, SupportedChains} from '@/constants/app';
+import {chainConfigMap, AppChains} from '@/constants/app';
 import {injectiveClient, transferInjective} from '@/utils/injective';
 import {InjectiveSigningStargateClient} from '@injectivelabs/sdk-ts/dist/cjs/core/stargate';
 import {createIcaBuyMsg} from '@/utils/ica';
@@ -30,7 +30,7 @@ const NFT_DETAIL: {
   participants: 13133,
 };
 
-const CONFIG = chainConfigMap[SupportedChains.XION_TESTNET];
+const CONFIG = chainConfigMap[AppChains.XION_TESTNET];
 const INJECTIVE_ID = 'injective-888';
 
 const createKeplrSigner = async () => {

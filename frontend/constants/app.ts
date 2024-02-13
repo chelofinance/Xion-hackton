@@ -60,15 +60,22 @@ export const CHAIN_METADATA_DICT: Record<AllChains, { explorerAddressURL: string
 
 export const chainConfigMap: Record<AppChains, ContractsDict> = {
   [AppChains.XION_TESTNET]: {
-      cw3FixedMultisig: {
-          codeId: 50
-      },
-      nomosFactory: {
-          address: 'xion1jyrjanlg6mvna42rur559t8rcscrjfrayz4flasfymyvpzvkgefs9mnylc'
-      },
-      icaFactory: {
-          address: 'xion1n7p3k5ffmj4upmfuhhak6yua5psfwcsh6ejevwh53s2nj8y8sg2sdexzp9'
-      }
+    cw3FixedMultisig: {
+      codeId: 50,
+      address: 'xion1tunl6hq335lhpjawvzfm6djk8mthaua3725fl7jhpgwdkxrr3qyqcn43ng', //placeholder addr
+    },
+    icaController: {
+      address: 'xion1yylkaz0u4gef9n77m3dmarq6wmjwgzlhrrveu45cv9neh582m36q0aq33m',
+    },
+    icaAccount: {
+      address: 'inj1a0nmuld00el7qap2yr9awp7pfzudmut5n73eyz28q9307c6atjesqq0qzw',
+    },
+    nomosFactory: {
+      address: 'xion1jyrjanlg6mvna42rur559t8rcscrjfrayz4flasfymyvpzvkgefs9mnylc',
+    },
+    icaFactory: {
+      address: 'xion1v84yekkwnvperl9gjx80knxan7x3l6d0w7az5pp8p4t0e6zcamks93efuc',
+    },
   }
 }
 
