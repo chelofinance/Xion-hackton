@@ -51,6 +51,9 @@
       "@/store/*": [
         "store/*"
       ],
+      "@/struct/*": [
+        "struct/*"
+      ],
       "@/styles/*": [
         "styles/*"
       ],
