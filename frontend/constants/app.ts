@@ -1,6 +1,5 @@
 import GoogleAnalytics from '@/analytics/googleAnalytics/GoogleAnalytics';
 import Mixpanel from '@/analytics/mixpanel/Mixpanel';
-// import ChainLogoOsmosis from "@/resources/logos/chain_logo_osmosis.png";
 import XION_CHAIN_LOGO from "@/resources/logos/chain_logo_xion.png";
 import type { NFTVault } from '@/types/asset';
 import { ContractsDict } from '@/types/contract';
@@ -79,9 +78,15 @@ export const chainConfigMap: Record<AppChains, ContractsDict> = {
   }
 }
 
-export const abstraxionProviderConfig = { 
-  contracts: [chainConfigMap[AppChains.XION_TESTNET].icaFactory.address],
- };
+export const abstraxionProviderConfig = {
+  contracts: [
+    chainConfigMap[AppChains.XION_TESTNET].icaFactory.address,
+    chainConfigMap[AppChains.XION_TESTNET].cw3FixedMultisig.address,
+  ],
+};
+
+export const INJECTIVE_RPC = 'https://testnet.sentry.tm.injective.network:443';
+export const INJECTIVE_ID = 'injective-888';
 
 /**
  *
