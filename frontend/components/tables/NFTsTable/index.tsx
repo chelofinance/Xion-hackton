@@ -1,16 +1,17 @@
-import { useCallback, useMemo } from 'react';
+import {useCallback, useMemo} from 'react';
 import Table from '@/components/Table';
 import Heading from '@/components/Heading';
 import useUserAgent from '@/hooks/useUserAgent';
 import Card from '@/components/Card';
-import { formatNumber, formatUSD } from '@/utils/number';
-import type { TooltipLayer } from '@/components/Tooltip/styles';
+import {formatNumber, formatUSD} from '@/utils/number';
+import type {TooltipLayer} from '@/components/Tooltip/styles';
 import Image from 'next/image';
 import ProgressBar from '@/components/ProgressBar';
 import CoinAmount from '@/components/CoinAmount';
-import { TokenSymbols } from '@/constants/app';
+import {TokenSymbols} from '@/constants/app';
 import NFTTumbnail from '@/components/NFTThumbnail';
 import CaptionAmount from '@/components/CaptionAmount';
+import {useRouter} from 'next/router';
 
 type NFTsTableRow = {
   id: string;
@@ -37,33 +38,35 @@ const HOT_NFT_DEALS: {
   raisedAmountUSD: number;
   participants: number;
 }[] = [
-  {
-    id: 'MultiSig 1',
-    nftName: 'Monkey - 2004(WOOD)',
-    imgSrc: 'https://images.talis.art/tokens/6582d0be4a3988d286be0f9c/mediaThumbnail',
-    price: 13131313133,
-    raisedAmountUSD: 11111381919,
-    participants: 13133,
-  },
-  {
-    id: 'MultiSig 2',
-    nftName: 'Injective Vandals #341',
-    imgSrc: 'https://images.talis.art/tokens/65a091fb10709e02588e13da/mediaThumbnail',
-    price: 22414,
-    raisedAmountUSD: 4140,
-    participants: 111,
-  },
-  {
-    id: 'MultiSig 3',
-    nftName: 'Crypto Lady',
-    imgSrc: 'https://talis-protocol.mo.cloudinary.net/inj/families/65b2e902e6b67bb48ef359fb/miniaturePicture',
-    price: 131313,
-    raisedAmountUSD: 138,
-    participants: 467,
-  },
-];
+    {
+      id: '1',
+      nftName: 'Monkey - 2004(WOOD)',
+      imgSrc: 'https://images.talis.art/tokens/6582d0be4a3988d286be0f9c/mediaThumbnail',
+      price: 13131313133,
+      raisedAmountUSD: 11111381919,
+      participants: 13133,
+    },
+    {
+      id: '2',
+      nftName: 'Injective Vandals #341',
+      imgSrc: 'https://images.talis.art/tokens/65a091fb10709e02588e13da/mediaThumbnail',
+      price: 22414,
+      raisedAmountUSD: 4140,
+      participants: 111,
+    },
+    {
+      id: '3',
+      nftName: 'Crypto Lady',
+      imgSrc: 'https://talis-protocol.mo.cloudinary.net/inj/families/65b2e902e6b67bb48ef359fb/miniaturePicture',
+      price: 131313,
+      raisedAmountUSD: 138,
+      participants: 467,
+    },
+  ];
 
-const NFTsTable = ({ className = '', tooltipLayer }: NFTsTableProps) => {
+const NFTsTable = ({className = '', tooltipLayer}: NFTsTableProps) => {
+  const router = useRouter();
+
   const rows = useMemo<readonly NFTsTableRow[]>(() => {
     return (
       HOT_NFT_DEALS?.map((item) => {
@@ -77,7 +80,7 @@ const NFTsTable = ({ className = '', tooltipLayer }: NFTsTableProps) => {
         const priceFormatted = (
           <div className="flex flex-col gap-y-1 items-end">
             <CoinAmount size="md" color="body" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(1112.23242, 2)} />
-            <CaptionAmount size="sm" formattedAmount={formatUSD(121313111.311, { compact: true })} />
+            <CaptionAmount size="sm" formattedAmount={formatUSD(121313111.311, {compact: true})} />
           </div>
         );
 
@@ -86,7 +89,7 @@ const NFTsTable = ({ className = '', tooltipLayer }: NFTsTableProps) => {
           <ProgressBar
             currentNumber={raisedAmountUSD}
             targetNumber={price}
-            formatOptions={{ currencySymbol: '$', compact: true }}
+            formatOptions={{currencySymbol: '$', compact: true}}
             currentNumberCaption="raised"
             className="!w-[300px]"
           />
@@ -111,7 +114,7 @@ const NFTsTable = ({ className = '', tooltipLayer }: NFTsTableProps) => {
   }, []);
 
   const onRowClick = useCallback((row: NFTsTableRow) => {
-    console.log('row', row);
+    router.push(`/nft/${row.id}`);
   }, []);
 
   const Content = useMemo<JSX.Element>(() => {
@@ -160,14 +163,14 @@ const NFTsTable = ({ className = '', tooltipLayer }: NFTsTableProps) => {
             widthPx: 400,
           },
         ]}
-        // isLoading={isExchangesDataLoading || isExchangesMetadataLoading}
+      // isLoading={isExchangesDataLoading || isExchangesMetadataLoading}
       >
         <Table.FieldRow />
       </Table>
     );
   }, [rows, tooltipLayer]);
 
-  const { isMobile } = useUserAgent();
+  const {isMobile} = useUserAgent();
 
   return (
     <article className={`space-y-4 ${className}`}>
