@@ -12,6 +12,7 @@ const COLOR_CLASS_DICT = TEXT_COLOR_CLASS_DICT;
 
 const CHAIN_REP_TOKEN_SYMBOL_DICT: Record<AllChains, TokenSymbols> = {
   [AllChains.INJECTIVE_TESTNET]: TokenSymbols.INJ,
+  [AllChains.XION_TESTNET]: TokenSymbols.XION,
 };
 
 const ChainLabel_SIZE_DICT: Record<ChainLabelSize, { px: number; className: string }> = {
