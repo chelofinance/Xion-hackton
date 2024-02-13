@@ -31,7 +31,6 @@ type NFTsTableProps = {
   tooltipLayer: TooltipLayer;
 };
 
-
 const NFTsTable = ({ className = '', tooltipLayer }: NFTsTableProps) => {
   const { getOraclePrice } = useOraclePrice();
   const vaults = useRaisingNFTVaults();
@@ -87,9 +86,12 @@ const NFTsTable = ({ className = '', tooltipLayer }: NFTsTableProps) => {
 
   const router = useRouter();
 
-  const onRowClick = useCallback((row: NFTsTableRow) => {
-    router.push(`/raising-vault/${row.id}`);
-  }, [router]);
+  const onRowClick = useCallback(
+    (row: NFTsTableRow) => {
+      router.push(`/raising-vault/${row.id}`);
+    },
+    [router]
+  );
 
   const Content = useMemo<JSX.Element>(() => {
     return (

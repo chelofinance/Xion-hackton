@@ -35,7 +35,7 @@ const useAccountOverlayElements = (props: AccountOverlayProps) => {
       const oraclePrice = getOraclePrice(vault.floorPrice.symbol);
       const priceUSD = new BigNumber(vault.floorPrice.value).times(oraclePrice);
 
-      const share = vault.multisig.voters.find(voter => voter.addr === wallet.account.address)?.share ?? 0;
+      const share = vault.multisig.voters.find((voter) => voter.addr === wallet.account.address)?.share ?? 0;
       const shareUSD = priceUSD.times(share);
 
       return accm.plus(shareUSD);
@@ -55,8 +55,9 @@ const useAccountOverlayElements = (props: AccountOverlayProps) => {
         <h4 className="Font_label_14px">Raising Vaults</h4>
 
         <div className="flex flex-col gap-4 items-stretch">
-          {raisingVaults.map(vault => (
+          {raisingVaults.map((vault) => (
             <NFTVaultLinkCard
+              key={vault.contract.address}
               href="raising-vault"
               nftVault={vault}
               amountLabel="My deposit"
@@ -70,8 +71,9 @@ const useAccountOverlayElements = (props: AccountOverlayProps) => {
         <h4 className="Font_label_14px">My Vaults</h4>
 
         <div className="flex flex-col gap-4 items-stretch">
-          {ownedVaults.map(vault => (
+          {ownedVaults.map((vault) => (
             <NFTVaultLinkCard
+              key={vault.contract.address}
               href="my-vault"
               nftVault={vault}
               amountLabel="My share"

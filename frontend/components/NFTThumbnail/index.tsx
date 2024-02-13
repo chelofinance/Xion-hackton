@@ -39,12 +39,12 @@ const NFTTumbnail = ({ imgSrc, name, size = 'md', className = '' }: NFTTumbnailP
         color="on_primary"
         className={`group/nft flex items-center justify-center ${sizes.classNames.width} ${sizes.classNames.height}`}
       >
-        <Image 
-          src={imgSrc} 
-          width={sizes.pxSize} 
-          height={sizes.pxSize} 
-          alt={name ?? 'NFT thumbnail'} 
-          className="object-cover Transition_500 transition-transform group-hover/nft:scale-105" 
+        <Image
+          src={imgSrc}
+          width={sizes.pxSize}
+          height={sizes.pxSize}
+          alt={name ?? 'NFT thumbnail'}
+          className="object-cover Transition_500 transition-transform group-hover/nft:scale-105"
         />
       </Card>
 

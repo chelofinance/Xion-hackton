@@ -19,7 +19,7 @@ const AccountOverlay = (props: AccountOverlayProps) => {
     // alternatives: routeChangeComplete
     router.events.on('routeChangeStart', onClose);
   }, [router.events, onClose]);
-    
+
   const { Content, DisconnectButton } = useAccountOverlayElements(props);
 
   const { isMobile } = useUserAgent();

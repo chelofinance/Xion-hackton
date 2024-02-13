@@ -26,7 +26,7 @@ const RaisingVault: NextPage = () => {
   const params = useParams<{ address: string }>();
 
   const vault = useRaisingNFTVault(params.address);
-  
+
   const [isDepositFormOpen, setIsDepositFormOpen] = useState<boolean>(false);
 
   const onClickParticipate = useCallback(() => {
@@ -65,8 +65,7 @@ const RaisingVault: NextPage = () => {
   const priceUSD = useMemo(() => new BigNumber(vault.floorPrice.value).times(oraclePrice), [oraclePrice]);
   const raisedAmountUSD = useMemo(() => new BigNumber(vault.raisedAmount).times(oraclePrice), [oraclePrice]);
 
-  const formattedCompactPriceUSD =
-    priceUSD.gte(1000) ? ` (${formatUSD(priceUSD, { compact: true, semiequate: true })})` : '';
+  const formattedCompactPriceUSD = priceUSD.gte(1000) ? ` (${formatUSD(priceUSD, { compact: true, semiequate: true })})` : '';
   const formattedPriceUSD = `${formatUSD(priceUSD)}${formattedCompactPriceUSD}`;
 
   const getDepositAmountErrorMsg = useCallback(
@@ -82,16 +81,22 @@ const RaisingVault: NextPage = () => {
     [minDepositAmount, maxDepositAmount]
   );
 
-  const openExplorer = useCallback((address: string) => {
-    const url = `${CHAIN_METADATA_DICT[vault.chain].explorerAddressURL}/${address}`
-    window.open(url, '_blank');
-  }, [vault.chain]);
+  const openExplorer = useCallback(
+    (address: string) => {
+      const url = `${CHAIN_METADATA_DICT[vault.chain].explorerAddressURL}/${address}`;
+      window.open(url, '_blank');
+    },
+    [vault.chain]
+  );
 
   const [userWallet] = useAtom(userWalletAtom);
 
   const { raisingVaults: myRaisingVaults } = useMyNFTVaults(userWallet?.account.address);
 
-  const myVault = useMemo<MyNFTVault | undefined>(() => myRaisingVaults.find(myVault => myVault.contract.address === vault.contract.address), [myRaisingVaults, vault.contract.address]);
+  const myVault = useMemo<MyNFTVault | undefined>(
+    () => myRaisingVaults.find((myVault) => myVault.contract.address === vault.contract.address),
+    [myRaisingVaults, vault.contract.address]
+  );
 
   return (
     <Main className="flex flex-col items-stretch min-h-screen pt-app_header_height pb-page_bottom md:mx-page_x">
@@ -103,10 +108,10 @@ const RaisingVault: NextPage = () => {
             <NFTTumbnail size="xl" imgSrc={vault.imgSrc} />
 
             <div className="flex items-center gap-x-2">
-              <Button 
-                type="outline" 
-                size="xs" 
-                iconType="external_link" 
+              <Button
+                type="outline"
+                size="xs"
+                iconType="external_link"
                 label={`See NFT details`}
                 onClick={() => openExplorer(vault.contract.address)}
               />
@@ -125,10 +130,10 @@ const RaisingVault: NextPage = () => {
                   <div className="h-6 flex flex-col justify-center Font_label_14px">My deposit</div>
                   <NumberText color="on_primary" formattedNumber={formatUSD(myVault.shareUSD)} />
                 </div>
-                
+
                 <div className="flex items-center justify-between gap-x-4">
                   <div className="h-6 flex flex-col justify-center Font_label_14px">My share</div>
-                  <NumberText color="on_primary" formattedNumber={formatNumber(myVault.share * 100)} unit='%' />
+                  <NumberText color="on_primary" formattedNumber={formatNumber(myVault.share * 100)} unit="%" />
                 </div>
               </Card>
             )}
