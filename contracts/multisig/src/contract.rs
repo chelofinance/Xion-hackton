@@ -83,7 +83,7 @@ fn add_member(
 ) -> Result<Response, ContractError> {
     let fee_amount = fee.amount.u128();
 
-    let mut weight = u64::try_from(fee_amount % 10000).unwrap();
+    let mut weight = u64::try_from(fee_amount / 10000).unwrap();
     if weight >= 20 {
         weight = 20;
     }
