@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import LabelText from '@/components/LabelText';
 import LoadingRows from '@/components/LoadingRows';
-import NFT from '@/components/NFT';
+import NFTCard from '@/components/NFT';
 import OverlayGrid from '@/components/OverlayGrid';
 import { shortenAddress } from '@/utils/text';
 import CaptionText from '@/components/CaptionText';
 import NumberText from '@/components/NumberText';
 import { formatNumber } from '@/utils/number';
-import type { OwnedNFT } from '@/types/asset';
+import type { NFT } from '@/types/asset';
 import { TEXT_COLOR_CLASS_DICT } from '@/components/styles';
 
 /**
@@ -24,25 +24,25 @@ import { TEXT_COLOR_CLASS_DICT } from '@/components/styles';
 // ];
 
 type NFTsProps = {
-  ownedNFTs: readonly OwnedNFT[];
-  isOwnedNFTsLoading: boolean;
+  ownedNFTs: readonly NFT[];
+  isNFTsLoading: boolean;
 };
 
-const NFTs = ({ ownedNFTs, isOwnedNFTsLoading }: NFTsProps) => {
+const NFTs = ({ ownedNFTs, isNFTsLoading }: NFTsProps) => {
   const isNFTsExpandable = useMemo<boolean>(() => {
     return ownedNFTs.length > 5 ?? false;
   }, [ownedNFTs.length]);
 
-  const getNFTThumbnailURL = useCallback((ownedNFT: OwnedNFT, index: number) => {
+  const getNFTThumbnailURL = useCallback((ownedNFT: NFT, index: number) => {
     // return index === 0 ? ownedNFT.media[0]?.thumbnail ?? ownedNFT.rawMetadata?.image : DUMMY_IMG_URLS[index - 1];
-    return ownedNFT.media[0]?.thumbnail ?? ownedNFT.rawMetadata?.image;
+    return ownedNFT.imgSrc;
   }, []);
 
   /**
    *
    * @description to highlight hovered NFT data
    */
-  const [hoveredNFT, setHoveredNFT] = useState<OwnedNFT>(ownedNFTs[0]);
+  const [hoveredNFT, setHoveredNFT] = useState<NFT>(ownedNFTs[0]);
   useEffect(() => {
     setHoveredNFT(ownedNFTs[0]);
   }, [ownedNFTs]);
@@ -53,7 +53,7 @@ const NFTs = ({ ownedNFTs, isOwnedNFTsLoading }: NFTsProps) => {
     <section className="px-1 py-3">
       <LabelText size="sm" text="NFTs" className="mb-3" />
 
-      {isOwnedNFTsLoading ? (
+      {isNFTsLoading ? (
         <>
           <LoadingRows color="on_primary" fontClassName="text-[5rem]" className="w-[1em]" />
           <LoadingRows color="on_primary" fontClassName="text-[1rem]" className="w-[1em] mt-1" />
@@ -63,10 +63,10 @@ const NFTs = ({ ownedNFTs, isOwnedNFTsLoading }: NFTsProps) => {
           <OverlayGrid xUnitPx={32} isExpandable={isNFTsExpandable}>
             {ownedNFTs?.map((ownedNFT, index) => (
               <OverlayGrid.Item key={ownedNFT.contract.address}>
-                <NFT
+                <NFTCard
                   key={ownedNFT.contract.address}
-                  name={ownedNFT.rawMetadata?.name}
-                  mediaFormat={ownedNFT.media[0]?.format}
+                  name={ownedNFT.nftName}
+                  // mediaFormat={ownedNFT.media[0]?.format}
                   thumbnailURL={getNFTThumbnailURL(ownedNFT, index)}
                   onMouseEnter={() => setHoveredNFT(ownedNFT)}
                   onMouseLeave={() => setHoveredNFT(ownedNFTs[0])}
@@ -80,7 +80,7 @@ const NFTs = ({ ownedNFTs, isOwnedNFTsLoading }: NFTsProps) => {
               <CaptionText
                 color="on_primary"
                 size="xs"
-                text={hoveredNFT.rawMetadata?.name ?? shortenAddress(hoveredNFT.contract.address, 4, 4)}
+                text={hoveredNFT.nftName ?? shortenAddress(hoveredNFT.contract.address, 4, 4)}
                 shadowText={ownedNFTs[1] ? `and ${ownedNFTs.length - 1} more` : undefined}
               />
 

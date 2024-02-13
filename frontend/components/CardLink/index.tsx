@@ -10,7 +10,7 @@ const TEXT_COLOR_DICT: Record<CardColor, string> = {
 };
 
 type CardLinkProps = LinkProps & {
-  label: string;
+  label: string | JSX.Element;
   color?: CardColor;
   className?: string;
 };
@@ -30,7 +30,7 @@ const CardLink = ({ label, color = 'primary', className = '', ...props }: CardLi
   return (
     <Link {...props} className={`group/card-link block ${hoverAnimationClassName} ${className}`}>
       <Card color={color} size="sm" className={`${cardGridClassName}`}>
-        <span className={`${fontClassName} ${colorClassName}`}>{label}</span>
+        {typeof label === 'string' ? <span className={`${fontClassName} ${colorClassName}`}>{label}</span> : label}
         <Icon type="arrow_forward" className={`${hoverIconAnimationClassName} ${colorClassName}`} />
       </Card>
     </Link>

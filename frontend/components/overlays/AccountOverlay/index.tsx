@@ -3,11 +3,23 @@ import Button from '@/components/Button';
 import useUserAgent from '@/hooks/useUserAgent';
 import BottomSheet from '@/components/BottomSheet';
 import useAccountOverlayElements, { AccountOverlayProps } from './useAccountOverlayElements';
+import { useEffect } from 'react';
+import router from 'next/router';
 
 const ARIA_LABEL = 'Connected wallet account';
 
 const AccountOverlay = (props: AccountOverlayProps) => {
-  const { isOpen } = props;
+  const { isOpen, onClose } = props;
+
+  /**
+   *
+   * @todo replace with remote hook
+   */
+  useEffect(() => {
+    // alternatives: routeChangeComplete
+    router.events.on('routeChangeStart', onClose);
+  }, [router.events, onClose]);
+    
   const { Content, DisconnectButton } = useAccountOverlayElements(props);
 
   const { isMobile } = useUserAgent();

@@ -35,7 +35,8 @@ const useMouseEffect = (active = false) => {
         : {
             backgroundSize: '200% 200%',
             backgroundImage:
-              'linear-gradient(89.94deg, rgba(255, 199, 127, 0) 43.24%, rgba(255, 199, 127, 0.15) 52.09%, rgba(255, 199, 127, 0) 60.93%)',
+              // 'linear-gradient(89.94deg, rgba(255, 199, 127, 0) 43.24%, rgba(255, 199, 127, 0.15) 52.09%, rgba(255, 199, 127, 0) 60.93%)',
+              'linear-gradient(89.94deg, rgba(255, 255, 255, 0) 43.24%, rgba(255, 255, 255, 0.6) 52.09%, rgba(255, 255, 255, 0) 60.93%)',
             backgroundPosition: `calc((100 - ${mouseX.toFixed(2)}) * 1%) calc((100 - ${mouseY.toFixed(2)}) * 1%)`,
           },
     [mouseX, mouseY]

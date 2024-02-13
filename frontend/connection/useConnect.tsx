@@ -11,6 +11,7 @@ import { useAtom } from 'jotai';
 import { userWalletAtom } from '@/store/states';
 import useModal from '@/hooks/useModal';
 import type { Account } from '@cosmjs/stargate';
+import { FAKE_ABSTRAXION_ADDRESS } from '@/constants/app';
 
 const XionWalletConnectOverlay = lazy(() => import('@/components/overlays/XionWalletConnectOverlay'));
 
@@ -28,13 +29,24 @@ const useConnectAbstraxion = () => {
       return abstractAccount ?? null;
   }, [abstraxionClient]);
 
+  /**
+   * 
+   * @todo roll back to real one after test
+   */
   const getConnectingWallet = useCallback(async (): Promise<ConnectingWallet | null> => {
-    if (isXionAcccountConnected) {
-      const account = await getAbstraxionAccountFrom(xionAccount.bech32Address);
-      return { ...abstraxion, account };
-    } else {
-      return null;
-    }
+    return { ...abstraxion, account: {
+      address: FAKE_ABSTRAXION_ADDRESS,
+      pubkey: null,
+      accountNumber: 0,
+      sequence: 0,
+    } };
+
+    // if (isXionAcccountConnected) {
+    //   const account = await getAbstraxionAccountFrom(xionAccount.bech32Address);
+    //   return { ...abstraxion, account };
+    // } else {
+    //   return null;
+    // }
   }, [getAbstraxionAccountFrom, xionAccount.bech32Address, isXionAcccountConnected]);
 
   const abstraxionModal = useModal();

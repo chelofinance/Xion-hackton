@@ -11,8 +11,8 @@ export const THRD_PARTY_SERVICES: readonly {
   //   description: '',
   // },
   {
-    title: 'CoinMarketCap API',
-    href: 'https://coinmarketcap.com/api',
-    description: 'This app uses CoinMarketCap API to fetch off-chain data such as orcle price.',
+    title: 'Talis Testnet',
+    href: 'https://talis.art',
+    description: 'This app uses Talis testnet market data to show the list of NFTs.',
   },
 ];
