@@ -29,12 +29,12 @@ export const TEXTS = {
 export const IS_DEV = process.env.NODE_ENV === 'development';
 
 /**
- * 
+ *
  * @description supported chains and contracts map
  */
 export enum AppChains {
   XION_TESTNET = 'xion-testnet',
-};
+}
 
 export const SUPPORTED_CHAINS_DICT: Record<AppChains, { logoURL: string }> = {
   [AppChains.XION_TESTNET]: {
@@ -77,7 +77,7 @@ export const abstraxionProviderConfig = {
  };
 
 /**
- * 
+ *
  * @description the below types are tmp for wireframing
  */
 export enum TokenSymbols {

@@ -1,6 +1,6 @@
-import type { NextPage } from 'next';
+import type {NextPage} from 'next';
 import dynamic from 'next/dynamic';
-import { useCallback, useState } from 'react';
+import {useCallback, useState} from 'react';
 import Main from '@/components/Main';
 import NFTsTable from '@/components/tables/NFTsTable';
 import MobileAppLaunchSection from '@/components/home/MobileAppLaunchSection';
@@ -8,7 +8,7 @@ import useUserAgent from '@/hooks/useUserAgent';
 import Heading from '@/components/Heading';
 import VaultSearchTextInput from '@/components/form-presets/VaultSearchTextInput';
 import Button from '@/components/Button';
-import { useRouter } from 'next/router';
+import {useRouter} from 'next/router';
 
 const AsciiGlobe = dynamic(() => import('@/components/canvases/AsciiGlobe'), {
   ssr: false,

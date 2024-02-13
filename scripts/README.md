@@ -49,6 +49,19 @@ With it you will get the ica controller address and your multisig address
 hermes start
 ```
 
+You can also relay the packet manually. For this get the transaction hash of your multisig deployment and search for the following in the logs:
+
+- src port: should be "wasm.<ica_controller_address>"
+- src channel: should be under the name channel_id
+- dst-connection: you sent it on the factory message as "counterparty_connection_id"
+- dst-port: should be "icahost"
+
+After this run the command:
+
+```
+hermes tx chan-open-try --dst-chain injective-888 --src-chain xion-testnet-1 --dst-connection <counterparty_connection_id> --dst-port icahost --src-port wasm.<ica_controller_addr> --src-channel <src-channel>
+```
+
 3 - Replace ICA account, multisig and ica controller on scritps used for this process.
 You can get the ICA by running
 

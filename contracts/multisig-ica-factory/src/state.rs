@@ -27,8 +27,11 @@ mod contract {
         /// This is the code id of the multisig contract that is used
         pub cw3_multisig_code_id: u64,
 
-        /// store callbacks messages
+        /// store callbacks messages. For debugging
         pub callbacks: Vec<String>,
+
+        /// store multisigs created
+        pub multisigs: Vec<String>,
     }
 
     impl State {
@@ -38,6 +41,7 @@ mod contract {
                 cw_ica_controller_code: CwIcaControllerCode::new(cw_ica_controller_code_id),
                 cw3_multisig_code_id,
                 callbacks: vec![],
+                multisigs: vec![],
             }
         }
     }

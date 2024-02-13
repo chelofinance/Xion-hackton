@@ -2,10 +2,15 @@
 
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
-use cosmwasm_std::{to_json_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult};
+use cosmwasm_std::{
+    to_json_binary, Addr, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult,
+};
 
 use crate::error::ContractError;
-use crate::msg::{CallbacksResponses, ExecuteMsg, InstantiateMsg, QueryMsg};
+use crate::msg::{
+    CallbacksResponses, ExecuteMsg, ICAControllerResponse, InstantiateMsg, MultisigsResponses,
+    QueryMsg,
+};
 use crate::state;
 
 // version info for migration info
@@ -64,6 +69,10 @@ pub fn execute(
 pub fn query(_deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
         QueryMsg::QueryCallbacks() => to_json_binary(&query_callbacks(_deps)?),
+        QueryMsg::QueryMultisigs() => to_json_binary(&query_multisigs(_deps)?),
+        QueryMsg::QueryControllerByMultisig(multisig) => {
+            to_json_binary(&query_controller_by_multisig(_deps, multisig)?)
+        }
     }
 }
 
@@ -72,6 +81,22 @@ fn query_callbacks(deps: Deps) -> StdResult<CallbacksResponses> {
 
     Ok(CallbacksResponses {
         list: state.callbacks,
+    })
+}
+
+fn query_multisigs(deps: Deps) -> StdResult<MultisigsResponses> {
+    let state = state::STATE.load(deps.storage)?;
+
+    Ok(MultisigsResponses {
+        multisigs: state.multisigs,
+    })
+}
+
+fn query_controller_by_multisig(deps: Deps, multisig: Addr) -> StdResult<ICAControllerResponse> {
+    let controller = state::MULTISIG_ICA.load(deps.storage, &multisig)?;
+
+    Ok(ICAControllerResponse {
+        controller: controller.to_string(),
     })
 }
 
@@ -127,8 +152,12 @@ mod execute {
                 salt,
             )?;
 
+        let mut state = state::STATE.load(deps.storage)?;
+        state.multisigs.push(multisig_addr.to_string());
+
         state::MULTISIG_ICA.save(deps.storage, &multisig_addr, &cw_ica_controller_address)?;
         state::ICA_MULTISIG.save(deps.storage, &cw_ica_controller_address, &multisig_addr)?;
+        state::STATE.save(deps.storage, &state)?;
 
         Ok(Response::new()
             .add_message(multisig_init_cosmos_msg)

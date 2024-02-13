@@ -3,38 +3,38 @@
 import '@burnt-labs/ui/dist/index.css';
 import '@burnt-labs/abstraxion/dist/index.css';
 import '@/styles/globals.css';
-import type { AppProps } from 'next/app';
-import { DehydratedState, Hydrate, QueryClient, QueryClientProvider, useQueryErrorResetBoundary } from '@tanstack/react-query';
-import { Suspense, useRef } from 'react';
+import type {AppProps} from 'next/app';
+import {DehydratedState, Hydrate, QueryClient, QueryClientProvider, useQueryErrorResetBoundary} from '@tanstack/react-query';
+import {Suspense, useRef} from 'react';
 import queryClient from '@/data/queryClient';
 import Fallback from '@/components/Fallback';
 import Head from 'next/head';
-import { NextSeo } from 'next-seo';
-import { SEO } from 'next-seo.config';
+import {NextSeo} from 'next-seo';
+import {SEO} from 'next-seo.config';
 import SentryErrorBoundary from '@/components/ErrorBoundary/SentryErrorBoundary';
 import AppHeader from '@/components/AppHeader';
-import { ModalProvider } from '@/hooks/useModal/ModalProvider';
+import {ModalProvider} from '@/hooks/useModal/ModalProvider';
 import useSetupTokens from '@/hooks/useSetupTokens';
 import dynamic from 'next/dynamic';
 import AppFooter from '@/components/AppFooter';
 import AnalyticsProvider from '@/hooks/useAnalytics/AnalyticsProvider';
-import { abstraxionProviderConfig, googleAnalytics, mixpanel } from '@/constants/app';
+import {abstraxionProviderConfig, googleAnalytics, mixpanel} from '@/constants/app';
 import GoogleAnalyticsReporter from '@/analytics/googleAnalytics/GoogleAnalyticsReporter';
 import MixPanelReporter from '@/analytics/mixpanel/MixPanelReporter';
 import GraphqlProvider from '@/data/graphql/GraphqlProvider';
-import { useAtom } from 'jotai';
-import { apolloClientsAtom } from '@/store/states';
-import { AbstraxionProvider } from '@burnt-labs/abstraxion';
+import {useAtom} from 'jotai';
+import {apolloClientsAtom} from '@/store/states';
+import {AbstraxionProvider} from '@burnt-labs/abstraxion';
 
-const UserAgentDetector = dynamic(() => import('@/components/UserAgentDetector'), { ssr: false });
+const UserAgentDetector = dynamic(() => import('@/components/UserAgentDetector'), {ssr: false});
 
 const MetaDataUpdater = () => {
   useSetupTokens();
   return null;
 };
 
-function MyApp({ Component, pageProps }: AppProps<{ dehydratedState: DehydratedState }>) {
-  const { reset } = useQueryErrorResetBoundary();
+function MyApp({Component, pageProps}: AppProps<{dehydratedState: DehydratedState}>) {
+  const {reset} = useQueryErrorResetBoundary();
 
   /**
    *
@@ -51,7 +51,7 @@ function MyApp({ Component, pageProps }: AppProps<{ dehydratedState: DehydratedS
     });
   }
 
-  const [{ talisApolloClient }] = useAtom(apolloClientsAtom);
+  const [{talisApolloClient}] = useAtom(apolloClientsAtom);
 
   return (
     <>

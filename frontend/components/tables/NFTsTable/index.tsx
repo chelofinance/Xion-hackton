@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import {useCallback, useMemo} from 'react';
 import Table from '@/components/Table';
 import Heading from '@/components/Heading';
 import useUserAgent from '@/hooks/useUserAgent';
@@ -60,7 +60,7 @@ const NFTsTable = ({ className = '', tooltipLayer }: NFTsTableProps) => {
           <ProgressBar
             currentNumber={raisedAmountUSD.toNumber()}
             targetNumber={price}
-            formatOptions={{ currencySymbol: '$', compact: true }}
+            formatOptions={{currencySymbol: '$', compact: true}}
             currentNumberCaption="raised"
             className="!w-[300px]"
           />
@@ -140,14 +140,14 @@ const NFTsTable = ({ className = '', tooltipLayer }: NFTsTableProps) => {
             widthPx: 400,
           },
         ]}
-        // isLoading={isExchangesDataLoading || isExchangesMetadataLoading}
+      // isLoading={isExchangesDataLoading || isExchangesMetadataLoading}
       >
         <Table.FieldRow />
       </Table>
     );
   }, [rows, tooltipLayer]);
 
-  const { isMobile } = useUserAgent();
+  const {isMobile} = useUserAgent();
 
   return (
     <article className={`space-y-4 ${className}`}>

@@ -10,11 +10,13 @@ import {required} from "../utils/args";
 const INJECTIVE_CONTRACT_MSG_URI = "/injective.wasmx.v1.MsgExecuteContractCompat";
 const WASM_CONTRACT_MSG_URI = "/cosmwasm.wasm.v1.MsgExecuteContract";
 const executeType = InjectiveWasmxV1Beta1Tx.MsgExecuteContractCompat as GeneratedType;
-const registry = new Registry([
+const allTypes: Array<[string, GeneratedType]> = [
   [INJECTIVE_CONTRACT_MSG_URI, executeType],
   ...stargateTypes,
   ...wasmTypes,
-]);
+];
+
+const registry = new Registry(allTypes)
 
 const buildInjectiveContractMsg = ({value}: EncodeObject) => {
   const message = value.msg;

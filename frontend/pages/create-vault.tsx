@@ -1,13 +1,17 @@
-import type { NextPage } from 'next';
+import React from 'react';
+import type {NextPage} from 'next';
 import Main from '@/components/Main';
-import NFTsTable from '@/components/tables/NFTsTable';
 import Heading from '@/components/Heading';
 import NFTTumbnail from '@/components/NFTThumbnail';
 import Card from '@/components/Card';
-import { formatNumber, formatUSD } from '@/utils/number';
+import {formatNumber, formatUSD} from '@/utils/number';
 import CoinAmount from '@/components/CoinAmount';
-import { TokenSymbols } from '@/constants/app';
+import {TokenSymbols} from '@/constants/app';
 import Button from '@/components/Button';
+import {ButtonStatus} from '@/components/Button/types';
+import {useAbstraxionAccount, useAbstraxionSigningClient} from '@burnt-labs/abstraxion';
+import {createIcaMultisig} from '@/utils/multisig';
+import {chainConfigMap, SupportedChains} from '@/constants/app';
 
 const NFT_DETAIL: {
   id: string;
@@ -26,6 +30,30 @@ const NFT_DETAIL: {
 };
 
 const CreateVault: NextPage = () => {
+  const [status, setStatus] = React.useState<ButtonStatus>('enabled');
+  const {client} = useAbstraxionSigningClient();
+  const {data: account, isConnected} = useAbstraxionAccount();
+  const [vault, setVault] = React.useState('');
+
+  const handleCreateVault = async () => {
+    try {
+      setStatus('processing');
+
+      const abstractAccount = await client?.getAccount(account.bech32Address);
+      const ica_multisig_address_response = await createIcaMultisig(
+        client,
+        account,
+        chainConfigMap[SupportedChains.XION_TESTNET].icaFactory.address,
+        [abstractAccount?.address || '']
+      );
+      setVault(ica_multisig_address_response?.ica_multisig_address);
+
+      setStatus('enabled');
+    } catch (err) {
+      console.log('RALPH ERR: ', err);
+    }
+  };
+
   return (
     <Main className="flex flex-col items-stretch min-h-screen pt-app_header_height pb-page_bottom md:mx-page_x">
       <Heading tagName="h2">Create Vault</Heading>
@@ -47,9 +75,18 @@ const CreateVault: NextPage = () => {
                 </div>
               </div>
             </Card>
+            <div className="h-6 flex flex-col justify-center">{vault.length > 0 && `Vault: ${vault}`}</div>
 
             <div className="flex justify-end">
-              <Button color="primary" size="lg" label="Create vault" iconType="arrow_forward" className="w-full md:w-fit" />
+              <Button
+                color="primary"
+                size="lg"
+                label="Create vault"
+                iconType="arrow_forward"
+                className="w-full md:w-fit"
+                onClick={handleCreateVault}
+                status={status}
+              />
             </div>
           </div>
         </div>

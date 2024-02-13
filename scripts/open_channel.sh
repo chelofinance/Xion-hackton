@@ -1,0 +1,1 @@
+hermes tx chan-open-try --dst-chain injective-888 --src-chain xion-testnet-1 --dst-connection connection-209 --dst-port icahost --src-port wasm.xion1yylkaz0u4gef9n77m3dmarq6wmjwgzlhrrveu45cv9neh582m36q0aq33m --src-channel channel-119

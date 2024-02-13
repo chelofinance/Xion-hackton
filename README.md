@@ -47,12 +47,12 @@ yarn start --action query --contract neutron1zf2tdlq9pn8jq680rlsgwtsgljt54ctu0ul
 ### Xion code ids for each contract
 
 - ica_controller: 59
-- multisig: 73
-- factory: 74
+- multisig: 158
+- factory: 159
 
 ### Xion addresses
 
-- factory: xion1tcx0s55pp5z7c938smnxn6e9d06mcdf0xpsrp85lyhmmwnfd0u5smetrhy
+- factory: xion1qmjxqd2j3vgcjrc9ea70qae2rkf28tced4sv50twmuxshzrxyfsq7saj9e
 
 - example multisig: xion1gs82e4l37phcp8hx4lj95tcqt3af4y5vnweypx9l3tklg7n6cr4qmtz0pj
 
