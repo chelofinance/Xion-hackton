@@ -262,7 +262,10 @@ export default function Page(): JSX.Element {
             <p className="info-description">
               <span className="info-bold">Run this command</span>
             </p>
-            <span className="info-value">{"hermes tx chan-open-try --dst-chain injective-888 --src-chain xion-testnet-1 --dst-connection "}{contracts.channelOpenInitOptions.counterpartyConnectionId}{" --dst-port "}{channelInitInfo?.destination_port}{" --src-port "}{channelInitInfo?.src_port_id}{" --src-channel "}{channelInitInfo.src_channel_id}</span>
+            <button className="info-value" onClick={(e: any) => {
+              navigator.clipboard.writeText(e.target.textContent)
+              alert("Command copied to clipboard. Please execute it in your terminal.")
+            }}>{"hermes tx chan-open-try --dst-chain injective-888 --src-chain xion-testnet-1 --dst-connection "}{contracts.channelOpenInitOptions.counterpartyConnectionId}{" --dst-port "}{channelInitInfo?.destination_port}{" --src-port "}{channelInitInfo?.src_port_id}{" --src-channel "}{channelInitInfo.src_channel_id}</button>
           </div>
         </div>
       )}
