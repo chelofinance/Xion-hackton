@@ -176,7 +176,9 @@ export default function Page(): JSX.Element {
   async function getBalanceHandler() {
     setLoading(true);
     const response = await getBalance(client, abstractAddress);
-    console.log("response", response);
+    const response2 = await getBalance(client, icaMultisigAddress);
+    console.log(abstractAddress, response);
+    console.log(icaMultisigAddress, response2)
     setLoading(false);
   }
 

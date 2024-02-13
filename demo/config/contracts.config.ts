@@ -19,11 +19,11 @@ export type SupportedNetworks = "xion-testnet";
 const contracts: Record<SupportedNetworks, Contracts> = {
     "xion-testnet": {
         channelOpenInitOptions: {
-            connectionId: "connection-40",
-            counterpartyConnectionId: "connection-208"
+            connectionId: "connection-42",
+            counterpartyConnectionId: "connection-210"
         },
         cw3FixedMultisig: {
-            codeId: 50
+            codeId: 157
         },
         icaFactory: {
             address: "xion1v84yekkwnvperl9gjx80knxan7x3l6d0w7az5pp8p4t0e6zcamks93efuc"
