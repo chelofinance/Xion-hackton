@@ -308,9 +308,15 @@ export default function Page(): JSX.Element {
             onChange={(e) => {
               setNewMemberAddress(e.target.value);
             }}
+            style={{
+              color: "black",
+            }}
             />
             <br/>
             Fee: <br/><input type="text" name="fee_amount" 
+            style={{
+              color: "black",
+            }}
             value={feeAmount}
             onChange={(e) => {
               setFeeAmount(e.target.value);

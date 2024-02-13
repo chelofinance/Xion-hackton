@@ -98,7 +98,7 @@ export const produceProposal = (
 
 export const addMemberProposal = (
   memberAddress: string,
-  amount: Number,
+  amount: string,
   multisigAddress: string
 ) => {
   const encodeMessage = (message: object) => {
@@ -109,7 +109,7 @@ export const addMemberProposal = (
     amount,
     denom: "uxion",
   };
-  
+
   const addMemberMessage = encodeMessage({
     add_member: {
       address: memberAddress,

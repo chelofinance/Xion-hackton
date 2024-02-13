@@ -207,7 +207,7 @@ export async function getBalance(client: any, address: string) {
 export async function addMember(client: any, 
     account: any, 
     memberAddress: string, 
-    amount: Number,
+    amount: string,
     multisigAddress: string) {
 
 
