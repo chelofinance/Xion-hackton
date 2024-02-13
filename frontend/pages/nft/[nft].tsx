@@ -12,7 +12,7 @@ import {ButtonStatus} from '@/components/Button/types';
 import {useAbstraxionAccount, useAbstraxionSigningClient} from '@burnt-labs/abstraxion';
 import {createProposal} from '@/utils/multisig';
 import {chainConfigMap, AppChains} from '@/constants/app';
-import {injectiveClient, transferInjective} from '@/utils/injective';
+import {injectiveClient} from '@/utils/injective';
 import {InjectiveSigningStargateClient} from '@injectivelabs/sdk-ts/dist/cjs/core/stargate';
 import {createIcaBuyMsg} from '@/utils/ica';
 
@@ -71,42 +71,25 @@ const CreateVault: NextPage = () => {
     }
   };
 
-  const handleVaultTransfer = async () => {
+  const handleICABuyNft = async () => {
     try {
-      const accounts = await signer.getAccounts();
-      const addr = accounts[0].address;
-
-      if (!cosmosCli) {
-        throw new Error('bad initialization');
-      }
-      console.log(accounts);
-
-      await transferInjective({
-        client: cosmosCli,
-        amount: '100000000000000000',
-        recipient: CONFIG.icaAccount.address,
-        account: addr,
+      const proposal = createIcaBuyMsg({
+        ica: CONFIG.icaAccount.address,
+        buyContract: 'inj1qt5ztu5l3cdkcwzsv2pe9u2mk3fq56rdckr0r7',
+        nftContract: 'inj1v3gg98tu6u7wq3a5dtzk97avk5rp97srz47wrs',
+        tokenId: '0',
+        cost: '100000000000000000',
+      });
+      await createProposal({
+        client,
+        account,
+        injectiveMsg: proposal,
+        icaMultisigAddress: CONFIG.cw3FixedMultisig.address,
+        icaControllerAddress: CONFIG.icaController.address,
       });
     } catch (err) {
-      console.log('ERR TRANSFER', err);
+      console.log('ERR:', err);
     }
-  };
-
-  const handleICABuyNft = async () => {
-    const proposal = createIcaBuyMsg({
-      ica: CONFIG.icaAccount.address,
-      buyContract: 'inj1qt5ztu5l3cdkcwzsv2pe9u2mk3fq56rdckr0r7',
-      nftContract: 'inj1v3gg98tu6u7wq3a5dtzk97avk5rp97srz47wrs',
-      tokenId: '0',
-      cost: '100000000000000000',
-    });
-    await createProposal({
-      client,
-      account,
-      injectiveMsg: proposal,
-      icaMultisigAddress: CONFIG.cw3FixedMultisig.address,
-      icaControllerAddress: CONFIG.icaController.address,
-    });
   };
 
   React.useEffect(() => {
@@ -143,15 +126,6 @@ const CreateVault: NextPage = () => {
             <div className="h-6 flex flex-col justify-center">{vault.length > 0 && `Vault: ${vault}`}</div>
 
             <div className="flex justify-between">
-              <Button
-                color="primary"
-                size="md"
-                label="Send ICA funds"
-                iconType="arrow_forward"
-                className="w-full md:w-fit"
-                onClick={handleVaultTransfer}
-                status={status}
-              />
               <Button
                 color="primary"
                 size="md"
