@@ -18,7 +18,10 @@ const useAccountOverlayElements = (props: AccountOverlayProps) => {
   const { wallet, onWillDisconnect } = props;
   const balance = useBalance(wallet);
 
-  const formattedBalanceAmount = useMemo(() => formatNumber(balance.shifted, balance.decimals), [balance.shifted, balance.decimals]);
+  const formattedBalanceAmount = useMemo(
+    () => formatNumber(balance.shifted, balance.decimals),
+    [balance.shifted, balance.decimals]
+  );
   const formattedTotalUSD = useMemo(() => formatUSD(balance.usd), [balance.usd]);
 
   const Content = (
