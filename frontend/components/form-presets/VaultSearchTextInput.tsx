@@ -8,7 +8,7 @@ import Divider from '@/components/Divider';
 import { shortenAddress } from '@/utils/text';
 import OverlayGrid from '../OverlayGrid';
 import Image from 'next/image';
-import { SUPPORTED_CHAINS, SupportedChain } from '@/constants/app';
+import { SUPPORTED_CHAINS, SUPPORTED_CHAINS_DICT, AppChains } from '@/constants/app';
 
 type FetchedMultiSigWallet = {
   address: string;
@@ -56,20 +56,20 @@ const VaultSearchTextInput = ({
    *
    * @description handle checked chains to filter vaults
    */
-  const [checkedChains, setCheckedChains] = useState<SupportedChain[]>([SUPPORTED_CHAINS[0]]);
+  const [checkedChains, setCheckedChains] = useState<AppChains[]>([SUPPORTED_CHAINS[0]]);
 
   const getIsChainChecked = useCallback(
-    (chain: SupportedChain) => {
-      return !!checkedChains.find((checkedChain) => checkedChain.name === chain.name);
+    (chain: AppChains) => {
+      return !!checkedChains.find((checkedChain) => checkedChain === chain);
     },
     [checkedChains]
   );
 
   const onChangeChainChecked = useCallback(
-    (supportedChain: SupportedChain, isChecked: boolean) => {
+    (supportedChain: AppChains, isChecked: boolean) => {
       const newCheckedChains = isChecked
         ? [...checkedChains, supportedChain]
-        : checkedChains.filter((checkedChain) => checkedChain.name !== supportedChain.name);
+        : checkedChains.filter((checkedChain) => checkedChain !== supportedChain);
       setCheckedChains(newCheckedChains);
     },
     [checkedChains]
@@ -94,10 +94,10 @@ const VaultSearchTextInput = ({
             <div className="flex items-center gap-x-2">
               {SUPPORTED_CHAINS.map((supportedChain) => (
                 <CheckItem
-                  key={supportedChain.name}
+                  key={supportedChain}
                   checked={getIsChainChecked(supportedChain)}
-                  imgURL={supportedChain.logoURL}
-                  label={supportedChain.name}
+                  imgURL={SUPPORTED_CHAINS_DICT[supportedChain].logoURL}
+                  label={supportedChain}
                   onChange={(isChecked) => onChangeChainChecked(supportedChain, isChecked)}
                 />
               ))}
@@ -120,12 +120,12 @@ const VaultSearchTextInput = ({
 
                     <OverlayGrid xUnitPx={12} className="!w-10">
                       {SUPPORTED_CHAINS.slice(1).map((supportedChain) => (
-                        <OverlayGrid.Item key={supportedChain.name}>
+                        <OverlayGrid.Item key={supportedChain}>
                           <Image
-                            src={supportedChain.logoURL ?? ''}
+                            src={SUPPORTED_CHAINS_DICT[supportedChain].logoURL}
                             width={20}
                             height={20}
-                            alt={supportedChain.name}
+                            alt={supportedChain}
                             className="rounded-full overflow-hidden border border-solid border-primary_line_light"
                           />
                         </OverlayGrid.Item>

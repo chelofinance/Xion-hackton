@@ -3,15 +3,16 @@ import Table from '@/components/Table';
 import Heading from '@/components/Heading';
 import useUserAgent from '@/hooks/useUserAgent';
 import Card from '@/components/Card';
-import {formatNumber, formatUSD} from '@/utils/number';
-import type {TooltipLayer} from '@/components/Tooltip/styles';
-import Image from 'next/image';
+import { formatNumber, formatUSD } from '@/utils/number';
+import type { TooltipLayer } from '@/components/Tooltip/styles';
 import ProgressBar from '@/components/ProgressBar';
 import CoinAmount from '@/components/CoinAmount';
-import {TokenSymbols} from '@/constants/app';
 import NFTTumbnail from '@/components/NFTThumbnail';
 import CaptionAmount from '@/components/CaptionAmount';
-import {useRouter} from 'next/router';
+import useOraclePrice from '@/hooks/useOraclePrice';
+import BigNumber from 'bignumber.js';
+import { useRouter } from 'next/router';
+import useRaisingNFTVaults from '@/hooks/useRaisingNFTVaults';
 
 type NFTsTableRow = {
   id: string;
@@ -19,7 +20,7 @@ type NFTsTableRow = {
   nftName: string;
   price: number;
   priceFormatted: string | JSX.Element;
-  raisedAmountUSD: number;
+  raisedAmountUSD: BigNumber;
   raisedAmountUSDFormatted: string | JSX.Element;
   participants: number;
   participantsFormatted: string | JSX.Element;
@@ -30,64 +31,34 @@ type NFTsTableProps = {
   tooltipLayer: TooltipLayer;
 };
 
-const HOT_NFT_DEALS: {
-  id: string;
-  nftName: string;
-  imgSrc: string;
-  price: number;
-  raisedAmountUSD: number;
-  participants: number;
-}[] = [
-    {
-      id: '1',
-      nftName: 'Monkey - 2004(WOOD)',
-      imgSrc: 'https://images.talis.art/tokens/6582d0be4a3988d286be0f9c/mediaThumbnail',
-      price: 13131313133,
-      raisedAmountUSD: 11111381919,
-      participants: 13133,
-    },
-    {
-      id: '2',
-      nftName: 'Injective Vandals #341',
-      imgSrc: 'https://images.talis.art/tokens/65a091fb10709e02588e13da/mediaThumbnail',
-      price: 22414,
-      raisedAmountUSD: 4140,
-      participants: 111,
-    },
-    {
-      id: '3',
-      nftName: 'Crypto Lady',
-      imgSrc: 'https://talis-protocol.mo.cloudinary.net/inj/families/65b2e902e6b67bb48ef359fb/miniaturePicture',
-      price: 131313,
-      raisedAmountUSD: 138,
-      participants: 467,
-    },
-  ];
-
-const NFTsTable = ({className = '', tooltipLayer}: NFTsTableProps) => {
-  const router = useRouter();
+const NFTsTable = ({ className = '', tooltipLayer }: NFTsTableProps) => {
+  const { getOraclePrice } = useOraclePrice();
+  const vaults = useRaisingNFTVaults();
 
   const rows = useMemo<readonly NFTsTableRow[]>(() => {
     return (
-      HOT_NFT_DEALS?.map((item) => {
-        const id = String(item.id);
+      vaults.map((item) => {
+        const id = item.contract.address;
 
         const nftName = item.nftName;
 
         const nft = <NFTTumbnail imgSrc={item.imgSrc} name={item.nftName} />;
 
-        const price = item.price;
+        const oraclePrice = getOraclePrice(item.floorPrice.symbol);
+
+        const price = item.floorPrice.value;
+        const priceUSD = new BigNumber(price).times(oraclePrice);
         const priceFormatted = (
           <div className="flex flex-col gap-y-1 items-end">
-            <CoinAmount size="md" color="body" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(1112.23242, 2)} />
-            <CaptionAmount size="sm" formattedAmount={formatUSD(121313111.311, {compact: true})} />
+            <CoinAmount size="md" color="body" symbol={item.floorPrice.symbol} formattedAmount={formatNumber(price, 6)} />
+            <CaptionAmount size="sm" formattedAmount={formatUSD(priceUSD, { compact: true })} />
           </div>
         );
 
-        const raisedAmountUSD = item.raisedAmountUSD;
+        const raisedAmountUSD = new BigNumber(item.raisedAmount).times(oraclePrice);
         const raisedAmountUSDFormatted = (
           <ProgressBar
-            currentNumber={raisedAmountUSD}
+            currentNumber={raisedAmountUSD.toNumber()}
             targetNumber={price}
             formatOptions={{currencySymbol: '$', compact: true}}
             currentNumberCaption="raised"
@@ -113,13 +84,19 @@ const NFTsTable = ({className = '', tooltipLayer}: NFTsTableProps) => {
     );
   }, []);
 
-  const onRowClick = useCallback((row: NFTsTableRow) => {
-    router.push(`/nft/${row.id}`);
-  }, []);
+  const router = useRouter();
+
+  const onRowClick = useCallback(
+    (row: NFTsTableRow) => {
+      router.push(`/raising-vault/${row.id}`);
+    },
+    [router]
+  );
 
   const Content = useMemo<JSX.Element>(() => {
     return (
       <Table<NFTsTableRow>
+        hasMouseEffect={true}
         tooltipContext={tooltipLayer}
         dSortValue="raisedAmountUSD"
         rows={rows}
@@ -159,7 +136,7 @@ const NFTsTable = ({className = '', tooltipLayer}: NFTsTableProps) => {
             type: 'jsx',
             align: 'right',
             sortValue: 'raisedAmountUSD',
-            sortType: 'number',
+            sortType: 'bignumber',
             widthPx: 400,
           },
         ]}

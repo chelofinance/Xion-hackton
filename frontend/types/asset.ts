@@ -1,27 +1,43 @@
-export type Currency = 'USD';
+import type { AllChains, TokenSymbols } from "@/constants/app";
+import BigNumber from "bignumber.js";
 
-export type TokenMarketData = Readonly<{
-  tokenAddress: string;
-  decimals: number;
-  symbol: string;
-  price: Record<Currency, number | null>;
-  priceChange24H: number | null;
-  marketCap: number | null;
-  vol24H: number | null;
-  vol24HChangePercentage: number | null;
-}>;
-
-export type OwnedNFT = {
-  media: any[];
-  rawMetadata?: {
-    image?: string;
-    name: string;
-  };
+export type NFT = Readonly<{
+  nftName: string;
+  description: string;
+  imgSrc: string;
   contract: { 
     address: string;
   };
   floorPrice: {
-    symbol: string;
     value: number;
-  }
-};
+    symbol: TokenSymbols;
+  };
+}>;
+
+export type ICA = Readonly<{
+  icaMultisigAddress: string;
+  icaControllerAddress: string;
+}>;
+
+export type Multisig = Readonly<{
+  voters: readonly { addr: string; weight: number; share: number; }[];
+  govThreshold: number;
+}>;
+
+export type RaisingNFT = NFT & Readonly<{
+  chain: AllChains;
+  participants: number;
+  raisedAmount: number;
+}>;
+
+export type NFTVault = RaisingNFT & Readonly<{
+  ica: ICA;
+  multisig: Multisig;
+}>;
+
+export type MyNFTVault = NFTVault & Readonly<{
+  priceUSD: BigNumber;
+  share: number;
+  shareUSD: BigNumber;
+}>
+

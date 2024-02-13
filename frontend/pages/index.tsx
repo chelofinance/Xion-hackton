@@ -10,15 +10,12 @@ import VaultSearchTextInput from '@/components/form-presets/VaultSearchTextInput
 import Button from '@/components/Button';
 import {useRouter} from 'next/router';
 
-// import QUERY_TALIS_TOKENS, { type QueryTalisTokensParams } from '@/data/graphql/queries/queryTalisTokens';
-// import { useQuery } from '@apollo/client';
-
 const AsciiGlobe = dynamic(() => import('@/components/canvases/AsciiGlobe'), {
   ssr: false,
 });
 
 const Home: NextPage = () => {
-  const {isMobile} = useUserAgent();
+  const { isMobile } = useUserAgent();
   const [isAppLaunched, setIsAppLaunched] = useState<boolean>(!isMobile);
 
   const router = useRouter();

@@ -70,7 +70,7 @@ const NumberText = ({
               </span>
             )}
           </span>
-          <span className={sizeClassNames.unit}>{unit}</span>
+          {unit && <span className={sizeClassNames.unit}>{unit}</span>}
         </>
       ) : (
         '-'
