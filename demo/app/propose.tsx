@@ -128,12 +128,8 @@ export const addMemberProposal = (
         wasm: {
           execute: {
             contract_addr: multisigAddress,
-            msg: Buffer.from(JSON.stringify(addMemberMessage)).toString(
-              "base64"
-            ),
-            funds: [
-              fee
-            ],
+            msg: addMemberMessage,
+            funds: [fee],
           },
         },
       },
