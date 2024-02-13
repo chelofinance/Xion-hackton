@@ -63,6 +63,7 @@ export const abstraxionProviderConfig = {
  */
 export enum TokenSymbols {
   INJ = 'INJ',
+  XION = 'XION',
 }
 
 export type SupportedChain = {

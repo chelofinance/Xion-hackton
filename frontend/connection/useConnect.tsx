@@ -47,16 +47,14 @@ const useConnectAbstraxion = () => {
     ));
   }, [abstraxionModal]);
 
-  const connect = async (): Promise<ConnectingWallet | null> => {
+  const connect = useCallback(async (): Promise<ConnectingWallet | null> => {
     const wallet = await getConnectingWallet();
     if (wallet !== null) return wallet;
 
     await openConnectModal();
 
-    const connectingWallet = await getConnectingWallet();
-    console.log('connectingWallet', connectingWallet);
-    return connectingWallet;
-  };
+    return await getConnectingWallet();
+  }, [getConnectingWallet, openConnectModal]);
 
   return { connect };
 };
@@ -69,7 +67,7 @@ const useConnect = () => {
   const { sendEvent, identify } = useAnalytics();
   const { target, startProcessing: startConnecting, stopProcessing: stopConnecting } = useProcessing<Wallet>();
 
-  const [userWallet, setUserWallet] = useAtom(userWalletAtom);
+  const [, setUserWallet] = useAtom(userWalletAtom);
 
   const { connect: connectAbstraxion } = useConnectAbstraxion();
 
@@ -104,7 +102,7 @@ const useConnect = () => {
 
       return connectedWallet;
     },
-    [userWallet, startConnecting, stopConnecting, sendEvent, identify]
+    [connectAbstraxion, startConnecting, stopConnecting, sendEvent, identify]
   );
 
   return { connect, connectingWallet: target };

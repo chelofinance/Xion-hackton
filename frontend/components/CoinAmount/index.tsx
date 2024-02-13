@@ -17,10 +17,9 @@ export type CoinAmountProps = {
   size: NumberTextSize;
   symbol?: TokenSymbols;
   formattedAmount?: string;
-  amountUnit?: string;
 };
 
-const CoinAmount = ({ formattedAmount, color = 'body', size, symbol, amountUnit }: CoinAmountProps) => {
+const CoinAmount = ({ formattedAmount, color = 'body', size, symbol }: CoinAmountProps) => {
   const coinSize = COIN_SIZE_MAPPING_DICT[size];
 
   return (

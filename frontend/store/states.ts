@@ -1,8 +1,12 @@
 import { atom } from 'jotai';
 import { LOCAL_STORAGE_KEYS, TokenSymbols } from '@/constants/app';
 import type { ConnectedWallet } from '@/types/wallet';
-import type { TokenData } from '@/data/types';
 import apolloClients, { type AppApolloClients } from '@/data/graphql/apolloClients';
+import BURNT_LABS_LOGO_URL from '@/resources/logos/burnt_logo.svg';
+
+type TokenData = {
+  logoURI: string;
+};
 
 export const apolloClientsAtom = atom<AppApolloClients>(apolloClients);
 
@@ -12,6 +16,7 @@ export const apolloClientsAtom = atom<AppApolloClients>(apolloClients);
  */
 export const allTokensDictAtom = atom<Record<TokenSymbols, TokenData>>({
   [TokenSymbols.INJ]: { logoURI: 'https://injective.talis.art/svg/icons/inj.svg' },
+  [TokenSymbols.XION]: { logoURI: BURNT_LABS_LOGO_URL },
 });
 
 const userWalletAtomOrigin = atom<ConnectedWallet | null>(null);
