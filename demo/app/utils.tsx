@@ -84,7 +84,7 @@ export async function createIcaMultisig(
     const ica_multisig_address = instantiate_events
       ?.find((e: any) =>
         e.attributes.find(
-          (attr: any) => attr.key === "code_id" && attr.value === "73"
+          (attr: any) => attr.key === "code_id" && attr.value === contracts.cw3FixedMultisig.codeId
         )
       )
       ?.attributes.find((attr: any) => attr.key === "_contract_address")?.value;

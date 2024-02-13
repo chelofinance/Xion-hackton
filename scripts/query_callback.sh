@@ -1,1 +1,1 @@
-yarn start --action query --contract xion1v84yekkwnvperl9gjx80knxan7x3l6d0w7az5pp8p4t0e6zcamks93efuc --network xion-testnet --message '{"query_callbacks":[]}'
+yarn start --action query --contract xion1qmjxqd2j3vgcjrc9ea70qae2rkf28tced4sv50twmuxshzrxyfsq7saj9e --network xion-testnet --message '{"query_callbacks":[]}'
