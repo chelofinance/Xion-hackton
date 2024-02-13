@@ -1,0 +1,43 @@
+
+  "txBody": {
+    "messages": [
+      {
+        "typeUrl": "/injective.wasmx.v1.MsgExecuteContractCompat",
+        "value": "CippbmoxZGhram1wY3ludzVsN3Q4dTQ1eDM5enpreHIybWM3bjB3MGVlaHoSKmluajFxdDV6dHU1bDNjZGtjd3pzdjJwZTl1Mm1rM2ZxNTZyZGNrcjByNxp1eyJidXlfdG9rZW4iOnsidG9rZW5faWQiOiIwIiwiY29udHJhY3RfYWRkcmVzcyI6ImluajFtNnNwYTIwMHFldnpmbnJ0OWNhMmV6NWRnbWQ3NzI1bDBydWM3NCIsImNsYXNzX2lkIjoiaW5qZWN0aXZlIn19IhQxMDAwMDAwMDAwMDAwMDAwMGluag=="
+      }
+    ],
+    "memo": "",
+    "timeoutHeight": "0",
+    "extensionOptions": [],
+    "nonCriticalExtensionOptions": []
+  },
+  "authInfo": {
+    "signerInfos": [
+      {
+        "publicKey": {
+          "typeUrl": "/injective.crypto.v1beta1.ethsecp256k1.PubKey",
+          "value": "CiEDyRxy3juoVDfG3C/0fglpBPpgCbm8Yh0e7c2xOQuvLZ4="
+        },
+        "modeInfo": {
+          "single": {
+            "mode": "SIGN_MODE_DIRECT"
+          }
+        },
+        "sequence": "0"
+      }
+    ],
+    "fee": {
+      "amount": [
+        {
+          "denom": "inj",
+          "amount": "417132000000000"
+        }
+      ],
+      "gasLimit": "417132",
+      "payer": "",
+      "granter": ""
+    }
+  },
+  "chainId": "injective-888",
+  "accountNumber": "552770"
+}
