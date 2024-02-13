@@ -107,29 +107,26 @@ export const addMemberProposal = (
 
   const fee = {
     amount,
-    denom: "uxion",
+    denom: "inj",
   };
 
   const addMemberMessage = encodeMessage({
     add_member: {
       address: memberAddress,
-      fee: {
-        amount,
-        denom: "uxion",
-      },
+      fee
     },
   });
 
   return {
     title: "Add Member",
-    description: "Add Member)",
+    description: "Add Member",
     msgs: [
       {
         wasm: {
           execute: {
             contract_addr: multisigAddress,
             msg: addMemberMessage,
-            funds: [fee],
+            funds: [],
           },
         },
       },
