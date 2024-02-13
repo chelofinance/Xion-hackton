@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Abstraxion, useAbstraxionAccount, useAbstraxionSigningClient, useModal } from "@burnt-labs/abstraxion";
 import { Button } from "@burnt-labs/ui";
 import Contracts from "@/config/contracts.config";
-import { createIcaMultisig, createProposal, executeProposal, getBalance, getContractState, getProposalList, voteProposal } from "./utils";
+import { createIcaMultisig, createProposal, executeProposal, getBalance, getIcaAccountAddress, getIcaControllerAddress, getProposalList, voteProposal } from "./utils";
 
 const contracts = Contracts["xion-testnet"];
 
@@ -17,6 +17,7 @@ export default function Page(): JSX.Element {
   const [memberAddresses, setMemberAddresses] = useState<string[]>([]);
   const [icaMultisigAddress, setIcaMultisigAddress] = useState<string>("");
   const [icaControllerAddress, setIcaControllerAddress] = useState<string>("");
+  const [channelInitInfo, setChannelInitInfo] = useState<any>({});
   const [icaAccountAddress, setIcaAccountAddress] = useState<string>("");
   const [proposals, setProposals] = useState<any[]>([]);
   const [proposalJson, setProposalJson] = useState(JSON.stringify({
@@ -45,8 +46,6 @@ export default function Page(): JSX.Element {
 
         // For testing, let's hardcode the multisig. Ideally this should be the last created one.
         setIcaMultisigAddress(contracts.hardcodedIcaMultisig.address);
-        setIcaControllerAddress(contracts.hardcodedIcaController.address);
-
       }
     }
 
@@ -57,6 +56,8 @@ export default function Page(): JSX.Element {
   useEffect(() => {
     async function fetchData() {
       if (icaMultisigAddress) {
+        const ica_controller_address = await getIcaControllerAddress(client, icaMultisigAddress);
+        setIcaControllerAddress(ica_controller_address);
         getProposalListHandler();
       }
     }
@@ -66,15 +67,9 @@ export default function Page(): JSX.Element {
 
 
   useEffect(() => {
-    async function fetchData() {
-      if (icaControllerAddress) {
-        const { contract_state, ica_account_address } = await getContractState(client, icaControllerAddress);
-        setIcaAccountAddress(ica_account_address)
-        console.log("contract_state", contract_state)
-      }
+    if (icaControllerAddress) {
+      getIcaAccountAddressHandler();
     }
-
-    fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [icaControllerAddress])
 
@@ -83,11 +78,20 @@ export default function Page(): JSX.Element {
     return abstractAccount?.address || "";
   }
 
+  async function getIcaAccountAddressHandler() {
+    setLoading(true);
+    const ica_account_address = await getIcaAccountAddress(client, icaControllerAddress);
+    console.log("ica_account_address", ica_account_address);
+    setIcaAccountAddress(ica_account_address)
+    setLoading(false);
+  }
+
+
   async function createIcaMultisigHandler() {
     setLoading(true);
-    const multisig_creation_response = await createIcaMultisig(client, account, contracts.icaFactory.address, memberAddresses);
-    setIcaMultisigAddress(multisig_creation_response ? multisig_creation_response.ica_multisig_address : "");
-    setIcaControllerAddress(multisig_creation_response ? multisig_creation_response.ica_controller_address : "");
+    const ica_multisig_address_response = await createIcaMultisig(client, account, contracts.icaFactory.address, memberAddresses);
+    setIcaMultisigAddress(ica_multisig_address_response?.ica_multisig_address || "");
+    setChannelInitInfo(ica_multisig_address_response?.channel_init_info || {});
     setLoading(false);
     // logoutAbstraxion();
   }
@@ -126,10 +130,6 @@ export default function Page(): JSX.Element {
     localStorage.removeItem("xion-authz-granter-account");
     // reload page
     window.location.reload();
-  }
-
-  async function testFunction() {
-    // Do anything here
   }
 
   async function executeProposalHandler(proposalId: any) {
@@ -256,13 +256,29 @@ export default function Page(): JSX.Element {
           </div>
         </div>
       )}
-      {icaAccountAddress && (
+      {icaControllerAddress && !icaAccountAddress && Object.keys(channelInitInfo).length > 0 && (
+        <div className="info-container">
+          <div className="info-content">
+            <p className="info-description">
+              <span className="info-bold">Run this command</span>
+            </p>
+            <button className="info-value" onClick={(e: any) => {
+              navigator.clipboard.writeText(e.target.textContent)
+              alert("Command copied to clipboard. Please execute it in your terminal.")
+            }}>{"hermes tx chan-open-try --dst-chain injective-888 --src-chain xion-testnet-1 --dst-connection "}{contracts.channelOpenInitOptions.counterpartyConnectionId}{" --dst-port "}{channelInitInfo?.destination_port}{" --src-port "}{channelInitInfo?.src_port_id}{" --src-channel "}{channelInitInfo.src_channel_id}</button>
+          </div>
+        </div>
+      )}
+      {icaControllerAddress && ( // Show the ICA Account address even if it is not set
         <div className="info-container">
           <div className="info-content">
             <p className="info-description">
               <span className="info-bold">ICA Account Addresses</span>
             </p>
-            <span className="info-value">{icaAccountAddress}</span>
+            <span className="info-value">{icaAccountAddress || "-------------------------------------"}</span>
+            <button disabled={loading} onClick={getIcaAccountAddressHandler}>
+              {loading ? "LOADING..." : "Refetch ICA Account Address"}
+            </button>
           </div>
         </div>
       )}
@@ -301,16 +317,6 @@ export default function Page(): JSX.Element {
             ))}
           </tbody>
         </table>
-      )}
-      {icaMultisigAddress && (
-        <Button
-          disabled={loading}
-          fullWidth
-          onClick={testFunction}
-          structure="base"
-        >
-          {loading ? "LOADING..." : "Test"}
-        </Button>
       )}
       <Abstraxion onClose={() => setIsOpen(false)} />
     </main>
