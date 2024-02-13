@@ -187,3 +187,38 @@ export async function getBalance(client: any, address: string) {
         alert(error);
     }
 }
+
+
+export async function addMember(client: any, 
+                                account: any, 
+                                icaMultisigAddress: string, 
+                                memberAddress: string,
+                                amount: string,
+                                denom: string,
+                                ) {
+    const fee = {
+        amount,
+        denom
+    };
+
+    const msg = {
+        add_member: {
+            address: memberAddress,
+            fee
+        },
+    };
+
+    try {
+        const executionResponse = await client?.execute(
+            account.bech32Address,
+            icaMultisigAddress,
+            msg,
+            "auto",
+        );
+        console.log("executionResponse", executionResponse);
+        return executionResponse
+    } catch (error) {
+        console.log("error", error);
+        alert(error);
+    }
+}

@@ -3,8 +3,8 @@ use std::cmp::Ordering;
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
 use cosmwasm_std::{
-    to_json_binary, Binary, BlockInfo, CosmosMsg, Deps, DepsMut, Empty, Env, MessageInfo, Order,
-    Response, StdResult,
+    to_json_binary, Addr, Binary, BlockInfo, Coin, CosmosMsg, Deps, DepsMut, Empty, Env,
+    MessageInfo, Order, Response, StdResult,
 };
 
 use cw2::set_contract_version;
@@ -62,6 +62,7 @@ pub fn execute(
     msg: ExecuteMsg,
 ) -> Result<Response<Empty>, ContractError> {
     match msg {
+        ExecuteMsg::AddMember { address, fee } => add_member(deps, info, address, fee),
         ExecuteMsg::Propose {
             title,
             description,
@@ -72,6 +73,28 @@ pub fn execute(
         ExecuteMsg::Execute { proposal_id } => execute_execute(deps, env, info, proposal_id),
         ExecuteMsg::Close { proposal_id } => execute_close(deps, env, info, proposal_id),
     }
+}
+
+fn add_member(
+    deps: DepsMut,
+    info: MessageInfo,
+    address: Addr,
+    fee: Coin,
+) -> Result<Response, ContractError> {
+    let fee_amount = fee.amount.u128();
+
+    let mut weight = u64::try_from(fee_amount / 1000000000000000).unwrap();
+    if weight > 100 {
+        weight = 100;
+    }
+
+    let key = deps.api.addr_validate(&address.to_string())?;
+    VOTERS.save(deps.storage, &key, &weight)?;
+
+    Ok(Response::new()
+        .add_attribute("action", "add_member")
+        .add_attribute("sender", info.sender)
+        .add_attribute("member", address.to_string()))
 }
 
 pub fn execute_propose(
