@@ -1,5 +1,5 @@
 use cosmwasm_schema::{cw_serde, QueryResponses};
-use cosmwasm_std::{CosmosMsg, Coin, Empty, Addr};
+use cosmwasm_std::{Addr, Coin, CosmosMsg, Empty};
 use cw3::Vote;
 use cw_utils::{Duration, Expiration, Threshold};
 
@@ -21,7 +21,7 @@ pub struct Voter {
 pub enum ExecuteMsg {
     AddMember {
         address: Addr,
-        fee: Coin
+        fee: Coin,
     },
     Propose {
         title: String,
