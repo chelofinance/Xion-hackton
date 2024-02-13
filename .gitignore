@@ -20,3 +20,5 @@
 
 # binary
 *.wasm
+
+yarn.lock
