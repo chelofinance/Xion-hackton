@@ -7,6 +7,7 @@ import {
   INJECTIVE_CONTRACT_MSG_URI,
 } from "./propose";
 import Contracts from "@/config/contracts.config";
+import type {Coin} from "@cosmjs/stargate"
 
 const contracts = Contracts["xion-testnet"];
 
@@ -268,19 +269,13 @@ export async function addMember(
 
   console.log("proposalMsg", proposalMsg);
 
+  
   try {
     const executionResponse = await client?.execute(
       account.bech32Address,
       multisigAddress,
       proposalMsg,
       "auto",
-      "",
-      [
-        {
-          amount,
-          denom: "uxion",
-        },
-      ]
     );
     console.log("executionResponse", executionResponse);
 
