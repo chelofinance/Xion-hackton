@@ -1,12 +1,12 @@
-import { Suspense, lazy, useCallback, useEffect, useMemo } from 'react';
-import { useAtom } from 'jotai';
-import { userWalletAtom } from '@/store/states';
+import {Suspense, lazy, useCallback, useEffect, useMemo} from 'react';
+import {useAtom} from 'jotai';
+import {userWalletAtom} from '@/store/states';
 import useModal from '@/hooks/useModal';
-import type { IconType } from '@/components/Icon';
-import type { OnConnect } from '@/components/overlays/SelectWalletOverlay';
-import type { ButtonColor, ButtonStatus, ButtonType } from '@/components/Button/types';
-import type { ButtonProps } from '@/components/Button';
-import { shortenAddress } from '@/utils/text';
+import type {IconType} from '@/components/Icon';
+import type {OnConnect} from '@/components/overlays/SelectWalletOverlay';
+import type {ButtonColor, ButtonStatus, ButtonType} from '@/components/Button/types';
+import type {ButtonProps} from '@/components/Button';
+import {shortenAddress} from '@/utils/text';
 
 const AccountOverlay = lazy(() => import('@/components/overlays/AccountOverlay'));
 
@@ -30,7 +30,7 @@ const useAccountButton = (): {
         <AccountOverlay
           wallet={userWallet}
           onWillDisconnect={() => {
-            const { onClose } = props;
+            const {onClose} = props;
             disconnect();
             onClose();
           }}

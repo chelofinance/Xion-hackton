@@ -1,8 +1,8 @@
 import GoogleAnalytics from '@/analytics/googleAnalytics/GoogleAnalytics';
 import Mixpanel from '@/analytics/mixpanel/Mixpanel';
-import XION_CHAIN_LOGO from "@/resources/logos/chain_logo_xion.png";
-import type { NFTVault } from '@/types/asset';
-import { ContractsDict } from '@/types/contract';
+import XION_CHAIN_LOGO from '@/resources/logos/chain_logo_xion.png';
+import type {NFTVault} from '@/types/asset';
+import {ContractsDict} from '@/types/contract';
 
 export const googleAnalytics = new GoogleAnalytics('google analytics');
 export const mixpanel = new Mixpanel('mixpanel');
@@ -35,11 +35,11 @@ export enum AppChains {
   XION_TESTNET = 'xion-testnet',
 }
 
-export const SUPPORTED_CHAINS_DICT: Record<AppChains, { logoURL: string }> = {
+export const SUPPORTED_CHAINS_DICT: Record<AppChains, {logoURL: string}> = {
   [AppChains.XION_TESTNET]: {
     logoURL: XION_CHAIN_LOGO.src,
-  }
-}
+  },
+};
 
 export const SUPPORTED_CHAINS: readonly AppChains[] = Object.values(AppChains);
 
@@ -48,35 +48,35 @@ export enum AllChains {
   INJECTIVE_TESTNET = 'Injective Testnet',
 }
 
-export const CHAIN_METADATA_DICT: Record<AllChains, { explorerAddressURL: string }> = {
+export const CHAIN_METADATA_DICT: Record<AllChains, {explorerAddressURL: string}> = {
   [AllChains.XION_TESTNET]: {
     explorerAddressURL: '',
   },
   [AllChains.INJECTIVE_TESTNET]: {
     explorerAddressURL: '',
-  }
-}
+  },
+};
 
 export const chainConfigMap: Record<AppChains, ContractsDict> = {
   [AppChains.XION_TESTNET]: {
     cw3FixedMultisig: {
       codeId: 50,
-      address: 'xion1tunl6hq335lhpjawvzfm6djk8mthaua3725fl7jhpgwdkxrr3qyqcn43ng', //placeholder addr
+      address: 'xion105h6k7cv3kvt4vxeh5l86x9wnqudjl8wlx87ywwqzqcpa24m6fzsc4d2y0', //placeholder addr
     },
     icaController: {
-      address: 'xion1yylkaz0u4gef9n77m3dmarq6wmjwgzlhrrveu45cv9neh582m36q0aq33m',
+      address: 'xion1az60z73mezhcyxajgucvlcs3kj72fzwu2l2m5qxmsccs6vmnappqys5pjj',
     },
     icaAccount: {
-      address: 'inj1a0nmuld00el7qap2yr9awp7pfzudmut5n73eyz28q9307c6atjesqq0qzw',
+      address: 'inj1tfvcvjkpw02eeldx2lhtw0xysg3msehyarqe5lwygf3dk40vt9uqhuzlg3',
     },
     nomosFactory: {
-      address: 'xion1jyrjanlg6mvna42rur559t8rcscrjfrayz4flasfymyvpzvkgefs9mnylc',
+      address: 'xion1qmjxqd2j3vgcjrc9ea70qae2rkf28tced4sv50twmuxshzrxyfsq7saj9e',
     },
     icaFactory: {
-      address: 'xion1v84yekkwnvperl9gjx80knxan7x3l6d0w7az5pp8p4t0e6zcamks93efuc',
+      address: 'xion1qmjxqd2j3vgcjrc9ea70qae2rkf28tced4sv50twmuxshzrxyfsq7saj9e',
     },
-  }
-}
+  },
+};
 
 export const abstraxionProviderConfig = {
   contracts: [
@@ -100,25 +100,28 @@ export enum TokenSymbols {
 export const PRICE_ORACLE_DICT: Record<TokenSymbols, number> = {
   [TokenSymbols.INJ]: 1.1,
   [TokenSymbols.XION]: 0.78,
-}
+};
 
 export const FAKE_ABSTRAXION_ADDRESS = 'xion18104810481048104jfjkdfwofjk9280';
 
 export const RAISING_NFT_VAULTS_DICT: Record<string, NFTVault> = {
-  inj8x0x831k31lk31lkelklskdsldsdksldkslksll: {
-    nftName: 'Monkey - 2004(WOOD)',
+  0: {
+    nftName: 'Nomos 1',
     description: 'We are destined to rule.',
     imgSrc: 'https://images.talis.art/tokens/6582d0be4a3988d286be0f9c/mediaThumbnail',
     contract: {
-      address: 'inj8x0x831k31lk31lkelklskdsldsdksldkslksll',
+      address: 'inj1m6spa200qevzfnrt9ca2ez5dgmd7725l0ruc74',
+      buyAddr: 'inj1qt5ztu5l3cdkcwzsv2pe9u2mk3fq56rdckr0r7',
+      id: '0',
+      price: '10000000000000000',
     },
     floorPrice: {
-      value: 1313133,
+      value: 1,
       symbol: TokenSymbols.INJ,
     },
     chain: AllChains.INJECTIVE_TESTNET,
-    raisedAmount: 1111000,
-    participants: 990,
+    raisedAmount: 0.1,
+    participants: 3,
     ica: {
       icaMultisigAddress: 'injf1414o124802494hgdjfidhfdjfhqye01911881',
       icaControllerAddress: 'injf1414o124802494hgdjfidhfdjfhqye01911881',
@@ -129,12 +132,12 @@ export const RAISING_NFT_VAULTS_DICT: Record<string, NFTVault> = {
           addr: FAKE_ABSTRAXION_ADDRESS,
           weight: 1,
           share: 0.45,
-        }, 
+        },
         {
           addr: 'xion14710481048488481084fdjkfjdkl',
           weight: 1,
           share: 0.15,
-        }, 
+        },
         {
           addr: 'xionwf1kf8080f2fjdkflskfdlsdkflskdsl',
           weight: 1,
@@ -144,12 +147,15 @@ export const RAISING_NFT_VAULTS_DICT: Record<string, NFTVault> = {
       govThreshold: 0.8,
     },
   },
-  inj8x0x831k33191k31lkelklskdsldsdksldkslksll: {
-    nftName: 'Injective Vandals #341',
+  4: {
+    nftName: 'Nomos 2',
     description: 'Vandals worldwide',
     imgSrc: 'https://images.talis.art/tokens/65a091fb10709e02588e13da/mediaThumbnail',
     contract: {
-      address: 'inj8x0x831k33191k31lkelklskdsldsdksldkslksll',
+      address: 'inj1m6spa200qevzfnrt9ca2ez5dgmd7725l0ruc74',
+      buyAddr: 'inj1qt5ztu5l3cdkcwzsv2pe9u2mk3fq56rdckr0r7',
+      id: '4',
+      price: '10000000000000000',
     },
     floorPrice: {
       value: 13990,
@@ -168,12 +174,12 @@ export const RAISING_NFT_VAULTS_DICT: Record<string, NFTVault> = {
           addr: FAKE_ABSTRAXION_ADDRESS,
           weight: 1,
           share: 0.45,
-        }, 
+        },
         {
           addr: 'xion14710481048488481084fdjkfjdkl',
           weight: 1,
           share: 0.15,
-        }, 
+        },
         {
           addr: 'xionwf1kf8080f2fjdkflskfdlsdkflskdsl',
           weight: 1,
@@ -183,12 +189,16 @@ export const RAISING_NFT_VAULTS_DICT: Record<string, NFTVault> = {
       govThreshold: 0.8,
     },
   },
-  inj1019188104100101010101001100dksldkslksll: {
-    nftName: 'Crypto Lady',
+  3: {
+    //by nft id, since the contract is the same for all
+    nftName: 'Nomos 3',
     description: 'PFP',
     imgSrc: 'https://talis-protocol.mo.cloudinary.net/inj/families/65b2e902e6b67bb48ef359fb/miniaturePicture',
     contract: {
-      address: 'inj1019188104100101010101001100dksldkslksll',
+      address: 'inj1m6spa200qevzfnrt9ca2ez5dgmd7725l0ruc74',
+      buyAddr: 'inj1qt5ztu5l3cdkcwzsv2pe9u2mk3fq56rdckr0r7',
+      id: '3',
+      price: '10000000000000000',
     },
     floorPrice: {
       value: 1313133,
@@ -207,12 +217,12 @@ export const RAISING_NFT_VAULTS_DICT: Record<string, NFTVault> = {
           addr: FAKE_ABSTRAXION_ADDRESS,
           weight: 1,
           share: 0.45,
-        }, 
+        },
         {
           addr: 'xion14710481048488481084fdjkfjdkl',
           weight: 1,
           share: 0.15,
-        }, 
+        },
         {
           addr: 'xionwf1kf8080f2fjdkflskfdlsdkflskdsl',
           weight: 1,
@@ -221,5 +231,5 @@ export const RAISING_NFT_VAULTS_DICT: Record<string, NFTVault> = {
       ],
       govThreshold: 0.8,
     },
-  }
-}
+  },
+};

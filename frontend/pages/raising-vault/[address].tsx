@@ -38,10 +38,9 @@ const createKeplrSigner = async () => {
 const RaisingVault: NextPage = () => {
   //const params = useParams<{ address: string }>();
   //TODO useParams is not working
-  const params = {address: 'inj8x0x831k31lk31lkelklskdsldsdksldkslksll'};
 
   const router = useRouter();
-  const vault = useRaisingNFTVault(params.address);
+  const vault = useRaisingNFTVault('3');
 
   const [isDepositFormOpen, setIsDepositFormOpen] = useState<boolean>(false);
 
@@ -98,10 +97,10 @@ const RaisingVault: NextPage = () => {
   );
 
   const openExplorer = useCallback(
-    (address: string) => {
-      const url = `${CHAIN_METADATA_DICT[vault.chain].explorerAddressURL}/${address}`;
+    (id: string) => {
+      const url = `${CHAIN_METADATA_DICT[vault.chain].explorerAddressURL}/${id}`;
       //window.open(url, '_blank'); TODO instead it takes you to the app section about the nft
-      router.push(`/nft/${address}`);
+      router.push(`/nft/${id}`);
     },
     [vault.chain]
   );
@@ -148,7 +147,7 @@ const RaisingVault: NextPage = () => {
                 size="xs"
                 iconType="external_link"
                 label={`See NFT details`}
-                onClick={() => openExplorer(vault.contract.address)}
+                onClick={() => openExplorer(vault.contract.id)}
               />
               {/* <Button 
                 type="outline" 
