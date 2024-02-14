@@ -23,9 +23,9 @@ import { userWalletAtom } from '@/store/states';
 import NumberText from '@/components/NumberText';
 
 const RaisingVault: NextPage = () => {
-  const params = useParams<{ address: string }>();
+  const params = useParams<{ id: string }>();
 
-  const vault = useRaisingNFTVault(params.address);
+  const vault = useRaisingNFTVault(params.id);
 
   const [isDepositFormOpen, setIsDepositFormOpen] = useState<boolean>(false);
 
@@ -38,11 +38,11 @@ const RaisingVault: NextPage = () => {
   const form = useRef<HTMLFormElement>(null);
 
   const { getOraclePrice } = useOraclePrice();
-  const oraclePrice = getOraclePrice(vault.floorPrice.symbol);
+  const oraclePrice = getOraclePrice(vault.fixedPrice.symbol);
 
-  const maxDepositAmount = vault.floorPrice.value - vault.raisedAmount;
+  const maxDepositAmount = vault.fixedPrice.value - vault.raisedAmount;
   const maxDepositAmountUSD = useMemo(() => new BigNumber(maxDepositAmount).times(oraclePrice), [maxDepositAmount, oraclePrice]);
-  const minDepositAmount = 10;
+  const minDepositAmount = 0.000001;
 
   const [depositAmount, setDepositAmount] = useState<number>(maxDepositAmount);
   const [isDepositAmountValid, setIsDepositAmountValid] = useState<boolean>(true);
@@ -62,7 +62,7 @@ const RaisingVault: NextPage = () => {
     };
   }, [isDepositAmountValid]);
 
-  const priceUSD = useMemo(() => new BigNumber(vault.floorPrice.value).times(oraclePrice), [oraclePrice]);
+  const priceUSD = useMemo(() => new BigNumber(vault.fixedPrice.value).times(oraclePrice), [oraclePrice]);
   const raisedAmountUSD = useMemo(() => new BigNumber(vault.raisedAmount).times(oraclePrice), [oraclePrice]);
 
   const formattedCompactPriceUSD = priceUSD.gte(1000) ? ` (${formatUSD(priceUSD, { compact: true, semiequate: true })})` : '';
@@ -82,8 +82,8 @@ const RaisingVault: NextPage = () => {
   );
 
   const openExplorer = useCallback(
-    (address: string) => {
-      const url = `${CHAIN_METADATA_DICT[vault.chain].explorerAddressURL}/${address}`;
+    (collectionAddress: string) => {
+      const url = `${CHAIN_METADATA_DICT[vault.chain].explorerAddressURL}/contract/${collectionAddress}`;
       window.open(url, '_blank');
     },
     [vault.chain]
@@ -94,8 +94,8 @@ const RaisingVault: NextPage = () => {
   const { raisingVaults: myRaisingVaults } = useMyNFTVaults(userWallet?.account.address);
 
   const myVault = useMemo<MyNFTVault | undefined>(
-    () => myRaisingVaults.find((myVault) => myVault.contract.address === vault.contract.address),
-    [myRaisingVaults, vault.contract.address]
+    () => myRaisingVaults.find((myVault) => myVault.tokenId === vault.tokenId),
+    [myRaisingVaults, vault.tokenId]
   );
 
   return (
@@ -112,8 +112,8 @@ const RaisingVault: NextPage = () => {
                 type="outline"
                 size="xs"
                 iconType="external_link"
-                label={`See NFT details`}
-                onClick={() => openExplorer(vault.contract.address)}
+                label={`See in chain explorer`}
+                onClick={() => openExplorer(vault.collection.contractAddress)}
               />
               {/* <Button 
                 type="outline" 
@@ -170,7 +170,7 @@ const RaisingVault: NextPage = () => {
               <div className="h-6 flex flex-col justify-center Font_label_14px">Fixed price</div>
 
               <div className="flex flex-col gap-y-2 items-end">
-                <CoinAmount size="md" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(vault.floorPrice.value)} />
+                <CoinAmount size="md" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(vault.fixedPrice.value)} />
                 <CaptionAmount size="sm" formattedAmount={formattedPriceUSD} />
               </div>
               {/* </div> */}

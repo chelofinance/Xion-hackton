@@ -38,19 +38,19 @@ const NFTsTable = ({ className = '', tooltipLayer }: NFTsTableProps) => {
   const rows = useMemo<readonly NFTsTableRow[]>(() => {
     return (
       vaults.map((item) => {
-        const id = item.contract.address;
+        const id = `${item.collection.contractAddress}${item.tokenId}`;
 
         const nftName = item.nftName;
 
         const nft = <NFTTumbnail imgSrc={item.imgSrc} name={item.nftName} />;
 
-        const oraclePrice = getOraclePrice(item.floorPrice.symbol);
+        const oraclePrice = getOraclePrice(item.fixedPrice.symbol);
 
-        const price = item.floorPrice.value;
+        const price = item.fixedPrice.value;
         const priceUSD = new BigNumber(price).times(oraclePrice);
         const priceFormatted = (
           <div className="flex flex-col gap-y-1 items-end">
-            <CoinAmount size="md" color="body" symbol={item.floorPrice.symbol} formattedAmount={formatNumber(price, 6)} />
+            <CoinAmount size="md" color="body" symbol={item.fixedPrice.symbol} formattedAmount={formatNumber(price, 6)} />
             <CaptionAmount size="sm" formattedAmount={formatUSD(priceUSD, { compact: true })} />
           </div>
         );

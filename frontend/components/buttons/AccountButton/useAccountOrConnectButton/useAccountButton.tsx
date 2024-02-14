@@ -3,7 +3,6 @@ import { useAtom } from 'jotai';
 import { userWalletAtom } from '@/store/states';
 import useModal from '@/hooks/useModal';
 import type { IconType } from '@/components/Icon';
-import type { OnConnect } from '@/components/overlays/SelectWalletOverlay';
 import type { ButtonColor, ButtonStatus, ButtonType } from '@/components/Button/types';
 import type { ButtonProps } from '@/components/Button';
 import { shortenAddress } from '@/utils/text';
@@ -14,11 +13,7 @@ const useAccountButton = (): {
   accountButtonProps: Pick<ButtonProps, 'status' | 'color' | 'iconType' | 'label' | 'onClick'> | null;
   accountModal: ReturnType<typeof useModal> | null;
 } => {
-  const [userWallet, setUserWallet] = useAtom(userWalletAtom);
-
-  const disconnect = useCallback(() => {
-    setUserWallet(null);
-  }, []);
+  const [userWallet] = useAtom(userWalletAtom);
 
   const accountModal = useModal();
 
@@ -29,16 +24,11 @@ const useAccountButton = (): {
       <Suspense>
         <AccountOverlay
           wallet={userWallet}
-          onWillDisconnect={() => {
-            const { onClose } = props;
-            disconnect();
-            onClose();
-          }}
           {...props}
         />
       </Suspense>
     ));
-  }, [userWallet, disconnect, accountModal]);
+  }, [userWallet, accountModal]);
 
   const accountButtonProps = useMemo(() => {
     if (userWallet === null) return null;

@@ -2,7 +2,7 @@ import AccountAddress from '@/components/AccountAddress';
 import type { OverlayProps } from '@/components/types';
 import type { ConnectedWallet } from '@/types/wallet';
 import { formatNumber, formatUSD } from '@/utils/number';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import BalanceTotal from './BalanceTotal';
 import Button from '@/components/Button';
 import useBalance from '@/hooks/useBalance';
@@ -11,14 +11,15 @@ import useMyNFTVaults from '@/hooks/useMyNFTVaults';
 import useOraclePrice from '@/hooks/useOraclePrice';
 import BigNumber from 'bignumber.js';
 import NFTVaultLinkCard from '@/components/NFTVaultLinkCard';
+import { Abstraxion } from '@burnt-labs/abstraxion';
+import useDisconnect from '@/connection/useDisconnect';
 
 export type AccountOverlayProps = Omit<OverlayProps, 'ariaLabel'> & {
   wallet: ConnectedWallet;
-  onWillDisconnect?: () => void;
 };
 
 const useAccountOverlayElements = (props: AccountOverlayProps) => {
-  const { wallet, onWillDisconnect } = props;
+  const { wallet, onClose: onCloseModal } = props;
   const balance = useBalance(wallet);
 
   const formattedBalanceAmount = useMemo(
@@ -32,8 +33,8 @@ const useAccountOverlayElements = (props: AccountOverlayProps) => {
 
   const myNFTVaultsValueUSD = useMemo(() => {
     return ownedVaults.reduce((accm, vault) => {
-      const oraclePrice = getOraclePrice(vault.floorPrice.symbol);
-      const priceUSD = new BigNumber(vault.floorPrice.value).times(oraclePrice);
+      const oraclePrice = getOraclePrice(vault.fixedPrice.symbol);
+      const priceUSD = new BigNumber(vault.fixedPrice.value).times(oraclePrice);
 
       const share = vault.multisig.voters.find((voter) => voter.addr === wallet.account.address)?.share ?? 0;
       const shareUSD = priceUSD.times(share);
@@ -57,7 +58,7 @@ const useAccountOverlayElements = (props: AccountOverlayProps) => {
         <div className="flex flex-col gap-4 items-stretch">
           {raisingVaults.map((vault) => (
             <NFTVaultLinkCard
-              key={vault.contract.address}
+              key={vault.tokenId}
               href="raising-vault"
               nftVault={vault}
               amountLabel="My deposit"
@@ -73,7 +74,7 @@ const useAccountOverlayElements = (props: AccountOverlayProps) => {
         <div className="flex flex-col gap-4 items-stretch">
           {ownedVaults.map((vault) => (
             <NFTVaultLinkCard
-              key={vault.contract.address}
+              key={vault.tokenId}
               href="my-vault"
               nftVault={vault}
               amountLabel="My share"
@@ -90,8 +91,13 @@ const useAccountOverlayElements = (props: AccountOverlayProps) => {
     </div>
   );
 
+  const { disconnect, onClose } = useDisconnect({ onDisconnect: onCloseModal });
+
   const DisconnectButton = (
-    <Button iconType="disconnect" label="Disconnect" type="outline" color="on_primary" size="sm" onClick={onWillDisconnect} />
+    <>
+      <Button iconType="disconnect" label="Disconnect" type="outline" color="on_primary" size="sm" onClick={disconnect} />
+      <Abstraxion onClose={onClose} />
+    </>
   );
 
   return { Content, DisconnectButton };

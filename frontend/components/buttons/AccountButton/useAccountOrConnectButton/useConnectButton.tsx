@@ -10,11 +10,6 @@ const useConnectButton = (): {
   // connectModal: ReturnType<typeof useModal>;
   connectModal: null;
 } => {
-  // const wallets = useWallets();
-
-  // const [, setUserWallet] = useAtom(userWalletAtom);
-
-  // const { isConnecting } = useAutoConnect(Object.values(wallets));
   const { connect, connectingWallet } = useConnect();
 
   const connectModalButtonProps = useMemo(() => {

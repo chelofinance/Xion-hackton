@@ -62,9 +62,9 @@ const NFTs = ({ ownedNFTs, isNFTsLoading }: NFTsProps) => {
         <>
           <OverlayGrid xUnitPx={32} isExpandable={isNFTsExpandable}>
             {ownedNFTs?.map((ownedNFT, index) => (
-              <OverlayGrid.Item key={ownedNFT.contract.address}>
+              <OverlayGrid.Item key={ownedNFT.tokenId}>
                 <NFTCard
-                  key={ownedNFT.contract.address}
+                  key={ownedNFT.tokenId}
                   name={ownedNFT.nftName}
                   // mediaFormat={ownedNFT.media[0]?.format}
                   thumbnailURL={getNFTThumbnailURL(ownedNFT, index)}
@@ -80,7 +80,7 @@ const NFTs = ({ ownedNFTs, isNFTsLoading }: NFTsProps) => {
               <CaptionText
                 color="on_primary"
                 size="xs"
-                text={hoveredNFT.nftName ?? shortenAddress(hoveredNFT.contract.address, 4, 4)}
+                text={hoveredNFT.nftName}
                 shadowText={ownedNFTs[1] ? `and ${ownedNFTs.length - 1} more` : undefined}
               />
 
@@ -90,8 +90,8 @@ const NFTs = ({ ownedNFTs, isNFTsLoading }: NFTsProps) => {
                   <NumberText
                     color="on_primary"
                     size="sm"
-                    formattedNumber={formatNumber(hoveredNFT.floorPrice.value, 4)}
-                    unit={hoveredNFT.floorPrice.symbol}
+                    formattedNumber={formatNumber(hoveredNFT.fixedPrice.value, 4)}
+                    unit={hoveredNFT.fixedPrice.symbol}
                   />
                 </span>
               )}

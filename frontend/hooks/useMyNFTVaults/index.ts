@@ -1,4 +1,4 @@
-import { RAISING_NFT_VAULTS_DICT } from "@/constants/app";
+import { NFT_VAULTS_DICT } from "@/constants/app";
 import type { MyNFTVault, NFTVault } from "@/types/asset";
 import BigNumber from "bignumber.js";
 import { useCallback } from "react";
@@ -15,8 +15,8 @@ const useMyNFTVaults = (address: string | undefined): {
     const { getOraclePrice } = useOraclePrice();
 
     const getMyNFTVaultDetails = useCallback((vault: NFTVault): MyNFTVault => {
-        const oraclePrice = getOraclePrice(vault.floorPrice.symbol);
-        const priceUSD = new BigNumber(vault.floorPrice.value).times(oraclePrice);
+        const oraclePrice = getOraclePrice(vault.fixedPrice.symbol);
+        const priceUSD = new BigNumber(vault.fixedPrice.value).times(oraclePrice);
   
         const share = vault.multisig.voters.find(voter => voter.addr === address)?.share ?? 0;
         const shareUSD = priceUSD.times(share);
@@ -29,8 +29,8 @@ const useMyNFTVaults = (address: string | undefined): {
         }
     }, [address]);
 
-    const ownedVaults = !!address ? [...Object.values(RAISING_NFT_VAULTS_DICT), ...Object.values(RAISING_NFT_VAULTS_DICT).slice(0, 2)] : [];
-    const raisingVaults = !!address ? Object.values(RAISING_NFT_VAULTS_DICT).slice(0, 2) : [];
+    const ownedVaults = !!address ? [...Object.values(NFT_VAULTS_DICT), ...Object.values(NFT_VAULTS_DICT).slice(0, 2)] : [];
+    const raisingVaults = !!address ? Object.values(NFT_VAULTS_DICT).slice(0, 2) : [];
 
     return { 
         ownedVaults: ownedVaults.map(getMyNFTVaultDetails),

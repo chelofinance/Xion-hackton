@@ -1,17 +1,31 @@
 import type { AllChains, TokenSymbols } from "@/constants/app";
 import BigNumber from "bignumber.js";
 
-export type NFT = Readonly<{
-  nftName: string;
-  description: string;
-  imgSrc: string;
-  contract: { 
-    address: string;
-  };
+export type NFTCollection = Readonly<{
+  collectionId: string;
+  collectionName: string;
+  contractAddress: string;
+  createdByAddress: string;
   floorPrice: {
     value: number;
     symbol: TokenSymbols;
   };
+}>;
+
+export type NFT = Readonly<{
+  collection: NFTCollection;
+  tokenId: string;
+  nftName: string;
+  description: string;
+  imgSrc: string;
+  // contract: { 
+  //   address: string;
+  // };
+  fixedPrice: {
+    value: number;
+    symbol: TokenSymbols;
+  };
+  ownerAddress: string;
 }>;
 
 export type ICA = Readonly<{

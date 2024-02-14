@@ -13,7 +13,7 @@ type NFTVaultLinkCardProps = {
 const NFTVaultLinkCard = ({ href, nftVault, amountLabel, formattedAmount }: NFTVaultLinkCardProps) => {
   return (
     <Link
-      href={`/${href}/${nftVault.contract.address}`}
+      href={`/${href}/${nftVault.collection.contractAddress}${nftVault.tokenId}`}
       className="group/nft-vault-link overflow-hidden Transition_500 transition-colors rounded-card_md border border-solid border-transparent hover:border-ground"
     >
       <div className="flex items-center justify-between gap-x-4">
