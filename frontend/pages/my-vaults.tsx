@@ -3,7 +3,7 @@ import Main from '@/components/Main';
 import Heading from '@/components/Heading';
 import Card from '@/components/Card';
 import {formatNumber, formatUSD} from '@/utils/number';
-import { useMemo } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import useOraclePrice from '@/hooks/useOraclePrice';
 import BigNumber from 'bignumber.js';
 import useMyNFTVaults from '@/hooks/useMyNFTVaults';
@@ -21,6 +21,9 @@ import { useRouter } from 'next/router';
 import ChainLabel from '@/components/ChainLabel';
 import { AllChains } from '@/constants/app';
 import Tag from '@/components/Tag';
+import useProposals from '@/hooks/useProposals';
+import useAddMember from '@/hooks/useAddMember';
+import TextInput from '@/components/TextInput';
 
 // const CONFIG = chainConfigMap[AppChains.XION_TESTNET];
 
@@ -69,6 +72,18 @@ const MyVaults: NextPage = () => {
   
     const formattedTotalUSD = useMemo(() => formatUSD(balance.usd.plus(myNFTVaultsValueUSD)), [balance.usd, myNFTVaultsValueUSD]);
   
+
+    const { proposals, voteProposal } = useProposals(myVaults[0]?.ica.icaControllerAddress ?? '');
+
+    const { addMember } = useAddMember(myVaults[0]?.ica.icaControllerAddress ?? '');
+
+    const form = useRef<HTMLFormElement>(null);
+
+    const [newMemberAddress, setNewMemberAddress] = useState<string>('');
+    const onChangeNewMemberAddress = (debouncedValue: string) => {
+        setNewMemberAddress(debouncedValue);
+    };
+
     const Content = userWallet === null ? <AccountButton /> : (
         <div className="w-full flex items-stretch gap-x-14 text-body">
           <div className="w-1/3 space-y-14 pb-[5rem]">
@@ -82,14 +97,33 @@ const MyVaults: NextPage = () => {
                 </div>
             </Card>
         
-            {/* <section className="space-y-2">
-                <h4 className="Font_label_14px">Tokens</h4>
-                <CoinAmount color="body" size="lg" formattedAmount={formattedBalanceAmount} symbol={balance.symbol} />
+            {/* <section className="space-y-4">
+                <Heading tagName="h3">Proposals</Heading>
+
+                {proposals.map(proposal => (
+                    <Card key={proposal.id} color="primary" className="space-y-4 p-4">
+                        <div>#{proposal.id} {proposal.description}</div>
+                        {proposal.status === 'Pending' && <div className="flex justify-end gap-x-2">
+                            <Button color="on_primary" label="No" onClick={() => voteProposal(proposal.id, true)} />
+                            <Button color="on_primary" label="Yes" onClick={() => voteProposal(proposal.id, true)} />
+                        </div>}
+                        {proposal.status !== 'Pending' && <div className="flex justify-end gap-x-2">
+                            <Tag size="sm" label={proposal.status} />
+                        </div>}
+                    </Card>
+                ))}
+
+                {proposals.length === 0 && (
+                    <Card color="glass" className="p-4 text-body">
+                        No proposal found
+                    </Card>
+                )}
+
             </section> */}
           </div>
 
-          {myVaults[0] && <section className="grow shrink flex flex-col gap-y-6">
-                <Heading tagName="h3">Summary</Heading>
+          {myVaults[0] && <section className="grow shrink flex flex-col gap-y-8">
+                <Heading tagName="h3">Vault Summary</Heading>
 
                 <div className="flex flex-col gap-y-2">
                     <CopyHelper toCopy={myVaults[0].ica.icaMultisigAddress} className="text-body">
@@ -115,18 +149,60 @@ const MyVaults: NextPage = () => {
                     </CopyHelper>
                 </div>
 
+                <section className="space-y-4 mt-4">
+                    <Heading tagName="h4">Proposals</Heading>
+
+                    {proposals.map(proposal => (
+                        <Card key={proposal.id} color="primary" className="space-y-4 p-4">
+                            <div>#{proposal.id} {proposal.description}</div>
+                            {proposal.status === 'Pending' && <div className="flex justify-end gap-x-2">
+                                <Button color="on_primary" label="No" onClick={() => voteProposal(proposal.id, true)} />
+                                <Button color="on_primary" label="Yes" onClick={() => voteProposal(proposal.id, true)} />
+                            </div>}
+                            {proposal.status !== 'Pending' && <div className="flex justify-end gap-x-2">
+                                <Tag size="sm" label={proposal.status} />
+                            </div>}
+                        </Card>
+                    ))}
+
+                    {proposals.length === 0 && (
+                        <Card color="glass" className="p-4 text-body">
+                            No proposal found
+                        </Card>
+                    )}
+                </section>
+
                 <div className="flex flex-col gap-4 items-stretch mt-4">
-                {myVaults[0].nfts.map((nft) => (
-                    <NFTVaultLinkCard
-                        key={nft.tokenId}
-                        href="raising-vault"
-                        nftVault={nft}
-                        amountLabel="Fixed price"
-                        formattedAmount={formatNumber(nft.fixedPrice.value)}
-                        vaultAddress={myVaults[0].ica.icaMultisigAddress}
-                    />
-                ))}
+                    <Heading tagName="h4">NFTs</Heading>
+
+                    {myVaults[0].nfts.map((nft) => (
+                        <NFTVaultLinkCard
+                            key={nft.tokenId}
+                            href="raising-vault"
+                            nftVault={nft}
+                            amountLabel="Fixed price"
+                            formattedAmount={formatNumber(nft.fixedPrice.value)}
+                            vaultAddress={myVaults[0].ica.icaMultisigAddress}
+                        />
+                    ))}
                 </div>
+
+                <section className="space-y-4 mt-4">
+                    <Heading tagName="h4">Add Member</Heading>
+
+                    <TextInput 
+                        form={form.current} 
+                        initialValue={newMemberAddress} 
+                        onChange={onChangeNewMemberAddress} 
+                        type="text" 
+                        label="New member address"
+                        placeholder="New member address"
+                    />
+                    
+                    <div className="flex justify-end">
+                        <Button label="Add member" status={newMemberAddress.length === 0 ? 'disabled' : 'enabled'} onClick={() => addMember(newMemberAddress)} />
+                    </div>
+                </section>
             </section>}
 
             {!myVaults[0] && (
