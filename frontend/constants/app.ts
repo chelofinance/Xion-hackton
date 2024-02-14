@@ -219,11 +219,6 @@ export const NFT_VAULTS_DICT: Record<string, NFTVault> = {
     },
     multisig: {
       voters: [
-        // {
-        //   addr: 'xion1vmk42e8fjzdqxjvkrz9gdcxxp4xpxhey6f03xykfqzw0mqxwy4qs8lr8mn',
-        //   weight: 1,
-        //   share: 0.45,
-        // }, 
         {
           addr: 'xion14710481048488481084fdjkfjdkl',
           weight: 1,
@@ -271,8 +266,13 @@ export const NFT_VAULTS_DICT: Record<string, NFTVault> = {
         {
           addr: 'xion1vmk42e8fjzdqxjvkrz9gdcxxp4xpxhey6f03xykfqzw0mqxwy4qs8lr8mn',
           weight: 1,
-          share: 0.45,
+          share: 0.2,
         }, 
+        {
+          addr: 'xion1mg6m7kqmnc4ecx7grhm4mj2wvzdm44v3p5k8sn4p3qc2q8cda2uq4jcmt8',
+          weight: 1,
+          share: 0.45,
+        },
         {
           addr: 'xion14710481048488481084fdjkfjdkl',
           weight: 1,
@@ -317,11 +317,16 @@ export const NFT_VAULTS_DICT: Record<string, NFTVault> = {
     },
     multisig: {
       voters: [
-        // {
-        //   addr: 'xion1vmk42e8fjzdqxjvkrz9gdcxxp4xpxhey6f03xykfqzw0mqxwy4qs8lr8mn',
-        //   weight: 1,
-        //   share: 0.45,
-        // }, 
+        {
+          addr: 'xion1vmk42e8fjzdqxjvkrz9gdcxxp4xpxhey6f03xykfqzw0mqxwy4qs8lr8mn',
+          weight: 1,
+          share: 0.2,
+        }, 
+        {
+          addr: 'xion1mg6m7kqmnc4ecx7grhm4mj2wvzdm44v3p5k8sn4p3qc2q8cda2uq4jcmt8',
+          weight: 1,
+          share: 0.45,
+        },
         {
           addr: 'xion14710481048488481084fdjkfjdkl',
           weight: 1,
