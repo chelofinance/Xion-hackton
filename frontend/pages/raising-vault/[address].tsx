@@ -16,7 +16,7 @@ import useOraclePrice from '@/hooks/useOraclePrice';
 import BigNumber from 'bignumber.js';
 import useRaisingNFTVault from '@/hooks/useRaisingNFTVault';
 import useMyNFTVaults from '@/hooks/useMyNFTVaults';
-import {MyNFTVault, NFT} from '@/types/asset';
+import {MyNFTVault, NFT, RaisingNFT} from '@/types/asset';
 import {useAtom} from 'jotai';
 import {userWalletAtom} from '@/store/states';
 import NumberText from '@/components/NumberText';
@@ -45,6 +45,7 @@ const RaisingVault: NextPage = () => {
   const { address } = router.query;
 
   const nft = useRaisingNFTVault(address as string | undefined);
+  const [tmpRaisedAmount, setTmpRaisedAmount] = useState<number>(nft?.raisedAmount ?? 0);
 
   const [isDepositFormOpen, setIsDepositFormOpen] = useState<boolean>(false);
 
@@ -59,7 +60,7 @@ const RaisingVault: NextPage = () => {
   const { getOraclePrice } = useOraclePrice();
   const oraclePrice = nft ? getOraclePrice(nft.fixedPrice.symbol) : 0;
 
-  const maxDepositAmount = nft ? nft.fixedPrice.value - nft.raisedAmount : 0;
+  const maxDepositAmount = nft ? nft.fixedPrice.value - tmpRaisedAmount : 0;
   const maxDepositAmountUSD = useMemo(() => new BigNumber(maxDepositAmount).times(oraclePrice), [maxDepositAmount, oraclePrice]);
   const minDepositAmount = 0.000000000000000001;
 
@@ -82,7 +83,7 @@ const RaisingVault: NextPage = () => {
   }, [isDepositAmountValid]);
 
   const priceUSD = useMemo(() => new BigNumber(nft?.fixedPrice.value ?? 0).times(oraclePrice), [oraclePrice]);
-  const raisedAmountUSD = useMemo(() => new BigNumber(nft?.raisedAmount ?? 0).times(oraclePrice), [oraclePrice]);
+  const raisedAmountUSD = useMemo(() => new BigNumber(tmpRaisedAmount).times(oraclePrice), [oraclePrice, tmpRaisedAmount]);
 
   const formattedCompactPriceUSD = priceUSD.gte(1000) ? ` (${formatUSD(priceUSD, {compact: true, semiequate: true})})` : '';
   const formattedPriceUSD = `${formatUSD(priceUSD)}${formattedCompactPriceUSD}`;
@@ -120,7 +121,7 @@ const RaisingVault: NextPage = () => {
   const myRaisingVaults = useMyNFTVaults(userWallet?.account.address);
 
   const { myNFT, myVault } = useMemo<{
-    myNFT: NFT | undefined;
+    myNFT: RaisingNFT | undefined;
     myVault: MyNFTVault | undefined
   }>(
     () => {
@@ -146,6 +147,7 @@ const RaisingVault: NextPage = () => {
   const isRaisedAll = useMemo<boolean>(() => maxDepositAmount === 0, [maxDepositAmount]);
   const isOwningVault = useMemo<boolean>(() => nft?.ownerAddress === myVault?.ica.icaMultisigAddress, [nft, myVault]);
 
+
   const handleDeposit = async () => {
     try {
       const keplrSigner = await createKeplrSigner();
@@ -159,6 +161,8 @@ const RaisingVault: NextPage = () => {
         recipient: CONFIG.icaAccount.address,
         account: addr,
       });
+
+      setTmpRaisedAmount(tmpRaisedAmount + depositAmount);
     } catch (err) {
       console.log('ERR TRANSFER', err);
     }
@@ -322,7 +326,7 @@ const RaisingVault: NextPage = () => {
               <div className="h-6 flex flex-col justify-center Font_label_14px">Vault balance</div>
 
               <div className="flex flex-col gap-y-2 items-end">
-                <CoinAmount size="md" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(nft.raisedAmount)} />
+                <CoinAmount size="md" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(tmpRaisedAmount)} />
                 <CaptionAmount size="sm" formattedAmount={formattedPriceUSD} />
               </div>
             </Card>}
