@@ -8,25 +8,30 @@ import FTAmount from "@/struct/FTAmount";
  * 
  * @todo implement balance polling
  */
-const useBalance = (wallet: ConnectedWallet): FTAmount => {
+const useBalance = (wallet: ConnectedWallet | null): FTAmount => {
     const { client: abstraxionClient } = useAbstraxionSigningClient();
 
     const [balance, setBalance] = useState<Coin | null>(null);
 
     const updateAbstraxionBalance = useCallback(async (denom: string) => {
-        const fetchedBalance = await abstraxionClient?.getBalance(
-            wallet.account.address,
-            denom
-        );
+        try {
+            const fetchedBalance = await abstraxionClient?.getBalance(
+                wallet?.account.address ?? '',
+                denom
+            );
+    
+            setBalance(fetchedBalance ?? null);
+        } catch(e) {
+            console.log(e);
+        }
 
-        setBalance(fetchedBalance ?? null);
-    }, [abstraxionClient, wallet.account.address]);
+    }, [abstraxionClient, wallet?.account.address]);
 
     const updateBalance = useCallback(() => {
-        if (wallet.type === 'abstraxion') {
+        if (wallet?.type === 'abstraxion') {
             updateAbstraxionBalance('uxion');
         }
-    }, [wallet.type, updateAbstraxionBalance]);
+    }, [wallet?.type, updateAbstraxionBalance]);
 
     useEffect(() => {
         updateBalance();

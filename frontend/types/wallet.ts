@@ -14,6 +14,6 @@ export type Wallet = Readonly<{
 export type ConnectedWallet = Readonly<
   Omit<Wallet, 'onNoConnector'> 
   & {
-    account: Account;
+    account: { address: string };
   }
 >;

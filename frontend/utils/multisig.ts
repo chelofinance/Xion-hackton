@@ -20,7 +20,16 @@ export async function getIcaControllerAddress(client: any, ica_multisig_address:
     return ica_controller_response?.controller;
 }
 
-export async function createIcaMultisig(client: any, account: any, ica_factory: string, memberAddresses: string[]) {
+export type CreateIcaMultisigResult = {
+    ica_multisig_address: string | undefined;
+    channel_init_info: {
+        src_channel_id: string | undefined;
+        src_port_id: string | undefined;
+        destination_port: string | undefined;
+    };
+}
+
+export async function createIcaMultisig(client: any, account: any, ica_factory: string, memberAddresses: string[]): Promise<CreateIcaMultisigResult | null> {
     const voters = memberAddresses.map((address) => ({addr: address, weight: 1}));
 
     const msg = {
@@ -50,16 +59,16 @@ export async function createIcaMultisig(client: any, account: any, ica_factory: 
         console.log('instantiateResponse', instantiateResponse);
 
         const instantiate_events = instantiateResponse?.events.filter((e: any) => e.type === 'instantiate');
-        const ica_multisig_address = instantiate_events
+        const ica_multisig_address: string | undefined = instantiate_events
             ?.find((e: any) => e.attributes.find((attr: any) => attr.key === 'code_id' && attr.value === '158'))
             ?.attributes.find((attr: any) => attr.key === '_contract_address')?.value;
         console.log('ica_multisig_address:', ica_multisig_address);
 
         const channel_open_init_events = instantiateResponse?.events.filter((e: any) => e.type === 'channel_open_init');
         console.log('channel_open_init_events', channel_open_init_events);
-        const src_channel_id = channel_open_init_events[0]?.attributes?.find((attr: any) => attr.key === 'channel_id')?.value;
-        const src_port_id = channel_open_init_events[0]?.attributes?.find((attr: any) => attr.key === 'port_id')?.value;
-        const destination_port = channel_open_init_events[0]?.attributes?.find(
+        const src_channel_id: string | undefined = channel_open_init_events[0]?.attributes?.find((attr: any) => attr.key === 'channel_id')?.value;
+        const src_port_id: string | undefined = channel_open_init_events[0]?.attributes?.find((attr: any) => attr.key === 'port_id')?.value;
+        const destination_port: string | undefined = channel_open_init_events[0]?.attributes?.find(
             (attr: any) => attr.key === 'counterparty_port_id'
         )?.value;
 
@@ -74,6 +83,7 @@ export async function createIcaMultisig(client: any, account: any, ica_factory: 
     } catch (error) {
         console.log('error', error);
         alert(error);
+        return null;
     }
 }
 

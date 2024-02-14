@@ -10,7 +10,7 @@ const BalanceTotal = ({ formattedNumber, isLoading }: BalanceTotalProps) => {
   return isLoading ? (
     <LoadingRows color="on_primary" fontClassName="Font_data_32px_num" />
   ) : (
-    <NumberText color="on_primary" size="xl" type="small_fractions" formattedNumber={formattedNumber} animate />
+    <NumberText color="body" size="xl" type="small_fractions" formattedNumber={formattedNumber} animate />
   );
 };
 

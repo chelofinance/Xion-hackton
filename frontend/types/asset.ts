@@ -52,15 +52,19 @@ export type RaisingNFT = NFT &
     raisedAmount: number;
   }>;
 
-export type NFTVault = RaisingNFT &
+/**
+ * 
+ * @todo replace with array of NFTs
+ */
+export type NFTVault =
   Readonly<{
+    nfts: readonly RaisingNFT[];
     ica: ICA;
     multisig: Multisig;
   }>;
 
 export type MyNFTVault = NFTVault &
   Readonly<{
-    priceUSD: BigNumber;
     share: number;
-    shareUSD: BigNumber;
+    // shareUSD: BigNumber;
   }>;

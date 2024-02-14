@@ -9,6 +9,8 @@ import Heading from '@/components/Heading';
 import VaultSearchTextInput from '@/components/form-presets/VaultSearchTextInput';
 import Button from '@/components/Button';
 import {useRouter} from 'next/router';
+import { useAtom } from 'jotai';
+import { userWalletAtom } from '@/store/states';
 
 const AsciiGlobe = dynamic(() => import('@/components/canvases/AsciiGlobe'), {
   ssr: false,
@@ -19,7 +21,9 @@ const Home: NextPage = () => {
   const [isAppLaunched, setIsAppLaunched] = useState<boolean>(!isMobile);
 
   const router = useRouter();
-  const onClickCreateVault = useCallback(() => router.push('/create-vault'), []);
+  // const onClickCreateVault = useCallback(() => router.push('/create-vault'), []);
+
+  const [userWallet] = useAtom(userWalletAtom);
 
   return (
     <>
@@ -34,7 +38,21 @@ const Home: NextPage = () => {
             <span>Cross-chain trades made easy</span>
           </Heading>
 
-          <section className="space-y-4">
+          {userWallet !== null && <div className="flex justify-center items-center gap-x-2">
+            <Button 
+              type="outline"
+              label="See my vaults"
+              iconType="arrow_forward"
+              onClick={() => router.push('/my-vaults')}
+            />
+            <Button 
+              label="Create vault"
+              iconType="arrow_forward"
+              onClick={() => router.push('/create-vault')}
+            />
+          </div>}
+
+          {/* <section className="space-y-4">
             <VaultSearchTextInput
               label="Search NFT name, or address"
               placeholder="Search NFT name, or address"
@@ -53,7 +71,7 @@ const Home: NextPage = () => {
                 onClick={onClickCreateVault}
               />
             </div>
-          </section>
+          </section> */}
 
           <NFTsTable tooltipLayer="base" className="mt-20 md:mx-page_x" />
         </Main>

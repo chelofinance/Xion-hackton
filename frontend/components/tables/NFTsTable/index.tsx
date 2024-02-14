@@ -33,11 +33,11 @@ type NFTsTableProps = {
 
 const NFTsTable = ({className = '', tooltipLayer}: NFTsTableProps) => {
   const {getOraclePrice} = useOraclePrice();
-  const vaults = useRaisingNFTVaults();
+  const nfts = useRaisingNFTVaults();
 
   const rows = useMemo<readonly NFTsTableRow[]>(() => {
     return (
-      vaults.map((item) => {
+      nfts.map((item) => {
         const id = `${item.collection.contractAddress}${item.tokenId}`;
 
         const nftName = item.nftName;
