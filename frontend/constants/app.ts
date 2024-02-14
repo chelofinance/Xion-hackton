@@ -266,3 +266,18 @@ export const NFT_VAULTS: readonly NFTVault[] = [
   },
 ];
 
+export enum ProposalStatus {
+  Pending = 1,
+  Open = 2,
+  Rejected = 3,
+  Passed = 4,
+  Executed = 5,
+};
+
+export const PROPOSAL_STATUS_LABEL_DICT: Record<ProposalStatus, string> = {
+  [ProposalStatus.Pending]: 'Pending',
+  [ProposalStatus.Open]: 'Open',
+  [ProposalStatus.Rejected]: 'Rejected',
+  [ProposalStatus.Passed]: 'Passed',
+  [ProposalStatus.Executed]: 'Executed',
+};

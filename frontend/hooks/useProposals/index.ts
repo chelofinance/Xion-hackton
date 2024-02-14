@@ -1,8 +1,8 @@
 import { useAbstraxionAccount, useAbstraxionSigningClient } from "@burnt-labs/abstraxion";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { getProposalList, voteProposal as voteMultisigProposal } from "@/utils/multisig";
+import { ProposalStatus } from "@/constants/app";
 
-type ProposalStatus = 'Approved' | 'Rejected' | 'Pending';
 type Proposal = {
     id: string;
     description: string;
@@ -13,12 +13,12 @@ const TEST_PROPOSALS: Proposal[] = [
     {
         id: '1',
         description: 'buy this NFT',
-        status: 'Approved'
+        status: 4
     },
     {
         id: '2',
         description: 'sell this NFT',
-        status: 'Pending'
+        status: 1,
     },
 ];
 
