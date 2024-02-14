@@ -26,6 +26,7 @@ export type NFT = Readonly<{
     symbol: TokenSymbols;
   };
   ownerAddress: string;
+  buyContractAddress: string;
   // contract: {
   //   address: string;
   //   buyAddr: string;

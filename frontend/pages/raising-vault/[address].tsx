@@ -23,6 +23,7 @@ import NumberText from '@/components/NumberText';
 import {injectiveClient, transferInjective} from '@/utils/injective';
 import {useRouter} from 'next/router';
 import PageLoader from '@/components/PageLoader';
+import Tag from '@/components/Tag';
 
 const CONFIG = chainConfigMap[AppChains.XION_TESTNET];
 
@@ -56,7 +57,7 @@ const RaisingVault: NextPage = () => {
 
   const maxDepositAmount = vault ? vault.fixedPrice.value - vault.raisedAmount : 0;
   const maxDepositAmountUSD = useMemo(() => new BigNumber(maxDepositAmount).times(oraclePrice), [maxDepositAmount, oraclePrice]);
-  const minDepositAmount = 0.000001;
+  const minDepositAmount = 0.000000000000000001;
 
   const [depositAmount, setDepositAmount] = useState<number>(maxDepositAmount);
   const [isDepositAmountValid, setIsDepositAmountValid] = useState<boolean>(true);
@@ -137,6 +138,8 @@ const RaisingVault: NextPage = () => {
     }
   };
 
+  const isRaisedAll = useMemo<boolean>(() => maxDepositAmount === 0, [maxDepositAmount]);
+
   if (vault === undefined)
     return <PageLoader />;
 
@@ -190,7 +193,11 @@ const RaisingVault: NextPage = () => {
 
           <div className="grow shrink space-y-4">
             <div className="flex items-center justify-between gap-x-4">
-              <Heading tagName="h3">{vault.nftName}</Heading>
+              <Heading tagName="h3">
+                {vault.nftName}
+                {isRaisedAll && <Tag label="Voilà! All raised" size="sm" className="ml-2" />}
+              </Heading>
+
               <ChainLabel chain={vault.chain} />
             </div>
 
@@ -225,7 +232,29 @@ const RaisingVault: NextPage = () => {
               {/* </div> */}
             </Card>
 
-            <Card color="primary" className="flex items-stretch justify-between gap-x-4 p-4">
+            {isRaisedAll && <Card color="glass" className="flex items-stretch justify-between gap-x-4 p-4 text-body">
+              <div className="h-6 flex flex-col justify-center Font_label_14px">Vault balance</div>
+
+              <div className="flex flex-col gap-y-2 items-end">
+                <CoinAmount size="md" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(vault.raisedAmount)} />
+                <CaptionAmount size="sm" formattedAmount={formattedPriceUSD} />
+              </div>
+            </Card>}
+
+            {isRaisedAll && (
+              <div className="flex justify-end items-center gap-x-4">
+                <Button
+                  color="primary"
+                  size="lg"
+                  label={myVault ? 'Buy NFT' : 'Cannot join anymore'}
+                  iconType="arrow_forward"
+                  className="w-full md:w-fit"
+                  status={myVault ? 'enabled' : 'disabled'}
+                />
+              </div>
+            )}
+
+            {!isRaisedAll && <Card color="primary" className="flex items-stretch justify-between gap-x-4 p-4">
               <div className="h-6 flex flex-col justify-center Font_label_14px">Deposit up to</div>
 
               <div className="flex flex-col gap-y-2 items-end">
@@ -239,9 +268,9 @@ const RaisingVault: NextPage = () => {
                   <span className="Font_caption_md_num text-ground">{formatUSD(maxDepositAmountUSD)}</span>
                 </div>
               </div>
-            </Card>
+            </Card>}
 
-            {!isDepositFormOpen && (
+            {!isRaisedAll && !isDepositFormOpen && (
               <div className="flex justify-end items-center gap-x-4">
                 <Button
                   color="primary"
