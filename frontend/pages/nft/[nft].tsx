@@ -6,29 +6,16 @@ import NFTTumbnail from '@/components/NFTThumbnail';
 import Card from '@/components/Card';
 import {formatNumber} from '@/utils/number';
 import CoinAmount from '@/components/CoinAmount';
-import {TokenSymbols} from '@/constants/app';
+import {RAISING_NFT_VAULTS_DICT, TokenSymbols} from '@/constants/app';
 import Button from '@/components/Button';
 import {ButtonStatus} from '@/components/Button/types';
 import {useAbstraxionAccount, useAbstraxionSigningClient} from '@burnt-labs/abstraxion';
-import {createProposal} from '@/utils/multisig';
+import {createChannelProposal, createProposal, executeProposal} from '@/utils/multisig';
 import {chainConfigMap, AppChains} from '@/constants/app';
-import {injectiveClient, transferInjective} from '@/utils/injective';
+import {injectiveClient} from '@/utils/injective';
 import {InjectiveSigningStargateClient} from '@injectivelabs/sdk-ts/dist/cjs/core/stargate';
 import {createIcaBuyMsg} from '@/utils/ica';
-
-const NFT_DETAIL: {
-  id: string;
-  nftName: string;
-  imgSrc: string;
-  price: number;
-  participants: number;
-} = {
-  id: 'MultiSig 1',
-  nftName: 'Monkey - 2004(WOOD)',
-  imgSrc: 'https://images.talis.art/tokens/6582d0be4a3988d286be0f9c/mediaThumbnail',
-  price: 0.1,
-  participants: 13133,
-};
+import {useRouter} from 'next/router';
 
 const CONFIG = chainConfigMap[AppChains.XION_TESTNET];
 const INJECTIVE_ID = 'injective-888';
@@ -47,6 +34,7 @@ const createKeplrSigner = async () => {
 const CreateVault: NextPage = () => {
   const [status, setStatus] = React.useState<ButtonStatus>('enabled');
   const {client} = useAbstraxionSigningClient();
+  const router = useRouter();
   const {data: account} = useAbstraxionAccount();
   const [vault, setVault] = React.useState('');
   const [vaultBalance, setVaultBalance] = React.useState<string>('');
@@ -57,6 +45,7 @@ const CreateVault: NextPage = () => {
     client: null,
     signer: null,
   });
+  const nft = RAISING_NFT_VAULTS_DICT[router.query.nft as keyof typeof RAISING_NFT_VAULTS_DICT];
 
   const init = async () => {
     try {
@@ -71,42 +60,40 @@ const CreateVault: NextPage = () => {
     }
   };
 
-  const handleVaultTransfer = async () => {
+  const handleICABuyNft = async () => {
     try {
-      const accounts = await signer.getAccounts();
-      const addr = accounts[0].address;
-
-      if (!cosmosCli) {
-        throw new Error('bad initialization');
-      }
-      console.log(accounts);
-
-      await transferInjective({
-        client: cosmosCli,
-        amount: '100000000000000000',
-        recipient: CONFIG.icaAccount.address,
-        account: addr,
+      const proposal = createIcaBuyMsg({
+        ica: CONFIG.icaAccount.address,
+        buyContract: nft.contract.buyAddr,
+        nftContract: nft.contract.address,
+        tokenId: nft.contract.id,
+        cost: nft.contract.price,
       });
+      const {proposal_id} = await createProposal({
+        client,
+        account,
+        injectiveMsg: proposal,
+        icaMultisigAddress: CONFIG.cw3FixedMultisig.address,
+        icaControllerAddress: CONFIG.icaController.address,
+      });
+      await executeProposal(client, account, CONFIG.cw3FixedMultisig.address, Number(proposal_id));
     } catch (err) {
-      console.log('ERR TRANSFER', err);
+      console.log('ERR:', err);
     }
   };
 
-  const handleICABuyNft = async () => {
-    const proposal = createIcaBuyMsg({
-      ica: CONFIG.icaAccount.address,
-      buyContract: 'inj1qt5ztu5l3cdkcwzsv2pe9u2mk3fq56rdckr0r7',
-      nftContract: 'inj1v3gg98tu6u7wq3a5dtzk97avk5rp97srz47wrs',
-      tokenId: '0',
-      cost: '100000000000000000',
-    });
-    await createProposal({
-      client,
-      account,
-      injectiveMsg: proposal,
-      icaMultisigAddress: CONFIG.cw3FixedMultisig.address,
-      icaControllerAddress: CONFIG.icaController.address,
-    });
+  const handleCreateChannel = async () => {
+    try {
+      const {proposal_id} = await createChannelProposal({
+        client,
+        account,
+        icaMultisigAddress: CONFIG.cw3FixedMultisig.address,
+        icaControllerAddress: CONFIG.icaController.address,
+      });
+      await executeProposal(client, account, CONFIG.cw3FixedMultisig.address, Number(proposal_id));
+    } catch (err) {
+      console.log('ERR:', err);
+    }
   };
 
   React.useEffect(() => {
@@ -119,24 +106,24 @@ const CreateVault: NextPage = () => {
 
       <section className="space-y-4 mt-20">
         <div className="flex items-stretch gap-x-10">
-          <NFTTumbnail size="xl" imgSrc={NFT_DETAIL.imgSrc} className="grow-0 shrink-0" />
+          <NFTTumbnail size="xl" imgSrc={nft.imgSrc} className="grow-0 shrink-0" />
 
           <div className="grow shrink space-y-4">
-            <Heading tagName="h3">{NFT_DETAIL.nftName}</Heading>
+            <Heading tagName="h3">{nft.nftName}</Heading>
 
             <Card color="glass" className="flex flex-col items-stretch justify-between gap-x-4 p-4 text-body">
               <div className="flex justify-between w-full">
                 <div className="h-6 flex flex-col justify-center">Price:</div>
 
                 <div className="flex flex-col gap-y-2 items-end">
-                  <CoinAmount size="xl" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(NFT_DETAIL.price)} />
+                  <CoinAmount size="xl" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(nft.floorPrice.value)} />
                 </div>
               </div>
               <div className="flex justify-between w-full">
                 <div className="h-6 flex flex-col justify-center">Vault balance:</div>
 
                 <div className="flex flex-col gap-y-2 items-end">
-                  <CoinAmount size="xl" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(NFT_DETAIL.price)} />
+                  <CoinAmount size="xl" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(nft.floorPrice.value)} />
                 </div>
               </div>
             </Card>
@@ -146,10 +133,10 @@ const CreateVault: NextPage = () => {
               <Button
                 color="primary"
                 size="md"
-                label="Send ICA funds"
+                label="Create Channel"
                 iconType="arrow_forward"
                 className="w-full md:w-fit"
-                onClick={handleVaultTransfer}
+                onClick={handleCreateChannel}
                 status={status}
               />
               <Button

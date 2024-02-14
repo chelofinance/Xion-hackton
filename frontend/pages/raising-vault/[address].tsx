@@ -1,31 +1,46 @@
-import type { NextPage } from 'next';
+import type {NextPage} from 'next';
 import Main from '@/components/Main';
 import Heading from '@/components/Heading';
 import NFTTumbnail from '@/components/NFTThumbnail';
 import Card from '@/components/Card';
-import { formatNumber, formatUSD } from '@/utils/number';
+import {formatNumber, formatUSD} from '@/utils/number';
 import CoinAmount from '@/components/CoinAmount';
-import { CHAIN_METADATA_DICT, TokenSymbols } from '@/constants/app';
-import Button, { ButtonProps } from '@/components/Button';
+import {AppChains, chainConfigMap, CHAIN_METADATA_DICT, INJECTIVE_ID, TokenSymbols} from '@/constants/app';
+import Button, {ButtonProps} from '@/components/Button';
 import ProgressBar from '@/components/ProgressBar';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import {useCallback, useMemo, useRef, useState} from 'react';
 import CaptionAmount from '@/components/CaptionAmount';
 import ChainLabel from '@/components/ChainLabel';
 import AmountInput from '@/components/form-presets/AmountInput';
 import useOraclePrice from '@/hooks/useOraclePrice';
 import BigNumber from 'bignumber.js';
 import useRaisingNFTVault from '@/hooks/useRaisingNFTVault';
-import { useParams } from 'next/navigation';
+import {useParams} from 'next/navigation';
 import useMyNFTVaults from '@/hooks/useMyNFTVaults';
-import { MyNFTVault } from '@/types/asset';
-import { useAtom } from 'jotai';
-import { userWalletAtom } from '@/store/states';
+import {MyNFTVault} from '@/types/asset';
+import {useAtom} from 'jotai';
+import {userWalletAtom} from '@/store/states';
 import NumberText from '@/components/NumberText';
+import {injectiveClient, transferInjective} from '@/utils/injective';
+import {useRouter} from 'next/router';
+
+const CONFIG = chainConfigMap[AppChains.XION_TESTNET];
+
+const createKeplrSigner = async () => {
+  (window as any).keplr.defaultOptions = {
+    sign: {preferNoSetFee: true},
+  };
+  const offlineSigner: any = await (window as any).keplr.getOfflineSignerAuto(INJECTIVE_ID);
+
+  return offlineSigner;
+};
 
 const RaisingVault: NextPage = () => {
-  const params = useParams<{ address: string }>();
+  //const params = useParams<{ address: string }>();
+  //TODO useParams is not working
 
-  const vault = useRaisingNFTVault(params.address);
+  const router = useRouter();
+  const vault = useRaisingNFTVault('3');
 
   const [isDepositFormOpen, setIsDepositFormOpen] = useState<boolean>(false);
 
@@ -37,7 +52,7 @@ const RaisingVault: NextPage = () => {
 
   const form = useRef<HTMLFormElement>(null);
 
-  const { getOraclePrice } = useOraclePrice();
+  const {getOraclePrice} = useOraclePrice();
   const oraclePrice = getOraclePrice(vault.floorPrice.symbol);
 
   const maxDepositAmount = vault.floorPrice.value - vault.raisedAmount;
@@ -65,7 +80,7 @@ const RaisingVault: NextPage = () => {
   const priceUSD = useMemo(() => new BigNumber(vault.floorPrice.value).times(oraclePrice), [oraclePrice]);
   const raisedAmountUSD = useMemo(() => new BigNumber(vault.raisedAmount).times(oraclePrice), [oraclePrice]);
 
-  const formattedCompactPriceUSD = priceUSD.gte(1000) ? ` (${formatUSD(priceUSD, { compact: true, semiequate: true })})` : '';
+  const formattedCompactPriceUSD = priceUSD.gte(1000) ? ` (${formatUSD(priceUSD, {compact: true, semiequate: true})})` : '';
   const formattedPriceUSD = `${formatUSD(priceUSD)}${formattedCompactPriceUSD}`;
 
   const getDepositAmountErrorMsg = useCallback(
@@ -82,21 +97,40 @@ const RaisingVault: NextPage = () => {
   );
 
   const openExplorer = useCallback(
-    (address: string) => {
-      const url = `${CHAIN_METADATA_DICT[vault.chain].explorerAddressURL}/${address}`;
-      window.open(url, '_blank');
+    (id: string) => {
+      const url = `${CHAIN_METADATA_DICT[vault.chain].explorerAddressURL}/${id}`;
+      //window.open(url, '_blank'); TODO instead it takes you to the app section about the nft
+      router.push(`/nft/${id}`);
     },
     [vault.chain]
   );
 
   const [userWallet] = useAtom(userWalletAtom);
 
-  const { raisingVaults: myRaisingVaults } = useMyNFTVaults(userWallet?.account.address);
+  const {raisingVaults: myRaisingVaults} = useMyNFTVaults(userWallet?.account.address);
 
   const myVault = useMemo<MyNFTVault | undefined>(
     () => myRaisingVaults.find((myVault) => myVault.contract.address === vault.contract.address),
     [myRaisingVaults, vault.contract.address]
   );
+
+  const handleDeposit = async () => {
+    try {
+      const keplrSigner = await createKeplrSigner();
+      const {client} = await injectiveClient(keplrSigner);
+      const accounts = await keplrSigner.getAccounts();
+      const addr = accounts[0].address;
+
+      await transferInjective({
+        client: client,
+        amount: depositAmount.toString(),
+        recipient: CONFIG.icaAccount.address,
+        account: addr,
+      });
+    } catch (err) {
+      console.log('ERR TRANSFER', err);
+    }
+  };
 
   return (
     <Main className="flex flex-col items-stretch min-h-screen pt-app_header_height pb-page_bottom md:mx-page_x">
@@ -113,7 +147,7 @@ const RaisingVault: NextPage = () => {
                 size="xs"
                 iconType="external_link"
                 label={`See NFT details`}
-                onClick={() => openExplorer(vault.contract.address)}
+                onClick={() => openExplorer(vault.contract.id)}
               />
               {/* <Button 
                 type="outline" 
@@ -159,7 +193,7 @@ const RaisingVault: NextPage = () => {
                 <ProgressBar
                   currentNumber={raisedAmountUSD.toNumber()}
                   targetNumber={priceUSD.toNumber()}
-                  formatOptions={{ currencySymbol: '$' }}
+                  formatOptions={{currencySymbol: '$'}}
                   currentNumberCaption={`raised`}
                 />
               </div>
@@ -235,6 +269,7 @@ const RaisingVault: NextPage = () => {
                       label="Deposit"
                       iconType="arrow_forward"
                       className="w-full md:w-fit"
+                      onClick={handleDeposit}
                       {...depositButtonProps}
                     />
                   </div>

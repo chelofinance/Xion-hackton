@@ -8,7 +8,9 @@ const query: Action = async (action) => {
     required(args, "message");
     required(args, "network");
 
-    const data = await client.queryContractSmart(args.contract as string, args.message as object);
+    const data = JSON.stringify(
+        await client.queryContractSmart(args.contract as string, args.message as object)
+    );
 
     return {
         data,
