@@ -13,12 +13,12 @@ const TEST_PROPOSALS: Proposal[] = [
     {
         id: '1',
         description: 'buy this NFT',
-        status: 4
+        status: ProposalStatus.Passed,
     },
     {
         id: '2',
         description: 'sell this NFT',
-        status: 1,
+        status: ProposalStatus.Pending,
     },
 ];
 
