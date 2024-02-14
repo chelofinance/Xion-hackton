@@ -45,7 +45,7 @@ const useAccountOrConnectButton = (): {
   const buttonProps: AccountButtonProps = (
     isConnected
       ? accountButtonProps
-      : { label: 'Connect', onClick: () => setXionModal(true)}
+      : { label: 'Connect', iconType: 'arrow_forward', onClick: () => setXionModal(true)}
   );
   const modal = accountModal ?? connectModal;
   // END xion login
