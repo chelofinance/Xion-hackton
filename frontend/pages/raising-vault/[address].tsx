@@ -15,7 +15,6 @@ import AmountInput from '@/components/form-presets/AmountInput';
 import useOraclePrice from '@/hooks/useOraclePrice';
 import BigNumber from 'bignumber.js';
 import useRaisingNFTVault from '@/hooks/useRaisingNFTVault';
-import {useParams} from 'next/navigation';
 import useMyNFTVaults from '@/hooks/useMyNFTVaults';
 import {MyNFTVault} from '@/types/asset';
 import {useAtom} from 'jotai';
@@ -23,6 +22,7 @@ import {userWalletAtom} from '@/store/states';
 import NumberText from '@/components/NumberText';
 import {injectiveClient, transferInjective} from '@/utils/injective';
 import {useRouter} from 'next/router';
+import PageLoader from '@/components/PageLoader';
 
 const CONFIG = chainConfigMap[AppChains.XION_TESTNET];
 
@@ -36,11 +36,10 @@ const createKeplrSigner = async () => {
 };
 
 const RaisingVault: NextPage = () => {
-  //const params = useParams<{ address: string }>();
-  //TODO useParams is not working
-
   const router = useRouter();
-  const vault = useRaisingNFTVault('3');
+  const { address } = router.query;
+
+  const vault = useRaisingNFTVault(address as string | undefined);
 
   const [isDepositFormOpen, setIsDepositFormOpen] = useState<boolean>(false);
 
@@ -52,12 +51,12 @@ const RaisingVault: NextPage = () => {
 
   const form = useRef<HTMLFormElement>(null);
 
-  const {getOraclePrice} = useOraclePrice();
-  const oraclePrice = getOraclePrice(vault.floorPrice.symbol);
+  const { getOraclePrice } = useOraclePrice();
+  const oraclePrice = vault ? getOraclePrice(vault.fixedPrice.symbol) : 0;
 
-  const maxDepositAmount = vault.floorPrice.value - vault.raisedAmount;
+  const maxDepositAmount = vault ? vault.fixedPrice.value - vault.raisedAmount : 0;
   const maxDepositAmountUSD = useMemo(() => new BigNumber(maxDepositAmount).times(oraclePrice), [maxDepositAmount, oraclePrice]);
-  const minDepositAmount = 10;
+  const minDepositAmount = 0.000001;
 
   const [depositAmount, setDepositAmount] = useState<number>(maxDepositAmount);
   const [isDepositAmountValid, setIsDepositAmountValid] = useState<boolean>(true);
@@ -77,8 +76,8 @@ const RaisingVault: NextPage = () => {
     };
   }, [isDepositAmountValid]);
 
-  const priceUSD = useMemo(() => new BigNumber(vault.floorPrice.value).times(oraclePrice), [oraclePrice]);
-  const raisedAmountUSD = useMemo(() => new BigNumber(vault.raisedAmount).times(oraclePrice), [oraclePrice]);
+  const priceUSD = useMemo(() => new BigNumber(vault?.fixedPrice.value ?? 0).times(oraclePrice), [oraclePrice]);
+  const raisedAmountUSD = useMemo(() => new BigNumber(vault?.raisedAmount ?? 0).times(oraclePrice), [oraclePrice]);
 
   const formattedCompactPriceUSD = priceUSD.gte(1000) ? ` (${formatUSD(priceUSD, {compact: true, semiequate: true})})` : '';
   const formattedPriceUSD = `${formatUSD(priceUSD)}${formattedCompactPriceUSD}`;
@@ -97,21 +96,27 @@ const RaisingVault: NextPage = () => {
   );
 
   const openExplorer = useCallback(
-    (id: string) => {
-      const url = `${CHAIN_METADATA_DICT[vault.chain].explorerAddressURL}/${id}`;
-      //window.open(url, '_blank'); TODO instead it takes you to the app section about the nft
-      router.push(`/nft/${id}`);
+    (collectionAddress: string) => {
+      if (!vault?.chain) return;
+
+      const url = `${CHAIN_METADATA_DICT[vault.chain].explorerAddressURL}/contract/${collectionAddress}`;
+      window.open(url, '_blank');
     },
-    [vault.chain]
+    [vault?.chain]
   );
+
+  const goToNFTPage = useCallback(() => {
+    if (vault)
+      router.push(`/nft/${vault.collection.contractAddress}${vault.tokenId}`);
+  }, [vault]);
 
   const [userWallet] = useAtom(userWalletAtom);
 
   const {raisingVaults: myRaisingVaults} = useMyNFTVaults(userWallet?.account.address);
 
   const myVault = useMemo<MyNFTVault | undefined>(
-    () => myRaisingVaults.find((myVault) => myVault.contract.address === vault.contract.address),
-    [myRaisingVaults, vault.contract.address]
+    () => myRaisingVaults.find((myVault) => myVault.tokenId === vault?.tokenId),
+    [myRaisingVaults, vault?.tokenId]
   );
 
   const handleDeposit = async () => {
@@ -132,6 +137,9 @@ const RaisingVault: NextPage = () => {
     }
   };
 
+  if (vault === undefined)
+    return <PageLoader />;
+
   return (
     <Main className="flex flex-col items-stretch min-h-screen pt-app_header_height pb-page_bottom md:mx-page_x">
       <Heading tagName="h2">Raising Vault</Heading>
@@ -146,8 +154,15 @@ const RaisingVault: NextPage = () => {
                 type="outline"
                 size="xs"
                 iconType="external_link"
+                label={`See in chain explorer`}
+                onClick={() => openExplorer(vault.collection.contractAddress)}
+              />
+              <Button
+                type="outline"
+                size="xs"
+                iconType="external_link"
                 label={`See NFT details`}
-                onClick={() => openExplorer(vault.contract.id)}
+                onClick={goToNFTPage}
               />
               {/* <Button 
                 type="outline" 
@@ -204,7 +219,7 @@ const RaisingVault: NextPage = () => {
               <div className="h-6 flex flex-col justify-center Font_label_14px">Fixed price</div>
 
               <div className="flex flex-col gap-y-2 items-end">
-                <CoinAmount size="md" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(vault.floorPrice.value)} />
+                <CoinAmount size="md" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(vault.fixedPrice.value)} />
                 <CaptionAmount size="sm" formattedAmount={formattedPriceUSD} />
               </div>
               {/* </div> */}

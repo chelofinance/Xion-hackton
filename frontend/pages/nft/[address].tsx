@@ -16,6 +16,8 @@ import {injectiveClient} from '@/utils/injective';
 import {InjectiveSigningStargateClient} from '@injectivelabs/sdk-ts/dist/cjs/core/stargate';
 import {createIcaBuyMsg} from '@/utils/ica';
 import {useRouter} from 'next/router';
+import useRaisingNFTVault from '@/hooks/useRaisingNFTVault';
+import PageLoader from '@/components/PageLoader';
 
 const CONFIG = chainConfigMap[AppChains.XION_TESTNET];
 const INJECTIVE_ID = 'injective-888';
@@ -35,6 +37,8 @@ const CreateVault: NextPage = () => {
   const [status, setStatus] = React.useState<ButtonStatus>('enabled');
   const {client} = useAbstraxionSigningClient();
   const router = useRouter();
+  const { address } = router.query;
+
   const {data: account} = useAbstraxionAccount();
   const [vault, setVault] = React.useState('');
   const [vaultBalance, setVaultBalance] = React.useState<string>('');
@@ -45,7 +49,8 @@ const CreateVault: NextPage = () => {
     client: null,
     signer: null,
   });
-  const nft = RAISING_NFT_VAULTS_DICT[router.query.nft as keyof typeof RAISING_NFT_VAULTS_DICT];
+  // const nft = RAISING_NFT_VAULTS_DICT[router.query.nft as keyof typeof RAISING_NFT_VAULTS_DICT];
+  const nft = useRaisingNFTVault(address as string | undefined);
 
   const init = async () => {
     try {
@@ -61,13 +66,16 @@ const CreateVault: NextPage = () => {
   };
 
   const handleICABuyNft = async () => {
+    if (!nft) return;
+
     try {
       const proposal = createIcaBuyMsg({
         ica: CONFIG.icaAccount.address,
-        buyContract: nft.contract.buyAddr,
-        nftContract: nft.contract.address,
-        tokenId: nft.contract.id,
-        cost: nft.contract.price,
+        // buyContract: nft.contract.buyAddr,
+        buyContract: '',
+        nftContract: nft.collection.contractAddress,
+        tokenId: nft.tokenId,
+        cost: (nft.fixedPrice.value * 1000000).toString(), // tmp
       });
       const {proposal_id} = await createProposal({
         client,
@@ -100,6 +108,9 @@ const CreateVault: NextPage = () => {
     init();
   }, []);
 
+  if (!nft)
+    return <PageLoader />;
+
   return (
     <Main className="flex flex-col items-stretch min-h-screen pt-app_header_height pb-page_bottom md:mx-page_x">
       <Heading tagName="h2">Create Vault</Heading>
@@ -116,14 +127,14 @@ const CreateVault: NextPage = () => {
                 <div className="h-6 flex flex-col justify-center">Price:</div>
 
                 <div className="flex flex-col gap-y-2 items-end">
-                  <CoinAmount size="xl" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(nft.floorPrice.value)} />
+                  <CoinAmount size="xl" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(nft.fixedPrice.value)} />
                 </div>
               </div>
               <div className="flex justify-between w-full">
                 <div className="h-6 flex flex-col justify-center">Vault balance:</div>
 
                 <div className="flex flex-col gap-y-2 items-end">
-                  <CoinAmount size="xl" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(nft.floorPrice.value)} />
+                  <CoinAmount size="xl" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(nft.fixedPrice.value)} />
                 </div>
               </div>
             </Card>

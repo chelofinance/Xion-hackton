@@ -1,8 +1,8 @@
 import GoogleAnalytics from '@/analytics/googleAnalytics/GoogleAnalytics';
 import Mixpanel from '@/analytics/mixpanel/Mixpanel';
-import XION_CHAIN_LOGO from '@/resources/logos/chain_logo_xion.png';
-import type {NFTVault} from '@/types/asset';
-import {ContractsDict} from '@/types/contract';
+import XION_CHAIN_LOGO from "@/resources/logos/chain_logo_xion.png";
+import type { NFTVault, RaisingNFT } from '@/types/asset';
+import { ContractsDict } from '@/types/contract';
 
 export const googleAnalytics = new GoogleAnalytics('google analytics');
 export const mixpanel = new Mixpanel('mixpanel');
@@ -53,9 +53,9 @@ export const CHAIN_METADATA_DICT: Record<AllChains, {explorerAddressURL: string}
     explorerAddressURL: '',
   },
   [AllChains.INJECTIVE_TESTNET]: {
-    explorerAddressURL: '',
-  },
-};
+    explorerAddressURL: 'https://testnet.explorer.injective.network',
+  }
+}
 
 export const chainConfigMap: Record<AppChains, ContractsDict> = {
   [AppChains.XION_TESTNET]: {
@@ -98,25 +98,112 @@ export enum TokenSymbols {
 }
 
 export const PRICE_ORACLE_DICT: Record<TokenSymbols, number> = {
-  [TokenSymbols.INJ]: 1.1,
-  [TokenSymbols.XION]: 0.78,
-};
+  [TokenSymbols.INJ]: 35,
+  [TokenSymbols.XION]: 1,
+}
 
 export const FAKE_ABSTRAXION_ADDRESS = 'xion18104810481048104jfjkdfwofjk9280';
 
-export const RAISING_NFT_VAULTS_DICT: Record<string, NFTVault> = {
-  0: {
-    nftName: 'Nomos 1',
-    description: 'We are destined to rule.',
-    imgSrc: 'https://images.talis.art/tokens/6582d0be4a3988d286be0f9c/mediaThumbnail',
-    contract: {
-      address: 'inj1m6spa200qevzfnrt9ca2ez5dgmd7725l0ruc74',
-      buyAddr: 'inj1qt5ztu5l3cdkcwzsv2pe9u2mk3fq56rdckr0r7',
-      id: '0',
-      price: '10000000000000000',
+export const RAISING_NFT_VAULTS_DICT: Record<string, RaisingNFT> = {
+  inj1m6spa200qevzfnrt9ca2ez5dgmd7725l0ruc741: {
+    collection: {
+      collectionId: '65ca32d33e56373c6b5d1f95',
+      collectionName: 'Nomos',
+      contractAddress: 'inj1m6spa200qevzfnrt9ca2ez5dgmd7725l0ruc74',
+      createdByAddress: 'inj1p9jgmcs9hefl39u3qwrkhr2vqcv89383sekapq',
+      floorPrice: {
+        value: 0.01,
+        symbol: TokenSymbols.INJ,
+      },
     },
-    floorPrice: {
-      value: 1,
+    tokenId: '1',
+    nftName: 'Nomos 1',
+    description: 'A real crosschain solutsion',
+    imgSrc: 'https://talis-app-injective-staging.s3.eu-west-2.amazonaws.com/tokens/65ca33023e56373c6b5d1fb5/mediaThumbnail?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIARORJINLQJAF6N2GU%2F20240214%2Feu-west-2%2Fs3%2Faws4_request&X-Amz-Date=20240214T000000Z&X-Amz-Expires=86400&X-Amz-Signature=0217d2572c4d1f9d657392b8234601f629d15fbd31b09e90f0cef9169cd2265b&X-Amz-SignedHeaders=host&response-cache-control=public%2C%20max-age%3D86400%2C%20immutable&x-id=GetObject',
+    // contract: {
+    //   address: 'inj1m6spa200qevzfnrt9ca2ez5dgmd7725l0ruc74',
+    // },
+    ownerAddress: 'inj1p9jgmcs9hefl39u3qwrkhr2vqcv89383sekapq',
+    fixedPrice: {
+      value: 0.01,
+      symbol: TokenSymbols.INJ,
+    },
+    chain: AllChains.INJECTIVE_TESTNET,
+    raisedAmount: 0.005,
+    participants: 10,
+  },
+  inj1m6spa200qevzfnrt9ca2ez5dgmd7725l0ruc742: {
+    collection: {
+      collectionId: '65ca32d33e56373c6b5d1f95',
+      collectionName: 'Nomos',
+      contractAddress: 'inj1m6spa200qevzfnrt9ca2ez5dgmd7725l0ruc74',
+      createdByAddress: 'inj1p9jgmcs9hefl39u3qwrkhr2vqcv89383sekapq',
+      floorPrice: {
+        value: 0.01,
+        symbol: TokenSymbols.INJ,
+      },
+    },
+    tokenId: '2',
+    nftName: 'Nomos 2',
+    description: 'A real crosschain solutsion',
+    imgSrc: 'https://talis-app-injective-staging.s3.eu-west-2.amazonaws.com/tokens/65ca33423e56373c6b5d2007/mediaThumbnail?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIARORJINLQJAF6N2GU%2F20240214%2Feu-west-2%2Fs3%2Faws4_request&X-Amz-Date=20240214T000000Z&X-Amz-Expires=86400&X-Amz-Signature=f30d63bd6c4e5c64fb2f0b7992729c69ce268ecdefac96569c0b1c20c33ac0e5&X-Amz-SignedHeaders=host&response-cache-control=public%2C%20max-age%3D86400%2C%20immutable&x-id=GetObject',
+    ownerAddress: 'inj1p9jgmcs9hefl39u3qwrkhr2vqcv89383sekapq',
+    fixedPrice: {
+      value: 0.01,
+      symbol: TokenSymbols.INJ,
+    },
+    chain: AllChains.INJECTIVE_TESTNET,
+    raisedAmount: 0.007,
+    participants: 3,
+  },
+  inj1m6spa200qevzfnrt9ca2ez5dgmd7725l0ruc743: {
+    collection: {
+      collectionId: '65ca32d33e56373c6b5d1f95',
+      collectionName: 'Nomos',
+      contractAddress: 'inj1m6spa200qevzfnrt9ca2ez5dgmd7725l0ruc74',
+      createdByAddress: 'inj1p9jgmcs9hefl39u3qwrkhr2vqcv89383sekapq',
+      floorPrice: {
+        value: 0.01,
+        symbol: TokenSymbols.INJ,
+      },
+    },
+    tokenId: '3',
+    nftName: 'Nomos 3',
+    description: 'A real crosschain solutsion',
+    imgSrc: 'https://talis-app-injective-staging.s3.eu-west-2.amazonaws.com/tokens/65ca33723e56373c6b5d2088/mediaThumbnail?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIARORJINLQJAF6N2GU%2F20240214%2Feu-west-2%2Fs3%2Faws4_request&X-Amz-Date=20240214T000000Z&X-Amz-Expires=86400&X-Amz-Signature=d3247b89264ae0d83ee3a7f6df69c18c94d540c81d0179437cd1614eeacdd104&X-Amz-SignedHeaders=host&response-cache-control=public%2C%20max-age%3D86400%2C%20immutable&x-id=GetObject',
+    ownerAddress: 'inj1p9jgmcs9hefl39u3qwrkhr2vqcv89383sekapq',
+    fixedPrice: {
+      value: 0.01,
+      symbol: TokenSymbols.INJ,
+    },
+    chain: AllChains.INJECTIVE_TESTNET,
+    raisedAmount: 0.007,
+    participants: 3,
+  }
+}
+
+export const NFT_VAULTS_DICT: Record<string, NFTVault> = {
+  inj1m6spa200qevzfnrt9ca2ez5dgmd7725l0ruc741: {
+    collection: {
+      collectionId: '65ca32d33e56373c6b5d1f95',
+      collectionName: 'Nomos',
+      contractAddress: 'inj1m6spa200qevzfnrt9ca2ez5dgmd7725l0ruc74',
+      createdByAddress: 'inj1p9jgmcs9hefl39u3qwrkhr2vqcv89383sekapq',
+      floorPrice: {
+        value: 0.01,
+        symbol: TokenSymbols.INJ,
+      },
+    },
+    tokenId: '1',
+    nftName: 'Nomos 1',
+    description: 'A real crosschain solutsion',
+    imgSrc: 'https://images.talis.art/tokens/6582d0be4a3988d286be0f9c/mediaThumbnail',
+    // contract: {
+    //   address: 'inj1m6spa200qevzfnrt9ca2ez5dgmd7725l0ruc74',
+    // },
+    ownerAddress: 'inj1p9jgmcs9hefl39u3qwrkhr2vqcv89383sekapq',
+    fixedPrice: {
+      value: 0.01,
       symbol: TokenSymbols.INJ,
     },
     chain: AllChains.INJECTIVE_TESTNET,
@@ -128,11 +215,11 @@ export const RAISING_NFT_VAULTS_DICT: Record<string, NFTVault> = {
     },
     multisig: {
       voters: [
-        {
-          addr: FAKE_ABSTRAXION_ADDRESS,
-          weight: 1,
-          share: 0.45,
-        },
+        // {
+        //   addr: 'xion1vmk42e8fjzdqxjvkrz9gdcxxp4xpxhey6f03xykfqzw0mqxwy4qs8lr8mn',
+        //   weight: 1,
+        //   share: 0.45,
+        // }, 
         {
           addr: 'xion14710481048488481084fdjkfjdkl',
           weight: 1,
@@ -147,34 +234,40 @@ export const RAISING_NFT_VAULTS_DICT: Record<string, NFTVault> = {
       govThreshold: 0.8,
     },
   },
-  4: {
+  inj1m6spa200qevzfnrt9ca2ez5dgmd7725l0ruc742: {
+    collection: {
+      collectionId: '65ca32d33e56373c6b5d1f95',
+      collectionName: 'Nomos',
+      contractAddress: 'inj1m6spa200qevzfnrt9ca2ez5dgmd7725l0ruc74',
+      createdByAddress: 'inj1p9jgmcs9hefl39u3qwrkhr2vqcv89383sekapq',
+      floorPrice: {
+        value: 0.01,
+        symbol: TokenSymbols.INJ,
+      },
+    },
+    tokenId: '2',
     nftName: 'Nomos 2',
-    description: 'Vandals worldwide',
-    imgSrc: 'https://images.talis.art/tokens/65a091fb10709e02588e13da/mediaThumbnail',
-    contract: {
-      address: 'inj1m6spa200qevzfnrt9ca2ez5dgmd7725l0ruc74',
-      buyAddr: 'inj1qt5ztu5l3cdkcwzsv2pe9u2mk3fq56rdckr0r7',
-      id: '4',
-      price: '10000000000000000',
-    },
-    floorPrice: {
-      value: 13990,
+    description: 'A real crosschain solutsion',
+    imgSrc: 'https://talis-app-injective-staging.s3.eu-west-2.amazonaws.com/tokens/65ca33423e56373c6b5d2007/mediaThumbnail?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIARORJINLQJAF6N2GU%2F20240214%2Feu-west-2%2Fs3%2Faws4_request&X-Amz-Date=20240214T000000Z&X-Amz-Expires=86400&X-Amz-Signature=f30d63bd6c4e5c64fb2f0b7992729c69ce268ecdefac96569c0b1c20c33ac0e5&X-Amz-SignedHeaders=host&response-cache-control=public%2C%20max-age%3D86400%2C%20immutable&x-id=GetObject',
+    ownerAddress: 'inj1p9jgmcs9hefl39u3qwrkhr2vqcv89383sekapq',
+    fixedPrice: {
+      value: 0.01,
       symbol: TokenSymbols.INJ,
     },
     chain: AllChains.INJECTIVE_TESTNET,
-    raisedAmount: 200,
-    participants: 22242,
+    raisedAmount: 0.007,
+    participants: 3,
     ica: {
       icaMultisigAddress: 'injf1414o124802494hgdjfidhfdjfhqye01911881',
       icaControllerAddress: 'injf1414o124802494hgdjfidhfdjfhqye01911881',
     },
     multisig: {
       voters: [
-        {
-          addr: FAKE_ABSTRAXION_ADDRESS,
-          weight: 1,
-          share: 0.45,
-        },
+        // {
+        //   addr: 'xion1vmk42e8fjzdqxjvkrz9gdcxxp4xpxhey6f03xykfqzw0mqxwy4qs8lr8mn',
+        //   weight: 1,
+        //   share: 0.45,
+        // }, 
         {
           addr: 'xion14710481048488481084fdjkfjdkl',
           weight: 1,
@@ -189,35 +282,40 @@ export const RAISING_NFT_VAULTS_DICT: Record<string, NFTVault> = {
       govThreshold: 0.8,
     },
   },
-  3: {
-    //by nft id, since the contract is the same for all
-    nftName: 'Nomos 3',
-    description: 'PFP',
-    imgSrc: 'https://talis-protocol.mo.cloudinary.net/inj/families/65b2e902e6b67bb48ef359fb/miniaturePicture',
-    contract: {
-      address: 'inj1m6spa200qevzfnrt9ca2ez5dgmd7725l0ruc74',
-      buyAddr: 'inj1qt5ztu5l3cdkcwzsv2pe9u2mk3fq56rdckr0r7',
-      id: '3',
-      price: '10000000000000000',
+  inj1m6spa200qevzfnrt9ca2ez5dgmd7725l0ruc743: {
+    collection: {
+      collectionId: '65ca32d33e56373c6b5d1f95',
+      collectionName: 'Nomos',
+      contractAddress: 'inj1m6spa200qevzfnrt9ca2ez5dgmd7725l0ruc74',
+      createdByAddress: 'inj1p9jgmcs9hefl39u3qwrkhr2vqcv89383sekapq',
+      floorPrice: {
+        value: 0.01,
+        symbol: TokenSymbols.INJ,
+      },
     },
-    floorPrice: {
-      value: 1313133,
+    tokenId: '3',
+    nftName: 'Nomos 3',
+    description: 'A real crosschain solutsion',
+    imgSrc: 'https://talis-app-injective-staging.s3.eu-west-2.amazonaws.com/tokens/65ca33723e56373c6b5d2088/mediaThumbnail?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIARORJINLQJAF6N2GU%2F20240214%2Feu-west-2%2Fs3%2Faws4_request&X-Amz-Date=20240214T000000Z&X-Amz-Expires=86400&X-Amz-Signature=d3247b89264ae0d83ee3a7f6df69c18c94d540c81d0179437cd1614eeacdd104&X-Amz-SignedHeaders=host&response-cache-control=public%2C%20max-age%3D86400%2C%20immutable&x-id=GetObject',
+    ownerAddress: 'inj1p9jgmcs9hefl39u3qwrkhr2vqcv89383sekapq',
+    fixedPrice: {
+      value: 0.01,
       symbol: TokenSymbols.INJ,
     },
     chain: AllChains.INJECTIVE_TESTNET,
-    raisedAmount: 1111000,
-    participants: 46,
+    raisedAmount: 0.007,
+    participants: 3,
     ica: {
       icaMultisigAddress: 'injf1414o124802494hgdjfidhfdjfhqye01911881',
       icaControllerAddress: 'injf1414o124802494hgdjfidhfdjfhqye01911881',
     },
     multisig: {
       voters: [
-        {
-          addr: FAKE_ABSTRAXION_ADDRESS,
-          weight: 1,
-          share: 0.45,
-        },
+        // {
+        //   addr: 'xion1vmk42e8fjzdqxjvkrz9gdcxxp4xpxhey6f03xykfqzw0mqxwy4qs8lr8mn',
+        //   weight: 1,
+        //   share: 0.45,
+        // }, 
         {
           addr: 'xion14710481048488481084fdjkfjdkl',
           weight: 1,
