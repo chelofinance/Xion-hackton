@@ -19,7 +19,7 @@ import { shortenAddress } from '@/utils/text';
 import Button from '@/components/Button';
 import { useRouter } from 'next/router';
 import ChainLabel from '@/components/ChainLabel';
-import { AllChains } from '@/constants/app';
+import { AllChains, PROPOSAL_STATUS_LABEL_DICT, ProposalStatus } from '@/constants/app';
 import Tag from '@/components/Tag';
 import useProposals from '@/hooks/useProposals';
 import useAddMember from '@/hooks/useAddMember';
@@ -96,30 +96,6 @@ const MyVaults: NextPage = () => {
                     </div>
                 </div>
             </Card>
-        
-            {/* <section className="space-y-4">
-                <Heading tagName="h3">Proposals</Heading>
-
-                {proposals.map(proposal => (
-                    <Card key={proposal.id} color="primary" className="space-y-4 p-4">
-                        <div>#{proposal.id} {proposal.description}</div>
-                        {proposal.status === 'Pending' && <div className="flex justify-end gap-x-2">
-                            <Button color="on_primary" label="No" onClick={() => voteProposal(proposal.id, true)} />
-                            <Button color="on_primary" label="Yes" onClick={() => voteProposal(proposal.id, true)} />
-                        </div>}
-                        {proposal.status !== 'Pending' && <div className="flex justify-end gap-x-2">
-                            <Tag size="sm" label={proposal.status} />
-                        </div>}
-                    </Card>
-                ))}
-
-                {proposals.length === 0 && (
-                    <Card color="glass" className="p-4 text-body">
-                        No proposal found
-                    </Card>
-                )}
-
-            </section> */}
           </div>
 
           {myVaults[0] && <section className="grow shrink flex flex-col gap-y-8">
@@ -155,12 +131,12 @@ const MyVaults: NextPage = () => {
                     {proposals.map(proposal => (
                         <Card key={proposal.id} color="primary" className="space-y-4 p-4">
                             <div>#{proposal.id} {proposal.description}</div>
-                            {proposal.status === 'Pending' && <div className="flex justify-end gap-x-2">
+                            {proposal.status === ProposalStatus.Pending && <div className="flex justify-end gap-x-2">
                                 <Button color="on_primary" label="No" onClick={() => voteProposal(proposal.id, true)} />
                                 <Button color="on_primary" label="Yes" onClick={() => voteProposal(proposal.id, true)} />
                             </div>}
-                            {proposal.status !== 'Pending' && <div className="flex justify-end gap-x-2">
-                                <Tag size="sm" label={proposal.status} />
+                            {proposal.status !== ProposalStatus.Pending && <div className="flex justify-end gap-x-2">
+                                <Tag size="sm" label={PROPOSAL_STATUS_LABEL_DICT[proposal.status]} />
                             </div>}
                         </Card>
                     ))}
