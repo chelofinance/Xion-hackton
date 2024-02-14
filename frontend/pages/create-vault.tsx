@@ -32,6 +32,8 @@ const CreateVault: NextPage = () => {
       setStatus('processing');
 
       const abstractAccount = await client?.getAccount(account.bech32Address);
+
+      console.log('abstractAccount', abstractAccount);
       const ica_multisig_address_response: CreateIcaMultisigResult | null = await createIcaMultisig(
         client,
         account,

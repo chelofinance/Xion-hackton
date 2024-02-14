@@ -133,7 +133,7 @@ export async function voteProposal(client: any, account: any, icaMultisigAddress
         console.log('executionResponse', executionResponse);
     } catch (error) {
         console.log('error', error);
-        alert(error);
+        // alert(error);
     }
 }
 
@@ -165,7 +165,7 @@ export async function getProposalList(client: any, icaMultisigAddress: string) {
         return queryResponse;
     } catch (error) {
         console.log('error', error);
-        alert(error);
+        // alert(error);
     }
     return [];
 }
