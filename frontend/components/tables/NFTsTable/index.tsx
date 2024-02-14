@@ -3,15 +3,15 @@ import Table from '@/components/Table';
 import Heading from '@/components/Heading';
 import useUserAgent from '@/hooks/useUserAgent';
 import Card from '@/components/Card';
-import { formatNumber, formatUSD } from '@/utils/number';
-import type { TooltipLayer } from '@/components/Tooltip/styles';
+import {formatNumber, formatUSD} from '@/utils/number';
+import type {TooltipLayer} from '@/components/Tooltip/styles';
 import ProgressBar from '@/components/ProgressBar';
 import CoinAmount from '@/components/CoinAmount';
 import NFTTumbnail from '@/components/NFTThumbnail';
 import CaptionAmount from '@/components/CaptionAmount';
 import useOraclePrice from '@/hooks/useOraclePrice';
 import BigNumber from 'bignumber.js';
-import { useRouter } from 'next/router';
+import {useRouter} from 'next/router';
 import useRaisingNFTVaults from '@/hooks/useRaisingNFTVaults';
 
 type NFTsTableRow = {
@@ -31,8 +31,8 @@ type NFTsTableProps = {
   tooltipLayer: TooltipLayer;
 };
 
-const NFTsTable = ({ className = '', tooltipLayer }: NFTsTableProps) => {
-  const { getOraclePrice } = useOraclePrice();
+const NFTsTable = ({className = '', tooltipLayer}: NFTsTableProps) => {
+  const {getOraclePrice} = useOraclePrice();
   const vaults = useRaisingNFTVaults();
 
   const rows = useMemo<readonly NFTsTableRow[]>(() => {

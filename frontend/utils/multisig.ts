@@ -51,7 +51,7 @@ export async function createIcaMultisig(client: any, account: any, ica_factory: 
 
         const instantiate_events = instantiateResponse?.events.filter((e: any) => e.type === 'instantiate');
         const ica_multisig_address = instantiate_events
-            ?.find((e: any) => e.attributes.find((attr: any) => attr.key === 'code_id' && attr.value === '73'))
+            ?.find((e: any) => e.attributes.find((attr: any) => attr.key === 'code_id' && attr.value === '158'))
             ?.attributes.find((attr: any) => attr.key === '_contract_address')?.value;
         console.log('ica_multisig_address:', ica_multisig_address);
 
@@ -77,17 +77,6 @@ export async function createIcaMultisig(client: any, account: any, ica_factory: 
     }
 }
 
-function generateIcaMsg(msg: any) {
-    const ibcMsg = {
-        propose: {
-            title: 'Test Proposal',
-            description: 'This is a test proposal',
-            msgs: Object.keys(msg).length === 0 ? [] : [msg], // ToDo: Add messages
-        },
-    };
-    return ibcMsg;
-}
-
 export async function createProposal({
     client,
     account,
@@ -101,14 +90,9 @@ export async function createProposal({
     icaMultisigAddress: string;
     icaControllerAddress: string;
 }) {
-    console.log('icaMultisigAddress', icaMultisigAddress);
-    console.log('icaControllerAddress', icaControllerAddress);
-
     const proposalMsg = {
         propose: produceProposal(injectiveMsg, icaControllerAddress),
     };
-
-    console.log('proposalMsg', proposalMsg);
 
     try {
         const executionResponse = await client?.execute(account.bech32Address, icaMultisigAddress, proposalMsg, 'auto');
@@ -122,6 +106,7 @@ export async function createProposal({
     } catch (error) {
         console.log('error', error);
         alert(error);
+        return {proposal_id: 'null'};
     }
 }
 
@@ -142,7 +127,7 @@ export async function voteProposal(client: any, account: any, icaMultisigAddress
     }
 }
 
-export async function executeProposal(client: any, account: any, icaMultisigAddress: string, proposalId: string) {
+export async function executeProposal(client: any, account: any, icaMultisigAddress: string, proposalId: number) {
     const msg = {
         execute: {
             proposal_id: proposalId,
@@ -188,37 +173,80 @@ export async function getBalance(client: any, address: string) {
     }
 }
 
-
-export async function addMember(client: any, 
-                                account: any, 
-                                icaMultisigAddress: string, 
-                                memberAddress: string,
-                                amount: string,
-                                denom: string,
-                                ) {
+export async function addMember(
+    client: any,
+    account: any,
+    icaMultisigAddress: string,
+    memberAddress: string,
+    amount: string,
+    denom: string
+) {
     const fee = {
         amount,
-        denom
+        denom,
     };
 
     const msg = {
         add_member: {
             address: memberAddress,
-            fee
+            fee,
         },
     };
 
     try {
-        const executionResponse = await client?.execute(
-            account.bech32Address,
-            icaMultisigAddress,
-            msg,
-            "auto",
-        );
-        console.log("executionResponse", executionResponse);
-        return executionResponse
+        const executionResponse = await client?.execute(account.bech32Address, icaMultisigAddress, msg, 'auto');
+        console.log('executionResponse', executionResponse);
+        return executionResponse;
     } catch (error) {
-        console.log("error", error);
+        console.log('error', error);
         alert(error);
     }
 }
+
+export const createChannelProposal = async ({
+    client,
+    account,
+    icaMultisigAddress,
+    icaControllerAddress,
+}: {
+    client: any;
+    account: any;
+    icaMultisigAddress: string;
+    icaControllerAddress: string;
+}) => {
+    try {
+        const controllerMessage = {
+            create_channel: {},
+        };
+
+        const fullProposal = {
+            propose: {
+                title: 'ICA transaction',
+                description: 'some desc :)',
+                msgs: [
+                    {
+                        wasm: {
+                            execute: {
+                                contract_addr: icaControllerAddress,
+                                msg: Buffer.from(JSON.stringify(controllerMessage)).toString('base64'),
+                                funds: [],
+                            },
+                        },
+                    },
+                ],
+            },
+        };
+
+        const executionResponse = await client?.execute(account.bech32Address, icaMultisigAddress, fullProposal, 'auto');
+        console.log({executionResponse});
+
+        const proposal_id = executionResponse?.events
+            .find((e: any) => e.type === 'wasm')
+            ?.attributes.find((a: any) => a.key === 'proposal_id')?.value;
+        return {proposal_id};
+    } catch (error) {
+        console.log('error', error);
+        alert(error);
+        return {proposal_id: 'null'};
+    }
+};

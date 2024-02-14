@@ -35,11 +35,11 @@ export enum AppChains {
   XION_TESTNET = 'xion-testnet',
 }
 
-export const SUPPORTED_CHAINS_DICT: Record<AppChains, { logoURL: string }> = {
+export const SUPPORTED_CHAINS_DICT: Record<AppChains, {logoURL: string}> = {
   [AppChains.XION_TESTNET]: {
     logoURL: XION_CHAIN_LOGO.src,
-  }
-}
+  },
+};
 
 export const SUPPORTED_CHAINS: readonly AppChains[] = Object.values(AppChains);
 
@@ -48,7 +48,7 @@ export enum AllChains {
   INJECTIVE_TESTNET = 'Injective Testnet',
 }
 
-export const CHAIN_METADATA_DICT: Record<AllChains, { explorerAddressURL: string }> = {
+export const CHAIN_METADATA_DICT: Record<AllChains, {explorerAddressURL: string}> = {
   [AllChains.XION_TESTNET]: {
     explorerAddressURL: '',
   },
@@ -61,22 +61,22 @@ export const chainConfigMap: Record<AppChains, ContractsDict> = {
   [AppChains.XION_TESTNET]: {
     cw3FixedMultisig: {
       codeId: 50,
-      address: 'xion1tunl6hq335lhpjawvzfm6djk8mthaua3725fl7jhpgwdkxrr3qyqcn43ng', //placeholder addr
+      address: 'xion105h6k7cv3kvt4vxeh5l86x9wnqudjl8wlx87ywwqzqcpa24m6fzsc4d2y0', //placeholder addr
     },
     icaController: {
-      address: 'xion1yylkaz0u4gef9n77m3dmarq6wmjwgzlhrrveu45cv9neh582m36q0aq33m',
+      address: 'xion1az60z73mezhcyxajgucvlcs3kj72fzwu2l2m5qxmsccs6vmnappqys5pjj',
     },
     icaAccount: {
-      address: 'inj1a0nmuld00el7qap2yr9awp7pfzudmut5n73eyz28q9307c6atjesqq0qzw',
+      address: 'inj1tfvcvjkpw02eeldx2lhtw0xysg3msehyarqe5lwygf3dk40vt9uqhuzlg3',
     },
     nomosFactory: {
-      address: 'xion1jyrjanlg6mvna42rur559t8rcscrjfrayz4flasfymyvpzvkgefs9mnylc',
+      address: 'xion1qmjxqd2j3vgcjrc9ea70qae2rkf28tced4sv50twmuxshzrxyfsq7saj9e',
     },
     icaFactory: {
-      address: 'xion1v84yekkwnvperl9gjx80knxan7x3l6d0w7az5pp8p4t0e6zcamks93efuc',
+      address: 'xion1qmjxqd2j3vgcjrc9ea70qae2rkf28tced4sv50twmuxshzrxyfsq7saj9e',
     },
-  }
-}
+  },
+};
 
 export const abstraxionProviderConfig = {
   contracts: [
@@ -207,8 +207,8 @@ export const NFT_VAULTS_DICT: Record<string, NFTVault> = {
       symbol: TokenSymbols.INJ,
     },
     chain: AllChains.INJECTIVE_TESTNET,
-    raisedAmount: 1111000,
-    participants: 990,
+    raisedAmount: 0.1,
+    participants: 3,
     ica: {
       icaMultisigAddress: 'injf1414o124802494hgdjfidhfdjfhqye01911881',
       icaControllerAddress: 'injf1414o124802494hgdjfidhfdjfhqye01911881',
@@ -224,7 +224,7 @@ export const NFT_VAULTS_DICT: Record<string, NFTVault> = {
           addr: 'xion14710481048488481084fdjkfjdkl',
           weight: 1,
           share: 0.15,
-        }, 
+        },
         {
           addr: 'xionwf1kf8080f2fjdkflskfdlsdkflskdsl',
           weight: 1,
@@ -272,7 +272,7 @@ export const NFT_VAULTS_DICT: Record<string, NFTVault> = {
           addr: 'xion14710481048488481084fdjkfjdkl',
           weight: 1,
           share: 0.15,
-        }, 
+        },
         {
           addr: 'xionwf1kf8080f2fjdkflskfdlsdkflskdsl',
           weight: 1,
@@ -320,7 +320,7 @@ export const NFT_VAULTS_DICT: Record<string, NFTVault> = {
           addr: 'xion14710481048488481084fdjkfjdkl',
           weight: 1,
           share: 0.15,
-        }, 
+        },
         {
           addr: 'xionwf1kf8080f2fjdkflskfdlsdkflskdsl',
           weight: 1,
@@ -329,5 +329,5 @@ export const NFT_VAULTS_DICT: Record<string, NFTVault> = {
       ],
       govThreshold: 0.8,
     },
-  }
-}
+  },
+};

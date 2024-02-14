@@ -1,31 +1,45 @@
-import type { NextPage } from 'next';
+import type {NextPage} from 'next';
 import Main from '@/components/Main';
 import Heading from '@/components/Heading';
 import NFTTumbnail from '@/components/NFTThumbnail';
 import Card from '@/components/Card';
-import { formatNumber, formatUSD } from '@/utils/number';
+import {formatNumber, formatUSD} from '@/utils/number';
 import CoinAmount from '@/components/CoinAmount';
-import { CHAIN_METADATA_DICT, TokenSymbols } from '@/constants/app';
-import Button, { ButtonProps } from '@/components/Button';
+import {AppChains, chainConfigMap, CHAIN_METADATA_DICT, INJECTIVE_ID, TokenSymbols} from '@/constants/app';
+import Button, {ButtonProps} from '@/components/Button';
 import ProgressBar from '@/components/ProgressBar';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import {useCallback, useMemo, useRef, useState} from 'react';
 import CaptionAmount from '@/components/CaptionAmount';
 import ChainLabel from '@/components/ChainLabel';
 import AmountInput from '@/components/form-presets/AmountInput';
 import useOraclePrice from '@/hooks/useOraclePrice';
 import BigNumber from 'bignumber.js';
 import useRaisingNFTVault from '@/hooks/useRaisingNFTVault';
-import { useParams } from 'next/navigation';
 import useMyNFTVaults from '@/hooks/useMyNFTVaults';
-import { MyNFTVault } from '@/types/asset';
-import { useAtom } from 'jotai';
-import { userWalletAtom } from '@/store/states';
+import {MyNFTVault} from '@/types/asset';
+import {useAtom} from 'jotai';
+import {userWalletAtom} from '@/store/states';
 import NumberText from '@/components/NumberText';
+import {injectiveClient, transferInjective} from '@/utils/injective';
+import {useRouter} from 'next/router';
+import PageLoader from '@/components/PageLoader';
+
+const CONFIG = chainConfigMap[AppChains.XION_TESTNET];
+
+const createKeplrSigner = async () => {
+  (window as any).keplr.defaultOptions = {
+    sign: {preferNoSetFee: true},
+  };
+  const offlineSigner: any = await (window as any).keplr.getOfflineSignerAuto(INJECTIVE_ID);
+
+  return offlineSigner;
+};
 
 const RaisingVault: NextPage = () => {
-  const params = useParams<{ id: string }>();
+  const router = useRouter();
+  const { address } = router.query;
 
-  const vault = useRaisingNFTVault(params.id);
+  const vault = useRaisingNFTVault(address as string | undefined);
 
   const [isDepositFormOpen, setIsDepositFormOpen] = useState<boolean>(false);
 
@@ -38,9 +52,9 @@ const RaisingVault: NextPage = () => {
   const form = useRef<HTMLFormElement>(null);
 
   const { getOraclePrice } = useOraclePrice();
-  const oraclePrice = getOraclePrice(vault.fixedPrice.symbol);
+  const oraclePrice = vault ? getOraclePrice(vault.fixedPrice.symbol) : 0;
 
-  const maxDepositAmount = vault.fixedPrice.value - vault.raisedAmount;
+  const maxDepositAmount = vault ? vault.fixedPrice.value - vault.raisedAmount : 0;
   const maxDepositAmountUSD = useMemo(() => new BigNumber(maxDepositAmount).times(oraclePrice), [maxDepositAmount, oraclePrice]);
   const minDepositAmount = 0.000001;
 
@@ -62,10 +76,10 @@ const RaisingVault: NextPage = () => {
     };
   }, [isDepositAmountValid]);
 
-  const priceUSD = useMemo(() => new BigNumber(vault.fixedPrice.value).times(oraclePrice), [oraclePrice]);
-  const raisedAmountUSD = useMemo(() => new BigNumber(vault.raisedAmount).times(oraclePrice), [oraclePrice]);
+  const priceUSD = useMemo(() => new BigNumber(vault?.fixedPrice.value ?? 0).times(oraclePrice), [oraclePrice]);
+  const raisedAmountUSD = useMemo(() => new BigNumber(vault?.raisedAmount ?? 0).times(oraclePrice), [oraclePrice]);
 
-  const formattedCompactPriceUSD = priceUSD.gte(1000) ? ` (${formatUSD(priceUSD, { compact: true, semiequate: true })})` : '';
+  const formattedCompactPriceUSD = priceUSD.gte(1000) ? ` (${formatUSD(priceUSD, {compact: true, semiequate: true})})` : '';
   const formattedPriceUSD = `${formatUSD(priceUSD)}${formattedCompactPriceUSD}`;
 
   const getDepositAmountErrorMsg = useCallback(
@@ -83,20 +97,48 @@ const RaisingVault: NextPage = () => {
 
   const openExplorer = useCallback(
     (collectionAddress: string) => {
+      if (!vault?.chain) return;
+
       const url = `${CHAIN_METADATA_DICT[vault.chain].explorerAddressURL}/contract/${collectionAddress}`;
       window.open(url, '_blank');
     },
-    [vault.chain]
+    [vault?.chain]
   );
+
+  const goToNFTPage = useCallback(() => {
+    if (vault)
+      router.push(`/nft/${vault.collection.contractAddress}${vault.tokenId}`);
+  }, [vault]);
 
   const [userWallet] = useAtom(userWalletAtom);
 
-  const { raisingVaults: myRaisingVaults } = useMyNFTVaults(userWallet?.account.address);
+  const {raisingVaults: myRaisingVaults} = useMyNFTVaults(userWallet?.account.address);
 
   const myVault = useMemo<MyNFTVault | undefined>(
-    () => myRaisingVaults.find((myVault) => myVault.tokenId === vault.tokenId),
-    [myRaisingVaults, vault.tokenId]
+    () => myRaisingVaults.find((myVault) => myVault.tokenId === vault?.tokenId),
+    [myRaisingVaults, vault?.tokenId]
   );
+
+  const handleDeposit = async () => {
+    try {
+      const keplrSigner = await createKeplrSigner();
+      const {client} = await injectiveClient(keplrSigner);
+      const accounts = await keplrSigner.getAccounts();
+      const addr = accounts[0].address;
+
+      await transferInjective({
+        client: client,
+        amount: depositAmount.toString(),
+        recipient: CONFIG.icaAccount.address,
+        account: addr,
+      });
+    } catch (err) {
+      console.log('ERR TRANSFER', err);
+    }
+  };
+
+  if (vault === undefined)
+    return <PageLoader />;
 
   return (
     <Main className="flex flex-col items-stretch min-h-screen pt-app_header_height pb-page_bottom md:mx-page_x">
@@ -114,6 +156,13 @@ const RaisingVault: NextPage = () => {
                 iconType="external_link"
                 label={`See in chain explorer`}
                 onClick={() => openExplorer(vault.collection.contractAddress)}
+              />
+              <Button
+                type="outline"
+                size="xs"
+                iconType="external_link"
+                label={`See NFT details`}
+                onClick={goToNFTPage}
               />
               {/* <Button 
                 type="outline" 
@@ -159,7 +208,7 @@ const RaisingVault: NextPage = () => {
                 <ProgressBar
                   currentNumber={raisedAmountUSD.toNumber()}
                   targetNumber={priceUSD.toNumber()}
-                  formatOptions={{ currencySymbol: '$' }}
+                  formatOptions={{currencySymbol: '$'}}
                   currentNumberCaption={`raised`}
                 />
               </div>
@@ -235,6 +284,7 @@ const RaisingVault: NextPage = () => {
                       label="Deposit"
                       iconType="arrow_forward"
                       className="w-full md:w-fit"
+                      onClick={handleDeposit}
                       {...depositButtonProps}
                     />
                   </div>

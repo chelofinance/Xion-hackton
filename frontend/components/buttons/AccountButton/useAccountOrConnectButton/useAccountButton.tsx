@@ -1,6 +1,6 @@
-import { Suspense, lazy, useCallback, useEffect, useMemo } from 'react';
-import { useAtom } from 'jotai';
-import { userWalletAtom } from '@/store/states';
+import {Suspense, lazy, useCallback, useEffect, useMemo} from 'react';
+import {useAtom} from 'jotai';
+import {userWalletAtom} from '@/store/states';
 import useModal from '@/hooks/useModal';
 import type { IconType } from '@/components/Icon';
 import type { ButtonColor, ButtonStatus, ButtonType } from '@/components/Button/types';

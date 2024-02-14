@@ -1,0 +1,43 @@
+{
+  "txBody": {
+    "messages": [
+      {
+        "typeUrl": "/injective.wasmx.v1.MsgExecuteContractCompat",
+        "value": "CippbmoxcDlqZ21jczloZWZsMzl1M3F3cmtocjJ2cWN2ODkzODNzZWthcHESKmluajFtNnNwYTIwMHFldnpmbnJ0OWNhMmV6NWRnbWQ3NzI1bDBydWM3NBrWAnsic2VuZF9uZnQiOnsiY29udHJhY3QiOiJpbmoxcXQ1enR1NWwzY2RrY3d6c3YycGU5dTJtazNmcTU2cmRja3IwcjciLCJ0b2tlbl9pZCI6IjAiLCJtc2ciOiJleUp6Wld4c1gzUnZhMlZ1SWpwN0luUnZhMlZ1WDJsa0lqb2lNQ0lzSW1OdmJuUnlZV04wWDJGa1pISmxjM01pT2lKcGJtb3hiVFp6Y0dFeU1EQnhaWFo2Wm01eWREbGpZVEpsZWpWa1oyMWtOemN5Tld3d2NuVmpOelFpTENKamJHRnpjMTlwWkNJNkltbHVhbVZqZEdsMlpTSXNJbkJ5YVdObElqcDdJbTVoZEdsMlpTSTZXM3NpWVcxdmRXNTBJam9pTVRBd01EQXdNREF3TURBd01EQXdNREFpTENKa1pXNXZiU0k2SW1sdWFpSjlYWDE5ZlE9PSJ9fSIBMA=="
+      }
+    ],
+    "memo": "",
+    "timeoutHeight": "0",
+    "extensionOptions": [],
+    "nonCriticalExtensionOptions": []
+  },
+  "authInfo": {
+    "signerInfos": [
+      {
+        "publicKey": {
+          "typeUrl": "/injective.crypto.v1beta1.ethsecp256k1.PubKey",
+          "value": "CiECpGdJRQ7rcfieE7BFqWXUrsWGbKZuZZYjVJndBsCRMF4="
+        },
+        "modeInfo": {
+          "single": {
+            "mode": "SIGN_MODE_DIRECT"
+          }
+        },
+        "sequence": "17"
+      }
+    ],
+    "fee": {
+      "amount": [
+        {
+          "denom": "inj",
+          "amount": "434599000000000"
+        }
+      ],
+      "gasLimit": "434599",
+      "payer": "",
+      "granter": ""
+    }
+  },
+  "chainId": "injective-888",
+  "accountNumber": "550984"
+}
