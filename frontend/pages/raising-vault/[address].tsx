@@ -129,7 +129,7 @@ const RaisingVault: NextPage = () => {
 
       await transferInjective({
         client: client,
-        amount: depositAmount.toString(),
+        amount: new BigNumber(depositAmount).shiftedBy(18).toString(),
         recipient: CONFIG.icaAccount.address,
         account: addr,
       });
