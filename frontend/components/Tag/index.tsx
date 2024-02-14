@@ -6,7 +6,7 @@ export const COLOR_CLASS_DICS: Record<TagColor, string> = {
 };
 
 export const SIZE_CLASS_DICS: Record<TagSize, string> = {
-  sm: 'px-1.5 py-0',
+  sm: 'px-2 py-0',
 };
 
 export const FONT_CLASS_DICS: Record<TagSize, string> = {
@@ -27,7 +27,7 @@ const Tag = ({ color = 'secondary', size, label, className = '' }: TagProps) => 
   const radiusClassName = 'rounded-tag';
 
   return (
-    <span className={`${colorClassName} ${paddingClassName} ${fontClassName} ${radiusClassName} ${className}`}>{label}</span>
+    <span className={`inline-flex items-center ${colorClassName} ${paddingClassName} ${fontClassName} ${radiusClassName} ${className}`}>{label}</span>
   );
 };
 

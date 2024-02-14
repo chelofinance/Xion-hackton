@@ -6,7 +6,7 @@ import NFTTumbnail from '@/components/NFTThumbnail';
 import Card from '@/components/Card';
 import {formatNumber} from '@/utils/number';
 import CoinAmount from '@/components/CoinAmount';
-import {RAISING_NFT_VAULTS_DICT, TokenSymbols} from '@/constants/app';
+import { TokenSymbols} from '@/constants/app';
 import Button from '@/components/Button';
 import {ButtonStatus} from '@/components/Button/types';
 import {useAbstraxionAccount, useAbstraxionSigningClient} from '@burnt-labs/abstraxion';
@@ -18,6 +18,7 @@ import {createIcaBuyMsg} from '@/utils/ica';
 import {useRouter} from 'next/router';
 import useRaisingNFTVault from '@/hooks/useRaisingNFTVault';
 import PageLoader from '@/components/PageLoader';
+import BigNumber from 'bignumber.js';
 
 const CONFIG = chainConfigMap[AppChains.XION_TESTNET];
 const INJECTIVE_ID = 'injective-888';
@@ -49,7 +50,6 @@ const CreateVault: NextPage = () => {
     client: null,
     signer: null,
   });
-  // const nft = RAISING_NFT_VAULTS_DICT[router.query.nft as keyof typeof RAISING_NFT_VAULTS_DICT];
   const nft = useRaisingNFTVault(address as string | undefined);
 
   const init = async () => {
@@ -71,11 +71,10 @@ const CreateVault: NextPage = () => {
     try {
       const proposal = createIcaBuyMsg({
         ica: CONFIG.icaAccount.address,
-        // buyContract: nft.contract.buyAddr,
-        buyContract: '',
+        buyContract: nft.buyContractAddress,
         nftContract: nft.collection.contractAddress,
         tokenId: nft.tokenId,
-        cost: (nft.fixedPrice.value * 1000000).toString(), // tmp
+        cost: new BigNumber(nft.fixedPrice.value).shiftedBy(18).toString(),
       });
       const {proposal_id} = await createProposal({
         client,
@@ -117,42 +116,48 @@ const CreateVault: NextPage = () => {
 
       <section className="space-y-4 mt-20">
         <div className="flex items-stretch gap-x-10">
-          <NFTTumbnail size="xl" imgSrc={nft.imgSrc} className="grow-0 shrink-0" />
-
-          <div className="grow shrink space-y-4">
-            <Heading tagName="h3">{nft.nftName}</Heading>
-
-            <Card color="glass" className="flex flex-col items-stretch justify-between gap-x-4 p-4 text-body">
-              <div className="flex justify-between w-full">
-                <div className="h-6 flex flex-col justify-center">Price:</div>
-
-                <div className="flex flex-col gap-y-2 items-end">
-                  <CoinAmount size="xl" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(nft.fixedPrice.value)} />
-                </div>
-              </div>
-              <div className="flex justify-between w-full">
-                <div className="h-6 flex flex-col justify-center">Vault balance:</div>
-
-                <div className="flex flex-col gap-y-2 items-end">
-                  <CoinAmount size="xl" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(nft.fixedPrice.value)} />
-                </div>
-              </div>
-            </Card>
-            <div className="h-6 flex flex-col justify-center">{vault.length > 0 && `Vault: ${vault}`}</div>
-
-            <div className="flex justify-between">
+          <div className="grow-0 shrink-0 w-fit flex flex-col gap-y-4">
+            <NFTTumbnail size="xl" imgSrc={nft.imgSrc} className="grow-0 shrink-0" />
+            <div className="flex items-center gap-x-2">
               <Button
                 color="primary"
-                size="md"
+                type="outline"
+                size="xs"
                 label="Create Channel"
                 iconType="arrow_forward"
                 className="w-full md:w-fit"
                 onClick={handleCreateChannel}
                 status={status}
               />
+            </div>
+          </div>
+
+          <div className="grow shrink space-y-4">
+            <Heading tagName="h3">{nft.nftName}</Heading>
+
+            <Card color="glass" className="flex flex-col items-stretch justify-between gap-x-4 p-4 text-body">
+              <div className="flex justify-between w-full">
+                <div className="h-6 flex flex-col justify-center Font_label_14px">Fixed price</div>
+
+                <div className="flex flex-col gap-y-2 items-end">
+                  <CoinAmount size="xl" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(nft.fixedPrice.value)} />
+                </div>
+              </div>
+              
+              <div className="flex justify-between w-full">
+                <div className="h-6 flex flex-col justify-center Font_label_14px">Vault balance</div>
+
+                <div className="flex flex-col gap-y-2 items-end">
+                  <CoinAmount size="xl" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(nft.raisedAmount)} />
+                </div>
+              </div>
+            </Card>
+            <div className="h-6 flex flex-col justify-center">{vault.length > 0 && `Vault: ${vault}`}</div>
+
+            <div className="flex items-center justify-end gap-x-4">
               <Button
                 color="primary"
-                size="md"
+                size="lg"
                 label="Buy NFT"
                 iconType="arrow_forward"
                 className="w-full md:w-fit"

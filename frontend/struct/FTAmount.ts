@@ -2,7 +2,7 @@ import BigNumber from 'bignumber.js';
 import type { Coin } from '@cosmjs/stargate';
 import { TokenSymbols } from '@/constants/app';
 
-const DECIMAL_PLACES = 6;
+const DECIMAL_PLACES = 18;
 
 /**
  * 
