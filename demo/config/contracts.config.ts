@@ -29,7 +29,7 @@ const contracts: Record<SupportedNetworks, Contracts> = {
             address: "xion1qmjxqd2j3vgcjrc9ea70qae2rkf28tced4sv50twmuxshzrxyfsq7saj9e"
         },
         hardcodedIcaMultisig: {
-            address: "xion1k75tz4uj4hvtcg5zs4dxquzcque2l03rwekvklmun2vrp504d5ls8vja0m"
+            address: "xion1tnrxmr69uqnyacq74njadhrezmqwstllkjn9adqhd0fs0qhalf8smkrmt6"
         }
     }
 }

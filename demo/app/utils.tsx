@@ -7,7 +7,7 @@ import {
   INJECTIVE_CONTRACT_MSG_URI,
 } from "./propose";
 import Contracts from "@/config/contracts.config";
-import type {Coin} from "@cosmjs/stargate"
+import type { Coin } from "@cosmjs/stargate"
 
 const contracts = Contracts["xion-testnet"];
 
@@ -19,7 +19,8 @@ export async function getIcaAccountAddress(
     ica_controller_address,
     { get_contract_state: {} }
   );
-  const ica_account_address = contract_response?.contract_state?.address;
+  console.log("contract_response", contract_response);
+  const ica_account_address = contract_response?.ica_info?.ica_address;
   return ica_account_address;
 }
 
@@ -269,7 +270,6 @@ export async function addMember(
 
   console.log("proposalMsg", proposalMsg);
 
-  
   try {
     const executionResponse = await client?.execute(
       account.bech32Address,

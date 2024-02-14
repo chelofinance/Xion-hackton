@@ -9,8 +9,8 @@ import {
 import { Button } from "@burnt-labs/ui";
 import Contracts from "@/config/contracts.config";
 import {
-  createIcaMultisig, createProposal, executeProposal, getBalance, 
-  getIcaAccountAddress, getIcaControllerAddress, getProposalList, 
+  createIcaMultisig, createProposal, executeProposal, getBalance,
+  getIcaAccountAddress, getIcaControllerAddress, getProposalList,
   voteProposal, addMember
 } from "./utils";
 
@@ -185,9 +185,9 @@ export default function Page(): JSX.Element {
   async function addMemberHandler() {
     setAddMemberLoading(true);
 
-    const response = await addMember(client, 
-      account, 
-      newMemberAddress, 
+    const response = await addMember(client,
+      account,
+      newMemberAddress,
       feeAmount,
       icaMultisigAddress)
 
@@ -283,28 +283,28 @@ export default function Page(): JSX.Element {
             </Button>
           </div>
           <div>
-          <br/>
-          <h3>Add New Member</h3>
-            Address: 
-            <input type="text" name="new_member_address" 
-            value={newMemberAddress}
-            onChange={(e) => {
-              setNewMemberAddress(e.target.value);
-            }}
-            style={{
-              color: "black",
-            }}
+            <br />
+            <h3>Add New Member</h3>
+            Address:
+            <input type="text" name="new_member_address"
+              value={newMemberAddress}
+              onChange={(e) => {
+                setNewMemberAddress(e.target.value);
+              }}
+              style={{
+                color: "black",
+              }}
             />
-            <br/>
-            Fee: <br/><input type="text" name="fee_amount" 
-            style={{
-              color: "black",
-            }}
-            value={feeAmount}
-            onChange={(e) => {
-              setFeeAmount(e.target.value);
-            }} /> uxion <br/>
-            <br/>
+            <br />
+            Fee: <br /><input type="text" name="fee_amount"
+              style={{
+                color: "black",
+              }}
+              value={feeAmount}
+              onChange={(e) => {
+                setFeeAmount(e.target.value);
+              }} /> uxion <br />
+            <br />
             <Button
               disabled={addMemberLoading}
               fullWidth
@@ -352,72 +352,93 @@ export default function Page(): JSX.Element {
             <p className="info-description">
               <span className="info-bold">Run this command</span>
             </p>
+            <span className="info-value">{"--------------------------------------------------------------------"}</span>
             <button className="info-value" onClick={(e: any) => {
               navigator.clipboard.writeText(e.target.textContent)
               alert("Command copied to clipboard. Please execute it in your terminal.")
             }}>{"hermes tx chan-open-try --dst-chain injective-888 --src-chain xion-testnet-1 --dst-connection "}{contracts.channelOpenInitOptions.counterpartyConnectionId}{" --dst-port "}{channelInitInfo?.destination_port}{" --src-port "}{channelInitInfo?.src_port_id}{" --src-channel "}{channelInitInfo.src_channel_id}</button>
+            <span className="info-value">{"--------------------------------------------------------------------"}</span>
+            <button className="info-value" onClick={(e: any) => {
+              navigator.clipboard.writeText(e.target.textContent)
+              alert("Command copied to clipboard. Please execute it in your terminal.")
+            }}>
+              {"hermes tx chan-open-ack --dst-chain injective-888 --src-chain xion-testnet-1 --dst-connection "}{contracts.channelOpenInitOptions.counterpartyConnectionId}{" --dst-port "}{channelInitInfo?.destination_port}{" --src-port "}{channelInitInfo?.src_port_id}{" --src-channel "}{channelInitInfo.src_channel_id}{" --dst-channel "}{channelInitInfo.destination_channel_id}
+            </button>
+            <span className="info-value">{"--------------------------------------------------------------------"}</span>
+            <button className="info-value" onClick={(e: any) => {
+              navigator.clipboard.writeText(e.target.textContent)
+              alert("Command copied to clipboard. Please execute it in your terminal.")
+            }}>
+              {"hermes tx chan-open-confirm --dst-chain injective-888 --src-chain xion-testnet-1 --dst-connection "}{contracts.channelOpenInitOptions.counterpartyConnectionId}{" --dst-port "}{channelInitInfo?.destination_port}{" --src-port "}{channelInitInfo?.src_port_id}{" --src-channel "}{channelInitInfo.src_channel_id}{" --dst-channel "}{channelInitInfo.destination_channel_id}
+            </button>
+            <span className="info-value">{"--------------------------------------------------------------------"}</span>
           </div>
         </div>
       )}
-      {icaControllerAddress && ( // Show the ICA Account address even if it is not set
+      {icaControllerAddress && (
         <div className="info-container">
           <div className="info-content">
             <p className="info-description">
               <span className="info-bold">ICA Account Addresses</span>
             </p>
-            <span className="info-value">{icaAccountAddress || "-------------------------------------"}</span>
-            <button disabled={loading} onClick={getIcaAccountAddressHandler}>
-              {loading ? "LOADING..." : "Refetch ICA Account Address"}
-            </button>
+            {icaAccountAddress ? (
+              <span className="info-value">{icaAccountAddress}</span>
+            ) : (
+              <button disabled={loading} onClick={getIcaAccountAddressHandler}>
+                {loading ? "LOADING..." : "Refetch ICA Account Address"}
+              </button>)}
           </div>
         </div>
-      )}
-      {proposals.length > 0 && (
-        <table>
-          <caption>Proposal Details</caption>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Description</th>
-              <th>Status</th>
-              <th>Vote</th>
-              <th>Execute</th>
-            </tr>
-          </thead>
-          <tbody>
-            {proposals.map((proposal, index) => (
-              <tr key={index}>
-                <td>{proposal.id}</td>
-                <td>{proposal.description}</td>
-                <td>{proposal.status}</td>
-                <td>
-                  <button
-                    disabled={loading}
-                    onClick={() => voteProposalHandler(proposal.id, true)}
-                  >
-                    {loading ? "LOADING..." : "Yes"}
-                  </button>
-                  <button
-                    disabled={loading}
-                    onClick={() => voteProposalHandler(proposal.id, false)}
-                  >
-                    {loading ? "LOADING..." : "No"}
-                  </button>
-                </td>
-                <td>
-                  <button
-                    disabled={loading}
-                    onClick={() => executeProposalHandler(proposal.id)}
-                  >
-                    {loading ? "LOADING..." : "Execute"}
-                  </button>
-                </td>
+      )
+      }
+      {
+        proposals.length > 0 && (
+          <table>
+            <caption>Proposal Details</caption>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>Vote</th>
+                <th>Execute</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+            </thead>
+            <tbody>
+              {proposals.map((proposal, index) => (
+                <tr key={index}>
+                  <td>{proposal.id}</td>
+                  <td>{proposal.description}</td>
+                  <td>{proposal.status}</td>
+                  <td>
+                    <button
+                      disabled={loading}
+                      onClick={() => voteProposalHandler(proposal.id, true)}
+                    >
+                      {loading ? "LOADING..." : "Yes"}
+                    </button>
+                    <button
+                      disabled={loading}
+                      onClick={() => voteProposalHandler(proposal.id, false)}
+                    >
+                      {loading ? "LOADING..." : "No"}
+                    </button>
+                  </td>
+                  <td>
+                    <button
+                      disabled={loading}
+                      onClick={() => executeProposalHandler(proposal.id)}
+                    >
+                      {loading ? "LOADING..." : "Execute"}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )
+      }
       <Abstraxion onClose={() => setIsOpen(false)} />
-    </main>
+    </main >
   );
 }
