@@ -8,7 +8,7 @@ import CoinAmount from '@/components/CoinAmount';
 import {AppChains, chainConfigMap, CHAIN_METADATA_DICT, INJECTIVE_ID, TokenSymbols} from '@/constants/app';
 import Button, {ButtonProps} from '@/components/Button';
 import ProgressBar from '@/components/ProgressBar';
-import {useCallback, useMemo, useRef, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import CaptionAmount from '@/components/CaptionAmount';
 import ChainLabel from '@/components/ChainLabel';
 import AmountInput from '@/components/form-presets/AmountInput';
@@ -16,7 +16,7 @@ import useOraclePrice from '@/hooks/useOraclePrice';
 import BigNumber from 'bignumber.js';
 import useRaisingNFTVault from '@/hooks/useRaisingNFTVault';
 import useMyNFTVaults from '@/hooks/useMyNFTVaults';
-import {MyNFTVault} from '@/types/asset';
+import {MyNFTVault, NFT, RaisingNFT} from '@/types/asset';
 import {useAtom} from 'jotai';
 import {userWalletAtom} from '@/store/states';
 import NumberText from '@/components/NumberText';
@@ -24,6 +24,10 @@ import {injectiveClient, transferInjective} from '@/utils/injective';
 import {useRouter} from 'next/router';
 import PageLoader from '@/components/PageLoader';
 import Tag from '@/components/Tag';
+import { createIcaBuyMsg } from '@/utils/ica';
+import { createProposal, executeProposal } from '@/utils/multisig';
+import { useAbstraxionAccount, useAbstraxionSigningClient } from '@burnt-labs/abstraxion';
+import {InjectiveSigningStargateClient} from '@injectivelabs/sdk-ts/dist/cjs/core/stargate';
 
 const CONFIG = chainConfigMap[AppChains.XION_TESTNET];
 
@@ -40,7 +44,8 @@ const RaisingVault: NextPage = () => {
   const router = useRouter();
   const { address } = router.query;
 
-  const vault = useRaisingNFTVault(address as string | undefined);
+  const nft = useRaisingNFTVault(address as string | undefined);
+  const [tmpRaisedAmount, setTmpRaisedAmount] = useState<number>(nft?.raisedAmount ?? 0);
 
   const [isDepositFormOpen, setIsDepositFormOpen] = useState<boolean>(false);
 
@@ -53,9 +58,9 @@ const RaisingVault: NextPage = () => {
   const form = useRef<HTMLFormElement>(null);
 
   const { getOraclePrice } = useOraclePrice();
-  const oraclePrice = vault ? getOraclePrice(vault.fixedPrice.symbol) : 0;
+  const oraclePrice = nft ? getOraclePrice(nft.fixedPrice.symbol) : 0;
 
-  const maxDepositAmount = vault ? vault.fixedPrice.value - vault.raisedAmount : 0;
+  const maxDepositAmount = nft ? nft.fixedPrice.value - tmpRaisedAmount : 0;
   const maxDepositAmountUSD = useMemo(() => new BigNumber(maxDepositAmount).times(oraclePrice), [maxDepositAmount, oraclePrice]);
   const minDepositAmount = 0.000000000000000001;
 
@@ -77,8 +82,8 @@ const RaisingVault: NextPage = () => {
     };
   }, [isDepositAmountValid]);
 
-  const priceUSD = useMemo(() => new BigNumber(vault?.fixedPrice.value ?? 0).times(oraclePrice), [oraclePrice]);
-  const raisedAmountUSD = useMemo(() => new BigNumber(vault?.raisedAmount ?? 0).times(oraclePrice), [oraclePrice]);
+  const priceUSD = useMemo(() => new BigNumber(nft?.fixedPrice.value ?? 0).times(oraclePrice), [oraclePrice]);
+  const raisedAmountUSD = useMemo(() => new BigNumber(tmpRaisedAmount).times(oraclePrice), [oraclePrice, tmpRaisedAmount]);
 
   const formattedCompactPriceUSD = priceUSD.gte(1000) ? ` (${formatUSD(priceUSD, {compact: true, semiequate: true})})` : '';
   const formattedPriceUSD = `${formatUSD(priceUSD)}${formattedCompactPriceUSD}`;
@@ -98,27 +103,50 @@ const RaisingVault: NextPage = () => {
 
   const openExplorer = useCallback(
     (collectionAddress: string) => {
-      if (!vault?.chain) return;
+      if (!nft?.chain) return;
 
-      const url = `${CHAIN_METADATA_DICT[vault.chain].explorerAddressURL}/contract/${collectionAddress}`;
+      const url = `${CHAIN_METADATA_DICT[nft.chain].explorerAddressURL}/contract/${collectionAddress}`;
       window.open(url, '_blank');
     },
-    [vault?.chain]
+    [nft?.chain]
   );
 
   const goToNFTPage = useCallback(() => {
-    if (vault)
-      router.push(`/nft/${vault.collection.contractAddress}${vault.tokenId}`);
-  }, [vault]);
+    if (nft)
+      router.push(`/nft/${nft.collection.contractAddress}${nft.tokenId}`);
+  }, [nft]);
 
   const [userWallet] = useAtom(userWalletAtom);
 
-  const {raisingVaults: myRaisingVaults} = useMyNFTVaults(userWallet?.account.address);
+  const myRaisingVaults = useMyNFTVaults(userWallet?.account.address);
 
-  const myVault = useMemo<MyNFTVault | undefined>(
-    () => myRaisingVaults.find((myVault) => myVault.tokenId === vault?.tokenId),
-    [myRaisingVaults, vault?.tokenId]
+  const { myNFT, myVault } = useMemo<{
+    myNFT: RaisingNFT | undefined;
+    myVault: MyNFTVault | undefined
+  }>(
+    () => {
+      const myVault = myRaisingVaults.find((myVault) => myVault.nfts.find(nft => nft.tokenId === nft?.tokenId));
+      const myNFT = myVault?.nfts.find(nft => nft.tokenId === nft?.tokenId);
+
+      return {
+        myNFT,
+        myVault,
+      }
+
+    },
+    [myRaisingVaults, nft?.tokenId]
   );
+
+  const myNFTPriceUSD = useMemo<BigNumber>(() => {
+    if (!myNFT) return new BigNumber(0);
+    const oraclePrice = getOraclePrice(myNFT.fixedPrice.symbol);
+    const priceUSD = new BigNumber(myNFT.fixedPrice.value).times(oraclePrice);
+    return priceUSD;
+  }, [myNFT]);
+
+  const isRaisedAll = useMemo<boolean>(() => maxDepositAmount === 0, [maxDepositAmount]);
+  const isOwningVault = useMemo<boolean>(() => nft?.ownerAddress === myVault?.ica.icaMultisigAddress, [nft, myVault]);
+
 
   const handleDeposit = async () => {
     try {
@@ -133,24 +161,86 @@ const RaisingVault: NextPage = () => {
         recipient: CONFIG.icaAccount.address,
         account: addr,
       });
+
+      setTmpRaisedAmount(tmpRaisedAmount + depositAmount);
     } catch (err) {
       console.log('ERR TRANSFER', err);
     }
   };
 
-  const isRaisedAll = useMemo<boolean>(() => maxDepositAmount === 0, [maxDepositAmount]);
+  const [{client: cosmosCli, signer}, setCosmos] = useState<{
+    client: InjectiveSigningStargateClient | null;
+    signer: any;
+  }>({
+    client: null,
+    signer: null,
+  });
 
-  if (vault === undefined)
+  const init = async () => {
+    try {
+      const keplrSigner = await createKeplrSigner();
+      const {client} = await injectiveClient(keplrSigner);
+      const balance = await client.getBalance(CONFIG.icaAccount.address, 'inj');
+
+      setCosmos({client, signer: keplrSigner});
+      // setVaultBalance(balance.amount);
+    } catch (err) {
+      console.log('ERR SETTING UP', err);
+    }
+  };
+
+  useEffect(() => {
+    init();
+  }, []);
+
+  const {client} = useAbstraxionSigningClient();
+  const {data: account} = useAbstraxionAccount();
+
+  const handleICABuyNft = async () => {
+    if (!nft) return;
+
+    try {
+      const proposal = createIcaBuyMsg({
+        ica: CONFIG.icaAccount.address,
+        buyContract: nft.buyContractAddress,
+        nftContract: nft.collection.contractAddress,
+        tokenId: nft.tokenId,
+        cost: new BigNumber(nft.fixedPrice.value).shiftedBy(18).toString(),
+      });
+      const {proposal_id} = await createProposal({
+        client,
+        account,
+        injectiveMsg: proposal,
+        icaMultisigAddress: CONFIG.cw3FixedMultisig.address,
+        icaControllerAddress: CONFIG.icaController.address,
+      });
+      await executeProposal(client, account, CONFIG.cw3FixedMultisig.address, Number(proposal_id));
+    } catch (err) {
+      console.log('ERR:', err);
+    }
+  };
+
+  const handleICASellNft = async () => {
+    if (!nft) return;
+
+    try {
+      // sell
+    } catch (err) {
+      console.log('ERR:', err);
+    }
+  };
+  
+  if (nft === undefined)
     return <PageLoader />;
 
   return (
     <Main className="flex flex-col items-stretch min-h-screen pt-app_header_height pb-page_bottom md:mx-page_x">
-      <Heading tagName="h2">Raising Vault</Heading>
+      <Heading tagName="h2">Raising NFT</Heading>
 
       <section className="space-y-4 mt-20">
         <div className="flex items-stretch gap-x-14">
           <div className="grow-0 shrink-0 w-fit flex flex-col gap-y-4">
-            <NFTTumbnail size="xl" imgSrc={vault.imgSrc} />
+            <NFTTumbnail size="xl" imgSrc={nft.imgSrc} />
 
             <div className="flex items-center gap-x-2">
               <Button
@@ -158,7 +248,7 @@ const RaisingVault: NextPage = () => {
                 size="xs"
                 iconType="external_link"
                 label={`See in chain explorer`}
-                onClick={() => openExplorer(vault.collection.contractAddress)}
+                onClick={() => openExplorer(nft.collection.contractAddress)}
               />
               <Button
                 type="outline"
@@ -171,16 +261,16 @@ const RaisingVault: NextPage = () => {
                 type="outline" 
                 size="xs"
                 iconType="external_link" 
-                label={`See vault details`} 
-                onClick={() => openExplorer(vault.ica.icaMultisigAddress)}
+                label={`See nft details`} 
+                onClick={() => openExplorer(nft.ica.icaMultisigAddress)}
               /> */}
             </div>
 
-            {!!myVault && (
+            {!!myNFT && !!myVault && (
               <Card color="primary" className="p-4 space-y-1">
                 <div className="flex items-center justify-between gap-x-4">
                   <div className="h-6 flex flex-col justify-center Font_label_14px">My deposit</div>
-                  <NumberText color="on_primary" formattedNumber={formatUSD(myVault.shareUSD)} />
+                  <NumberText color="on_primary" formattedNumber={formatUSD(myNFTPriceUSD.times(myVault.share))} />
                 </div>
 
                 <div className="flex items-center justify-between gap-x-4">
@@ -194,11 +284,11 @@ const RaisingVault: NextPage = () => {
           <div className="grow shrink space-y-4">
             <div className="flex items-center justify-between gap-x-4">
               <Heading tagName="h3">
-                {vault.nftName}
+                {nft.nftName}
                 {isRaisedAll && <Tag label="Voilà! All raised" size="sm" className="ml-2" />}
               </Heading>
 
-              <ChainLabel chain={vault.chain} />
+              <ChainLabel chain={nft.chain} />
             </div>
 
             <Card color="glass" className="flex flex-col items-stretch gap-y-2 p-4 text-body">
@@ -206,7 +296,7 @@ const RaisingVault: NextPage = () => {
                 <span className="h-6 flex flex-col justify-center Font_label_14px">Participants</span>
 
                 <span className="flex items-baseline gap-x-1 Font_data_16px_num">
-                  {formatNumber(vault.participants)}
+                  {formatNumber(nft.participants)}
                   <span className="Font_caption_xs">joining</span>
                 </span>
               </div>
@@ -226,7 +316,7 @@ const RaisingVault: NextPage = () => {
               <div className="h-6 flex flex-col justify-center Font_label_14px">Fixed price</div>
 
               <div className="flex flex-col gap-y-2 items-end">
-                <CoinAmount size="md" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(vault.fixedPrice.value)} />
+                <CoinAmount size="md" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(nft.fixedPrice.value)} />
                 <CaptionAmount size="sm" formattedAmount={formattedPriceUSD} />
               </div>
               {/* </div> */}
@@ -236,7 +326,7 @@ const RaisingVault: NextPage = () => {
               <div className="h-6 flex flex-col justify-center Font_label_14px">Vault balance</div>
 
               <div className="flex flex-col gap-y-2 items-end">
-                <CoinAmount size="md" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(vault.raisedAmount)} />
+                <CoinAmount size="md" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(tmpRaisedAmount)} />
                 <CaptionAmount size="sm" formattedAmount={formattedPriceUSD} />
               </div>
             </Card>}
@@ -246,10 +336,11 @@ const RaisingVault: NextPage = () => {
                 <Button
                   color="primary"
                   size="lg"
-                  label={myVault ? 'Buy NFT' : 'Cannot join anymore'}
+                  label={myNFT ? isOwningVault ? 'Sell NFT' : 'Buy NFT' : 'Cannot join anymore'}
                   iconType="arrow_forward"
                   className="w-full md:w-fit"
-                  status={myVault ? 'enabled' : 'disabled'}
+                  status={myNFT ? 'enabled' : 'disabled'}
+                  onClick={isOwningVault ? handleICASellNft : handleICABuyNft}
                 />
               </div>
             )}

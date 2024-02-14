@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import type {NextPage} from 'next';
 import Main from '@/components/Main';
 import Heading from '@/components/Heading';
@@ -6,47 +6,41 @@ import NFTTumbnail from '@/components/NFTThumbnail';
 import Card from '@/components/Card';
 import {formatNumber, formatUSD} from '@/utils/number';
 import CoinAmount from '@/components/CoinAmount';
-import {AppChains, TokenSymbols} from '@/constants/app';
+import {AppChains, TEST_VAULT, TokenSymbols} from '@/constants/app';
 import Button from '@/components/Button';
 import {ButtonStatus} from '@/components/Button/types';
 import {useAbstraxionAccount, useAbstraxionSigningClient} from '@burnt-labs/abstraxion';
-import {createIcaMultisig} from '@/utils/multisig';
+import {CreateIcaMultisigResult, createIcaMultisig} from '@/utils/multisig';
 import {chainConfigMap} from '@/constants/app';
-
-const NFT_DETAIL: {
-  id: string;
-  nftName: string;
-  imgSrc: string;
-  price: number;
-  raisedAmountUSD: number;
-  participants: number;
-} = {
-  id: 'MultiSig 1',
-  nftName: 'Monkey - 2004(WOOD)',
-  imgSrc: 'https://images.talis.art/tokens/6582d0be4a3988d286be0f9c/mediaThumbnail',
-  price: 1313133,
-  raisedAmountUSD: 11111381919,
-  participants: 13133,
-};
+import router from 'next/router';
+import CopyHelper from '@/components/CopyHelper';
+import { shortenAddress, shortenText } from '@/utils/text';
+import Head from 'next/head';
+import { useAtom } from 'jotai';
+import { testVaultAtom } from '@/store/states';
 
 const CreateVault: NextPage = () => {
   const [status, setStatus] = React.useState<ButtonStatus>('enabled');
   const {client} = useAbstraxionSigningClient();
   const {data: account, isConnected} = useAbstraxionAccount();
-  const [vault, setVault] = React.useState('');
+  const [vault, setVault] = useState<CreateIcaMultisigResult | null>(null);
+
+  const [testVault, setTestVault] = useAtom(testVaultAtom);
 
   const handleCreateVault = async () => {
     try {
       setStatus('processing');
 
       const abstractAccount = await client?.getAccount(account.bech32Address);
-      const ica_multisig_address_response = await createIcaMultisig(
+      const ica_multisig_address_response: CreateIcaMultisigResult | null = await createIcaMultisig(
         client,
         account,
         chainConfigMap[AppChains.XION_TESTNET].icaFactory.address,
         [abstractAccount?.address || '']
       );
-      setVault(ica_multisig_address_response?.ica_multisig_address);
+      setVault(ica_multisig_address_response);
+
+      setTestVault(TEST_VAULT);
 
       setStatus('enabled');
     } catch (err) {
@@ -58,38 +52,67 @@ const CreateVault: NextPage = () => {
     <Main className="flex flex-col items-stretch min-h-screen pt-app_header_height pb-page_bottom md:mx-page_x">
       <Heading tagName="h2">Create Vault</Heading>
 
-      <section className="space-y-4 mt-20">
-        <div className="flex items-stretch gap-x-10">
-          <NFTTumbnail size="xl" imgSrc={NFT_DETAIL.imgSrc} className="grow-0 shrink-0" />
+      <section className="mt-20">
+        <div className="space-y-4">
+          <Card color="glass" className="p-4 text-body">
+            You can create vaults to propose buying or selling NFTs.
+            <br/>
+            Shall we create?
+          </Card>
 
-          <div className="grow shrink space-y-4">
-            <Heading tagName="h3">{NFT_DETAIL.nftName}</Heading>
+          {vault && <Card className="p-4 space-y-8">
+            <Heading tagName="h3" color="on_primary">
+              Vault created!
+            </Heading>
 
-            <Card color="glass" className="flex items-stretch justify-between gap-x-4 p-4 text-body">
-              <div className="h-6 flex flex-col justify-center">Fixed price</div>
+            <div className="space-y-4">
+              <div className="flex justify-between">
+                <div className="Font_label_14px">Address</div>
 
-              <div className="flex flex-col gap-y-2 items-end">
-                <CoinAmount size="xl" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(NFT_DETAIL.price)} />
-                <div className="flex items-center justify-between">
-                  <span className="Font_data_14px_num text-caption">{formatUSD(12.311)}</span>
-                </div>
+                <CopyHelper toCopy={TEST_VAULT.icaAccount.address} className="text-ground">
+                  <span className="w-fit truncate Font_button_md">{shortenAddress(TEST_VAULT.icaAccount.address, 4, 4)}</span>
+                </CopyHelper>
               </div>
-            </Card>
-            <div className="h-6 flex flex-col justify-center">{vault.length > 0 && `Vault: ${vault}`}</div>
 
-            <div className="flex justify-end">
-              <Button
-                color="primary"
-                size="lg"
-                label="Create vault"
-                iconType="arrow_forward"
-                className="w-full md:w-fit"
-                onClick={handleCreateVault}
-                status={status}
-              />
+              {vault.channel_init_info.src_channel_id && <div className="flex justify-between">
+                <div className="Font_label_14px">Channel ID</div>
+
+                <CopyHelper toCopy={vault.channel_init_info.src_channel_id} className="text-ground">
+                  <span className="w-fit truncate Font_button_md">{vault.channel_init_info.src_channel_id}</span>
+                </CopyHelper>
+              </div>}
+
+              {vault.channel_init_info.src_port_id && <div className="flex justify-between">
+                <div className="Font_label_14px">Port ID</div>
+
+                <CopyHelper toCopy={vault.channel_init_info.src_port_id} className="text-ground">
+                  <span className="w-fit truncate Font_button_md">{shortenText(vault.channel_init_info.src_port_id, 20)}</span>
+                </CopyHelper>
+              </div>}
+
+              {vault.channel_init_info.destination_port && <div className="flex justify-between">
+                <div className="Font_label_14px">Destination Port</div>
+
+                <CopyHelper toCopy={vault.channel_init_info.destination_port} className="text-ground">
+                  <span className="w-fit truncate Font_button_md">{vault.channel_init_info.destination_port}</span>
+                </CopyHelper>
+              </div>}
             </div>
+          </Card>}
+
+          <div className="flex justify-end">
+            <Button
+              color="primary"
+              size="lg"
+              label={vault ? 'See my vaults' : 'Create vault'}
+              iconType="arrow_forward"
+              className="w-full md:w-fit"
+              onClick={vault ? () => router.push('my-vaults') : handleCreateVault}
+              status={status}
+            />
           </div>
         </div>
+
       </section>
     </Main>
   );

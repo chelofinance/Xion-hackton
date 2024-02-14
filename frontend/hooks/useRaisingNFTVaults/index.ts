@@ -1,9 +1,8 @@
-import { NFT_VAULTS_DICT } from "@/constants/app";
-import { RaisingNFT } from "@/types/asset";
+import { RAISING_NFTS } from "@/constants/app";
 
 const useRaisingNFTVaults = () => {
-    const RAISING_NFT_VAULTS: readonly RaisingNFT[] = Object.values(NFT_VAULTS_DICT);
-    return RAISING_NFT_VAULTS;
+    // const RAISING_NFT_VAULTS: readonly RaisingNFT[] = Object.values(RAISING_NFTS_DICT);
+    return RAISING_NFTS;
 }
 
 export default useRaisingNFTVaults;

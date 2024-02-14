@@ -1,31 +1,38 @@
-import { NFTVault } from '@/types/asset';
+import { NFT } from '@/types/asset';
 import Link from 'next/link';
 import NFTTumbnail from '@/components/NFTThumbnail';
 import NumberText from '@/components/NumberText';
+import { TokenSymbols } from '@/constants/app';
+import Tag from '../Tag';
 
 type NFTVaultLinkCardProps = {
   href: string;
-  nftVault: NFTVault;
+  nftVault: NFT;
   amountLabel: string;
   formattedAmount: string;
+  vaultAddress: string;
 };
 
-const NFTVaultLinkCard = ({ href, nftVault, amountLabel, formattedAmount }: NFTVaultLinkCardProps) => {
+const NFTVaultLinkCard = ({ href, nftVault, amountLabel, formattedAmount, vaultAddress }: NFTVaultLinkCardProps) => {
   return (
     <Link
       href={`/${href}/${nftVault.collection.contractAddress}${nftVault.tokenId}`}
-      className="group/nft-vault-link overflow-hidden Transition_500 transition-colors rounded-card_md border border-solid border-transparent hover:border-ground"
+      className="group/nft-vault-link overflow-hidden Transition_500 transition-colors rounded-card_md border border-solid border-transparent hover:border-body"
     >
       <div className="flex items-center justify-between gap-x-4">
-        <NFTTumbnail
-          size="sm"
-          imgSrc={nftVault.imgSrc}
-          className="Transition_500 transition-all group-hover/nft-vault-link:scale-105"
-        />
+        <div className="flex items-center gap-x-4">
+          <NFTTumbnail
+            size="md"
+            imgSrc={nftVault.imgSrc}
+            className="Transition_500 transition-all group-hover/nft-vault-link:scale-105"
+          />
+          <div className="Font_label_14px">{nftVault.nftName}</div>
+          {nftVault.ownerAddress === vaultAddress && <Tag size="sm" label="Owned" />}
+        </div>
 
         <div className="flex flex-col items-end Transition_500 transition-all group-hover/nft-vault-link:pr-3">
-          <div className="Font_caption_xs">{amountLabel}</div>
-          <NumberText color="on_primary" formattedNumber={formattedAmount} />
+          <div className="Font_caption_sm">{amountLabel}</div>
+          <NumberText size="lg" color="body" formattedNumber={formattedAmount} unit={TokenSymbols.INJ} />
         </div>
       </div>
     </Link>

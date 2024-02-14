@@ -3,6 +3,7 @@ import { LOCAL_STORAGE_KEYS, TokenSymbols } from '@/constants/app';
 import type { ConnectedWallet } from '@/types/wallet';
 import apolloClients, { type AppApolloClients } from '@/data/graphql/apolloClients';
 import BURNT_LABS_LOGO_URL from '@/resources/logos/burnt_logo.svg';
+import { ContractsDict } from '@/types/contract';
 
 type TokenData = {
   logoURI: string;
@@ -37,3 +38,9 @@ export const userWalletAtom = atom(
 export const userAgentAtom = atom<
   { isMobile: boolean; isMobileOrTablet: boolean; isIOS: boolean; isNonIOSMobile: boolean } | undefined
 >(undefined);
+
+/**
+ * 
+ * @description tmp states for demo
+ */
+export const testVaultAtom = atom<ContractsDict | null>(null);

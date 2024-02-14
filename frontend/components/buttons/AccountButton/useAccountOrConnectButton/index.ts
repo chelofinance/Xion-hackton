@@ -4,9 +4,12 @@ import {useModal as useXionModal, useAbstraxionAccount} from '@burnt-labs/abstra
 import useModal from '@/hooks/useModal';
 import useAccountButton from './useAccountButton';
 import { shortenAddress } from '@/utils/text';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { ButtonColor, ButtonStatus, ButtonType } from '@/components/Button/types';
 import { IconType } from '@/components/Icon';
+import { useAtom } from 'jotai';
+import { userWalletAtom } from '@/store/states';
+import { abstraxion } from '@/constants/wallet';
 
 type AccountButtonProps = Pick<ButtonProps, 'status' | 'color' | 'iconType' | 'label' | 'onClick'>;
 
@@ -49,6 +52,19 @@ const useAccountOrConnectButton = (): {
   );
   const modal = accountModal ?? connectModal;
   // END xion login
+
+  const [, setUserWallet] = useAtom(userWalletAtom);
+
+  useEffect(() => {
+    if (!isConnected) setUserWallet(null);
+
+    const userWallet = {
+      ...abstraxion,
+      account: { address: account.bech32Address }
+    };
+    
+    setUserWallet(userWallet);
+  }, [account.bech32Address, isConnected]);
 
   return {
     buttonProps,
