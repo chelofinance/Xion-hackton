@@ -115,7 +115,7 @@ const VaultSearchTextInput = ({
                     <div className="grow shrink flex items-center gap-x-2">
                       <div className="w-4 h-4 rounded-full bg-caption overflow-hidden text-transparent">Wallet Avatar</div>
                       <div className="Font_label_14px text-body">{fetchedMultisigWallet.name}</div>
-                      <div className="Font_caption_xs text-caption_dark">{shortenAddress(fetchedMultisigWallet.address)}</div>
+                      <div className="Font_caption_xs text-caption_on_primary">{shortenAddress(fetchedMultisigWallet.address)}</div>
                     </div>
 
                     <OverlayGrid xUnitPx={12} className="!w-10">

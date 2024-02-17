@@ -99,6 +99,11 @@ export enum TokenSymbols {
   XION = 'XION',
 }
 
+export const COIN_DICT: Record<TokenSymbols, { denom: string; decimals: number; }> = {
+  [TokenSymbols.INJ]: { denom: 'inj', decimals: 18, },
+  [TokenSymbols.XION]: { denom: 'uxion', decimals: 6 },
+};
+
 export const PRICE_ORACLE_DICT: Record<TokenSymbols, number> = {
   [TokenSymbols.INJ]: 35,
   [TokenSymbols.XION]: 1,
@@ -237,7 +242,7 @@ export const NFT_VAULTS: readonly NFTVault[] = [
   {
     nfts: RAISING_NFTS,
     ica: {
-      icaMultisigAddress: 'inj1tfvcvjkpw02eeldx2lhtw0xysg3msehyarqe5lwygf3dk40vt9uqhuzlg3',
+      icaMultisigAddress: TEST_VAULT.icaAccount.address,
       icaControllerAddress: TEST_VAULT.icaController.address,
     },
     multisig: {

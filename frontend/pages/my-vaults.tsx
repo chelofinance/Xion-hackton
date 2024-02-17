@@ -19,11 +19,13 @@ import {shortenAddress} from '@/utils/text';
 import Button from '@/components/Button';
 import {useRouter} from 'next/router';
 import ChainLabel from '@/components/ChainLabel';
-import {AllChains, PROPOSAL_STATUS_LABEL_DICT, ProposalStatus} from '@/constants/app';
+import {AllChains, PROPOSAL_STATUS_LABEL_DICT, ProposalStatus, TEST_VAULT, TokenSymbols} from '@/constants/app';
 import Tag from '@/components/Tag';
 import useProposals from '@/hooks/useProposals';
 import useAddMember from '@/hooks/useAddMember';
 import TextInput from '@/components/TextInput';
+import { MyNFTVault } from '@/types/asset';
+import CoinAmount from '@/components/CoinAmount';
 
 // const CONFIG = chainConfigMap[AppChains.XION_TESTNET];
 
@@ -41,7 +43,7 @@ const MyVaults: NextPage = () => {
 
     const [userWallet] = useAtom(userWalletAtom);
 
-    const balance = useBalance(userWallet);
+
 
     // const formattedBalanceAmount = useMemo(
     //   () => formatNumber(balance.shifted, balance.decimals),
@@ -51,7 +53,13 @@ const MyVaults: NextPage = () => {
     const {getOraclePrice} = useOraclePrice();
 
     const myVaults = useMyNFTVaults(userWallet?.account.address);
-    console.log({ica: myVaults[0].ica.icaMultisigAddress});
+
+    const [selectedVault, setSelectedVault] = useState<MyNFTVault | undefined>(myVaults[0]);
+
+    const { getBalance } = useBalance(selectedVault?.ica.icaMultisigAddress);
+    const vaultBalance = getBalance(TokenSymbols.INJ);
+
+    const formattedVaultBalanceUSD = useMemo(() => formatUSD(vaultBalance.usd), [vaultBalance.usd]);
 
     const myNFTVaultsValueUSD = useMemo(() => {
         return myVaults.reduce((accm, vault) => {
@@ -71,11 +79,11 @@ const MyVaults: NextPage = () => {
         }, new BigNumber(0));
     }, [getOraclePrice, myVaults, userWallet?.account.address]);
 
-    const formattedTotalUSD = useMemo(() => formatUSD(balance.usd.plus(myNFTVaultsValueUSD)), [balance.usd, myNFTVaultsValueUSD]);
+    const formattedTotalUSD = useMemo(() => formatUSD(vaultBalance.usd.plus(myNFTVaultsValueUSD)), [vaultBalance.usd, myNFTVaultsValueUSD]);
 
-    const {proposals, voteProposal} = useProposals(myVaults[0]?.ica.icaControllerAddress ?? '');
+    const {proposals, voteProposal} = useProposals(selectedVault?.ica.icaControllerAddress ?? '');
 
-    const {addMember} = useAddMember(myVaults[0]?.ica.icaControllerAddress ?? '');
+    const {addMember} = useAddMember(selectedVault?.ica.icaControllerAddress ?? '');
 
     const form = useRef<HTMLFormElement>(null);
 
@@ -95,18 +103,27 @@ const MyVaults: NextPage = () => {
                             <AccountAddress wallet={userWallet} />
                             <div className="flex items-baseline gap-x-4">
                                 <BalanceTotal formattedNumber={formattedTotalUSD} isLoading={false} />
-                                <span className="Font_caption_sm">NFTs owned</span>
+                                <span className="Font_caption_sm">Total holdings</span>
                             </div>
                         </div>
                     </Card>
                 </div>
 
-                {myVaults[0] && (
+                {selectedVault && (
                     <section className="grow shrink flex flex-col gap-y-8">
                         <Heading tagName="h3">Vault Summary</Heading>
 
+                        <Card color="glass" className="flex justify-between items-center p-4">
+                            <div className="space-y-1">
+                                <BalanceTotal formattedNumber={formattedVaultBalanceUSD} isLoading={false} />
+                                <CoinAmount size="sm" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(vaultBalance.shifted, vaultBalance.decimals)} />
+                            </div>
+
+                            <Button size="sm" label="Deposit" iconType="arrow_forward" />
+                        </Card>
+
                         <div className="flex flex-col gap-y-2">
-                            <CopyHelper toCopy={myVaults[0].ica.icaMultisigAddress} className="text-body">
+                            <CopyHelper toCopy={selectedVault.ica.icaMultisigAddress} className="text-body">
                                 <div className="flex items-center gap-x-4">
                                     <div className="flex items-center">
                                         <div className="w-[132px] Font_caption_xs mr-4 text-left">Vault address (ICA)</div>
@@ -114,12 +131,12 @@ const MyVaults: NextPage = () => {
                                     </div>
 
                                     <span className="w-fit truncate Font_button_md">
-                                        {shortenAddress(myVaults[0].ica.icaMultisigAddress, 4, 4)}
+                                        {shortenAddress(selectedVault.ica.icaMultisigAddress, 4, 4)}
                                     </span>
                                 </div>
                             </CopyHelper>
 
-                            <CopyHelper toCopy={myVaults[0].ica.icaControllerAddress} className="text-body">
+                            <CopyHelper toCopy={selectedVault.ica.icaControllerAddress} className="text-body">
                                 <div className="flex items-center gap-x-4">
                                     <div className="flex items-center">
                                         <div className="w-[132px] Font_caption_xs mr-4 text-left">Multisig address</div>
@@ -127,7 +144,7 @@ const MyVaults: NextPage = () => {
                                     </div>
 
                                     <span className="w-fit truncate Font_button_md">
-                                        {shortenAddress(myVaults[0].ica.icaControllerAddress, 4, 4)}
+                                        {shortenAddress(selectedVault.ica.icaControllerAddress, 4, 4)}
                                     </span>
                                 </div>
                             </CopyHelper>
@@ -173,14 +190,14 @@ const MyVaults: NextPage = () => {
                         <div className="flex flex-col gap-4 items-stretch mt-4">
                             <Heading tagName="h4">NFTs</Heading>
 
-                            {myVaults[0].nfts.map((nft) => (
+                            {selectedVault.nfts.map((nft) => (
                                 <NFTVaultLinkCard
                                     key={nft.tokenId}
                                     href="raising-vault"
                                     nftVault={nft}
                                     amountLabel="Fixed price"
                                     formattedAmount={formatNumber(nft.fixedPrice.value)}
-                                    vaultAddress={myVaults[0].ica.icaMultisigAddress}
+                                    vaultAddress={selectedVault.ica.icaMultisigAddress}
                                 />
                             ))}
                         </div>
@@ -208,7 +225,7 @@ const MyVaults: NextPage = () => {
                     </section>
                 )}
 
-                {!myVaults[0] && (
+                {!selectedVault && (
                     <div className="grow shrink flex flex-col gap-y-4">
                         <Card color="glass" className="p-4 text-body">
                             No vault found.

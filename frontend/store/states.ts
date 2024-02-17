@@ -1,5 +1,5 @@
 import { atom } from 'jotai';
-import { LOCAL_STORAGE_KEYS, TokenSymbols } from '@/constants/app';
+import { LOCAL_STORAGE_KEYS, TEST_VAULT, TokenSymbols } from '@/constants/app';
 import type { ConnectedWallet } from '@/types/wallet';
 import apolloClients, { type AppApolloClients } from '@/data/graphql/apolloClients';
 import BURNT_LABS_LOGO_URL from '@/resources/logos/burnt_logo.svg';
@@ -43,4 +43,4 @@ export const userAgentAtom = atom<
  * 
  * @description tmp states for demo
  */
-export const testVaultAtom = atom<ContractsDict | null>(null);
+export const testVaultAtom = atom<ContractsDict | null>(TEST_VAULT);

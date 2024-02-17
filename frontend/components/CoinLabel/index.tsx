@@ -13,7 +13,7 @@ type CoinLabelProps = {
 const CoinLabel = ({ symbol, description, size = 'md', color = 'primary', logoURL }: CoinLabelProps) => {
   const { coinSize, fontClassName, descriptionFontClassName } = SIZE_DICT[size];
   const colorClassName = COLOR_CLASS_DICT[color];
-  const captionColorClassName = color === 'primary' ? 'text-caption_dark' : 'text-caption';
+  const captionColorClassName = color === 'primary' ? 'text-caption_on_primary' : 'text-caption';
 
   return (
     <span className="inline-flex items-center gap-x-2">

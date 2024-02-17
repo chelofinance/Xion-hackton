@@ -1,45 +1,52 @@
-import { ConnectedWallet } from "@/types/wallet";
-import { useAbstraxionSigningClient } from "@burnt-labs/abstraxion";
 import type { Coin } from "@cosmjs/stargate";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import FTAmount from "@/struct/FTAmount";
+import { getNetworkEndpoints, Network as InjectvieNetwork } from '@injectivelabs/networks';
+import { ChainGrpcBankApi } from '@injectivelabs/sdk-ts';
+import { COIN_DICT, TokenSymbols } from "@/constants/app";
 
 /**
  * 
  * @todo implement balance polling
  */
-const useBalance = (wallet: ConnectedWallet | null): FTAmount => {
-    const { client: abstraxionClient } = useAbstraxionSigningClient();
+const useBalance = (address: string | undefined) => {
+    const chainGrpcBankApi = useMemo(() => {
+        const endpoints = getNetworkEndpoints(InjectvieNetwork.Testnet);
+        return new ChainGrpcBankApi(endpoints.grpc);
+    }, []);
 
-    const [balance, setBalance] = useState<Coin | null>(null);
+    const [balanceRecord, setBalanceRecord] = useState<{ [denom: string]: Coin }>({});
 
-    const updateAbstraxionBalance = useCallback(async (denom: string) => {
+    const updateInjectiveBalance = useCallback(async () => {
+        if (!address) return;
+
         try {
-            const fetchedBalance = await abstraxionClient?.getBalance(
-                wallet?.account.address ?? '',
-                denom
-            );
-    
-            setBalance(fetchedBalance ?? null);
+            const balancesResponse = await chainGrpcBankApi.fetchBalances(address);
+            const record = balancesResponse.balances.reduce<{ [denom: string]: Coin }>((accm, balance) => {
+                return {
+                    ...accm,
+                    [balance.denom]: balance,
+                }
+            }, {});
+
+            setBalanceRecord(record);
         } catch(e) {
             console.log(e);
         }
 
-    }, [abstraxionClient, wallet?.account.address]);
-
-    const updateBalance = useCallback(() => {
-        if (wallet?.type === 'abstraxion') {
-            updateAbstraxionBalance('uxion');
-        }
-    }, [wallet?.type, updateAbstraxionBalance]);
+    }, [chainGrpcBankApi, address]);
 
     useEffect(() => {
-        updateBalance();
-    }, [updateBalance]);
+        updateInjectiveBalance();
+    }, [updateInjectiveBalance]);
 
-    const priceOracle = 1.1;
+    const getBalance = useCallback((symbol: TokenSymbols): FTAmount => {
+        const coin = COIN_DICT[symbol];
+        const balance: Coin | undefined = balanceRecord[coin.denom];
+        return new FTAmount(balance ?? { amount: '0', denom: coin.denom }, coin.decimals);
+    }, [balanceRecord]);
 
-    return useMemo(() => new FTAmount(balance ?? { amount: '0', denom: 'uxion' }, priceOracle), [balance, priceOracle]);
+    return { getBalance };
 };
 
 export default useBalance;

@@ -20,12 +20,12 @@ export type AccountOverlayProps = Omit<OverlayProps, 'ariaLabel'> & {
 
 const useAccountOverlayElements = (props: AccountOverlayProps) => {
   const { wallet, onClose: onCloseModal } = props;
-  const balance = useBalance(wallet);
+  // const balance = useBalance(wallet);
 
-  const formattedBalanceAmount = useMemo(
-    () => formatNumber(balance.shifted, balance.decimals),
-    [balance.shifted, balance.decimals]
-  );
+  // const formattedBalanceAmount = useMemo(
+  //   () => formatNumber(balance.shifted, balance.decimals),
+  //   [balance.shifted, balance.decimals]
+  // );
 
   // const { getOraclePrice } = useOraclePrice();
 
