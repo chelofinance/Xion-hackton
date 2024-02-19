@@ -17,11 +17,14 @@ pub struct InstantiateMsg {
     pub cw3_multisig_code_id: u64,
     /// The code ID of the `cw-ica-controller` contract.
     pub cw_ica_controller_code_id: u64,
+    /// proxy address
+    pub proxy: Addr,
 }
 
 /// The messages to execute this contract.
 #[ica_callback_execute]
 #[allow(missing_docs)] // added this since the macro is not documented, will be fixed in the next release
+#[cw_ownable::cw_ownable_execute]
 #[cw_serde]
 pub enum ExecuteMsg {
     /// `DeployMultisigIca` deploys a new multisig contract and a new ICA controller contract.
@@ -35,9 +38,15 @@ pub enum ExecuteMsg {
         /// and the ICA controller contract.
         salt: String,
     },
+    UpdateState {
+        cw3_multisig_code_id: Option<u64>,
+        cw_ica_controller_code_id: Option<u64>,
+        proxy: Option<Addr>,
+    },
 }
 
 /// The messages to query this contract.
+#[cw_ownable::cw_ownable_query]
 #[cw_serde]
 #[derive(QueryResponses)]
 pub enum QueryMsg {
@@ -52,6 +61,10 @@ pub enum QueryMsg {
     /// get ica controller given multisig
     #[returns(ICAControllerResponse)]
     QueryControllerByMultisig(Addr),
+
+    /// get multisig and controller by creator
+    #[returns(ICAControllerResponse)]
+    QueryMultisigByCreator(Addr),
 }
 
 /// response to multisigs created
@@ -73,4 +86,13 @@ pub struct CallbacksResponses {
 pub struct ICAControllerResponse {
     ///
     pub controller: String,
+}
+
+///
+#[cw_serde]
+pub struct MultisigByCreator {
+    ///
+    pub multisigs: Vec<Addr>,
+    ///
+    pub controllers: Vec<Addr>,
 }

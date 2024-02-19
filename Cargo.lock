@@ -718,7 +718,7 @@ checksum = "13e3bf6590cbc649f4d1a3eefc9d5d6eb746f5200ffb04e5e142700b8faa56e7"
 
 [[package]]
 name = "multisig"
-version = "0.1.0"
+version = "0.1.3"
 dependencies = [
  "cosmwasm-schema",
  "cosmwasm-std",
@@ -736,11 +736,12 @@ dependencies = [
 
 [[package]]
 name = "multisig-ica-factory"
-version = "0.1.0"
+version = "0.1.3"
 dependencies = [
  "cosmwasm-schema",
  "cosmwasm-std",
  "cw-ica-controller",
+ "cw-ownable",
  "cw-storage-plus",
  "cw2",
  "multisig",
