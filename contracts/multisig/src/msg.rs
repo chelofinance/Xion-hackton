@@ -22,23 +22,28 @@ pub enum ExecuteMsg {
     AddMember {
         address: Addr,
         fee: Coin,
+        sender: Option<Addr>,
     },
     Propose {
         title: String,
         description: String,
         msgs: Vec<CosmosMsg<Empty>>,
+        sender: Option<Addr>,
         // note: we ignore API-spec'd earliest if passed, always opens immediately
         latest: Option<Expiration>,
     },
     Vote {
         proposal_id: u64,
         vote: Vote,
+        sender: Option<Addr>,
     },
     Execute {
         proposal_id: u64,
+        sender: Option<Addr>,
     },
     Close {
         proposal_id: u64,
+        sender: Option<Addr>,
     },
 }
 

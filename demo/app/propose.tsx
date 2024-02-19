@@ -89,5 +89,6 @@ export const produceProposal = (
         },
       },
     ],
+    sender: "",// Will be updated later
   };
 };

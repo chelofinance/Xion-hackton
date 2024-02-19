@@ -23,13 +23,13 @@ const contracts: Record<SupportedNetworks, Contracts> = {
             counterpartyConnectionId: "connection-212"
         },
         cw3FixedMultisig: {
-            codeId: "158"
+            codeId: "190"
         },
         icaFactory: {
-            address: "xion1qmjxqd2j3vgcjrc9ea70qae2rkf28tced4sv50twmuxshzrxyfsq7saj9e"
+            address: "xion1l33tz82g5n6kq6gtceyjhsk0fcqqrytwr5dzglaq5pulq96np4vqm6k8ce"
         },
         proxyMultisig: {
-            address: "xion1q5kd9rug3q9vrt9wxtt8kyypxj8e8xmg3sd4cqq7andusnemecasaa7exd"
+            address: "xion1y88tpcx8e8uz5y22an704ap558k6t7jw5r0e7n9e2scparmt82qsj74n96"
         }
     }
 }

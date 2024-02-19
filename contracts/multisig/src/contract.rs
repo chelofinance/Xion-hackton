@@ -62,16 +62,69 @@ pub fn execute(
     msg: ExecuteMsg,
 ) -> Result<Response<Empty>, ContractError> {
     match msg {
-        ExecuteMsg::AddMember { address, fee } => add_member(deps, info, address, fee),
+        ExecuteMsg::AddMember {
+            address,
+            fee,
+            sender,
+        } => {
+            let info_with_custom_sender = MessageInfo {
+                sender: sender.unwrap_or(info.sender),
+                ..info
+            };
+            add_member(deps, info_with_custom_sender, address, fee)
+        }
         ExecuteMsg::Propose {
             title,
             description,
             msgs,
             latest,
-        } => execute_propose(deps, env, info, title, description, msgs, latest),
-        ExecuteMsg::Vote { proposal_id, vote } => execute_vote(deps, env, info, proposal_id, vote),
-        ExecuteMsg::Execute { proposal_id } => execute_execute(deps, env, info, proposal_id),
-        ExecuteMsg::Close { proposal_id } => execute_close(deps, env, info, proposal_id),
+            sender,
+        } => {
+            let info_with_custom_sender = MessageInfo {
+                sender: sender.unwrap_or(info.sender),
+                ..info
+            };
+            execute_propose(
+                deps,
+                env,
+                info_with_custom_sender,
+                title,
+                description,
+                msgs,
+                latest,
+            )
+        }
+        ExecuteMsg::Vote {
+            proposal_id,
+            vote,
+            sender,
+        } => {
+            let info_with_custom_sender = MessageInfo {
+                sender: sender.unwrap_or(info.sender),
+                ..info
+            };
+            execute_vote(deps, env, info_with_custom_sender, proposal_id, vote)
+        }
+        ExecuteMsg::Execute {
+            proposal_id,
+            sender,
+        } => {
+            let info_with_custom_sender = MessageInfo {
+                sender: sender.unwrap_or(info.sender),
+                ..info
+            };
+            execute_execute(deps, env, info_with_custom_sender, proposal_id)
+        }
+        ExecuteMsg::Close {
+            proposal_id,
+            sender,
+        } => {
+            let info_with_custom_sender = MessageInfo {
+                sender: sender.unwrap_or(info.sender),
+                ..info
+            };
+            execute_close(deps, env, info_with_custom_sender, proposal_id)
+        }
     }
 }
 
@@ -607,6 +660,7 @@ mod tests {
             description: "Do we reward her?".to_string(),
             msgs,
             latest: None,
+            sender: None,
         };
         let res = execute(deps.as_mut(), mock_env(), info, proposal).unwrap();
 
@@ -617,6 +671,7 @@ mod tests {
         let no_vote = ExecuteMsg::Vote {
             proposal_id,
             vote: Vote::No,
+            sender: None,
         };
         // Only voters with weight can vote
         let info = mock_info(NOWEIGHT_VOTER, &[]);
@@ -647,6 +702,7 @@ mod tests {
             description: "Do we reward her?".to_string(),
             msgs: msgs.clone(),
             latest: None,
+            sender: None,
         };
         let err = execute(deps.as_mut(), mock_env(), info, proposal.clone()).unwrap_err();
         assert_eq!(err, ContractError::Unauthorized {});
@@ -658,6 +714,7 @@ mod tests {
             description: "Do we reward her?".to_string(),
             msgs,
             latest: Some(Expiration::AtHeight(123456)),
+            sender: None,
         };
         let err = execute(deps.as_mut(), mock_env(), info, proposal_wrong_exp).unwrap_err();
         assert_eq!(err, ContractError::WrongExpiration {});
@@ -712,6 +769,7 @@ mod tests {
             description: "Do I pay her?".to_string(),
             msgs,
             latest: None,
+            sender: None,
         };
         let res = execute(deps.as_mut(), mock_env(), info.clone(), proposal).unwrap();
 
@@ -722,6 +780,7 @@ mod tests {
         let yes_vote = ExecuteMsg::Vote {
             proposal_id,
             vote: Vote::Yes,
+            sender: None,
         };
         let err = execute(deps.as_mut(), mock_env(), info, yes_vote.clone()).unwrap_err();
         assert_eq!(err, ContractError::AlreadyVoted {});
@@ -756,6 +815,7 @@ mod tests {
         let no_vote = ExecuteMsg::Vote {
             proposal_id,
             vote: Vote::No,
+            sender: None,
         };
         let info = mock_info(VOTER2, &[]);
         execute(deps.as_mut(), mock_env(), info, no_vote.clone()).unwrap();
@@ -764,6 +824,7 @@ mod tests {
         let veto_vote = ExecuteMsg::Vote {
             proposal_id,
             vote: Vote::Veto,
+            sender: None,
         };
         let info = mock_info(VOTER3, &[]);
         execute(deps.as_mut(), mock_env(), info.clone(), veto_vote).unwrap();
@@ -824,6 +885,7 @@ mod tests {
             description: "Do I pay her?".to_string(),
             msgs,
             latest: None,
+            sender: None,
         };
         let res = execute(deps.as_mut(), mock_env(), info, proposal).unwrap();
 
@@ -834,6 +896,7 @@ mod tests {
         let no_vote = ExecuteMsg::Vote {
             proposal_id,
             vote: Vote::No,
+            sender: None,
         };
         // Voter1 vote no, weight 1
         let info = mock_info(VOTER1, &[]);
@@ -901,6 +964,7 @@ mod tests {
         let yes_vote = ExecuteMsg::Vote {
             proposal_id,
             vote: Vote::Yes,
+            sender: None,
         };
         let res = execute(deps.as_mut(), mock_env(), info, yes_vote).unwrap();
 
@@ -936,6 +1000,7 @@ mod tests {
             description: "Do I pay her?".to_string(),
             msgs: msgs.clone(),
             latest: None,
+            sender: None,
         };
         let res = execute(deps.as_mut(), mock_env(), info.clone(), proposal).unwrap();
 
@@ -943,7 +1008,10 @@ mod tests {
         let proposal_id: u64 = res.attributes[2].value.parse().unwrap();
 
         // Only Passed can be executed
-        let execution = ExecuteMsg::Execute { proposal_id };
+        let execution = ExecuteMsg::Execute {
+            proposal_id,
+            sender: None,
+        };
         let err = execute(deps.as_mut(), mock_env(), info, execution.clone()).unwrap_err();
         assert_eq!(err, ContractError::WrongExecuteStatus {});
 
@@ -951,6 +1019,7 @@ mod tests {
         let vote = ExecuteMsg::Vote {
             proposal_id,
             vote: Vote::Yes,
+            sender: None,
         };
         let info = mock_info(VOTER3, &[]);
         let res = execute(deps.as_mut(), mock_env(), info.clone(), vote).unwrap();
@@ -966,7 +1035,10 @@ mod tests {
         );
 
         // In passing: Try to close Passed fails
-        let closing = ExecuteMsg::Close { proposal_id };
+        let closing = ExecuteMsg::Close {
+            proposal_id,
+            sender: None,
+        };
         let err = execute(deps.as_mut(), mock_env(), info, closing).unwrap_err();
         assert_eq!(err, ContractError::WrongCloseStatus {});
 
@@ -985,7 +1057,10 @@ mod tests {
         );
 
         // In passing: Try to close Executed fails
-        let closing = ExecuteMsg::Close { proposal_id };
+        let closing = ExecuteMsg::Close {
+            proposal_id,
+            sender: None,
+        };
         let err = execute(deps.as_mut(), mock_env(), info, closing).unwrap_err();
         assert_eq!(err, ContractError::WrongCloseStatus {});
     }
@@ -1014,6 +1089,7 @@ mod tests {
             description: "Do I pay her?".to_string(),
             msgs,
             latest: None,
+            sender: None,
         };
         let res = execute(deps.as_mut(), mock_env(), info, proposal).unwrap();
 
@@ -1024,6 +1100,7 @@ mod tests {
         let vote = ExecuteMsg::Vote {
             proposal_id,
             vote: Vote::Yes,
+            sender: None,
         };
         let info = mock_info(VOTER3, &[]);
         let res = execute(deps.as_mut(), mock_env(), info, vote).unwrap();
@@ -1060,7 +1137,10 @@ mod tests {
             deps.as_mut(),
             env.clone(),
             info.clone(),
-            ExecuteMsg::Close { proposal_id },
+            ExecuteMsg::Close {
+                proposal_id,
+                sender: None,
+            },
         )
         .unwrap_err();
         assert_eq!(err, ContractError::WrongCloseStatus {});
@@ -1070,7 +1150,10 @@ mod tests {
             deps.as_mut(),
             env,
             info,
-            ExecuteMsg::Execute { proposal_id },
+            ExecuteMsg::Execute {
+                proposal_id,
+                sender: None,
+            },
         )
         .unwrap();
         assert_eq!(
@@ -1104,13 +1187,17 @@ mod tests {
             description: "Do I pay her?".to_string(),
             msgs: msgs.clone(),
             latest: None,
+            sender: None,
         };
         let res = execute(deps.as_mut(), mock_env(), info, proposal).unwrap();
 
         // Get the proposal id from the logs
         let proposal_id: u64 = res.attributes[2].value.parse().unwrap();
 
-        let closing = ExecuteMsg::Close { proposal_id };
+        let closing = ExecuteMsg::Close {
+            proposal_id,
+            sender: None,
+        };
 
         // Anybody can close
         let info = mock_info(SOMEBODY, &[]);
@@ -1127,13 +1214,17 @@ mod tests {
             description: "Pay somebody after time?".to_string(),
             msgs,
             latest: Some(Expiration::AtHeight(123456)),
+            sender: None,
         };
         let res = execute(deps.as_mut(), mock_env(), info.clone(), proposal).unwrap();
 
         // Get the proposal id from the logs
         let proposal_id: u64 = res.attributes[2].value.parse().unwrap();
 
-        let closing = ExecuteMsg::Close { proposal_id };
+        let closing = ExecuteMsg::Close {
+            proposal_id,
+            sender: None,
+        };
 
         // Close expired works
         let env = mock_env_height(1234567);

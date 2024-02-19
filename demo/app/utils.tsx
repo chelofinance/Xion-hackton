@@ -146,8 +146,11 @@ export async function createProposal(
   console.log("icaControllerAddress", icaControllerAddress);
   console.log("icaAccountAddress", icaAccountAddress);
 
+  let proposal_msg = produceProposal(injectiveMsg, icaControllerAddress);
+  proposal_msg.sender = account.bech32Address;
+
   const proposalMsg = {
-    propose: produceProposal(injectiveMsg, icaControllerAddress),
+    propose: proposal_msg
   };
 
   console.log("proposalMsg", proposalMsg);
@@ -191,6 +194,7 @@ export async function voteProposal(
     vote: {
       proposal_id: proposalId,
       vote,
+      sender: account.bech32Address,
     },
   };
 
@@ -225,6 +229,7 @@ export async function executeProposal(
   const msg = {
     execute: {
       proposal_id: proposalId,
+      sender: account.bech32Address,
     },
   };
 
@@ -319,6 +324,7 @@ export async function addMember(
         amount,
         denom: "inj",
       },
+      sender: account.bech32Address,
     }
   };
 
