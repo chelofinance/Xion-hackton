@@ -1,1 +1,1 @@
-yarn start --action execute --network xion-testnet --contract xion1qmjxqd2j3vgcjrc9ea70qae2rkf28tced4sv50twmuxshzrxyfsq7saj9e --message ./messages/factory_multisig.json
+yarn start --action execute --network xion-testnet --contract xion1l33tz82g5n6kq6gtceyjhsk0fcqqrytwr5dzglaq5pulq96np4vqm6k8ce --message ./messages/factory_multisig.json
