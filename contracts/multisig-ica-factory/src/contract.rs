@@ -8,8 +8,8 @@ use cosmwasm_std::{
 
 use crate::error::ContractError;
 use crate::msg::{
-    CallbacksResponses, ExecuteMsg, ICAControllerResponse, InstantiateMsg, MultisigsResponses,
-    QueryMsg,
+    CallbacksResponses, ExecuteMsg, ICAControllerResponse, InstantiateMsg, MultisigByCreator,
+    MultisigsResponses, QueryMsg,
 };
 use crate::state;
 
@@ -25,13 +25,17 @@ pub fn instantiate(
     _info: MessageInfo,
     msg: InstantiateMsg,
 ) -> Result<Response, ContractError> {
-    // Set the contract version using the cw2 standard.
+    cw_ownable::initialize_owner(deps.storage, deps.api, None)?;
     cw2::set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
 
     // Store the state of the contract.
     state::STATE.save(
         deps.storage,
-        &state::ContractState::new(msg.cw_ica_controller_code_id, msg.cw3_multisig_code_id),
+        &state::ContractState::new(
+            msg.cw_ica_controller_code_id,
+            msg.cw3_multisig_code_id,
+            msg.proxy,
+        ),
     )?;
 
     Ok(Response::default())
@@ -61,6 +65,22 @@ pub fn execute(
         ExecuteMsg::ReceiveIcaCallback(callback_msg) => {
             execute::receive_ica_callback(deps, env, info, callback_msg)
         }
+        ExecuteMsg::UpdateState {
+            cw3_multisig_code_id,
+            cw_ica_controller_code_id,
+            proxy,
+        } => execute::update_state(
+            deps,
+            env,
+            info,
+            cw3_multisig_code_id,
+            cw_ica_controller_code_id,
+            proxy,
+        ),
+        ExecuteMsg::UpdateOwnership(action) => {
+            cw_ownable::update_ownership(deps, &env.block, &info.sender, action)?;
+            Ok(Response::default())
+        }
     }
 }
 
@@ -73,6 +93,10 @@ pub fn query(_deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
         QueryMsg::QueryControllerByMultisig(multisig) => {
             to_json_binary(&query_controller_by_multisig(_deps, multisig)?)
         }
+        QueryMsg::QueryMultisigByCreator(creator) => {
+            to_json_binary(&query_multisig_by_creator(_deps, creator)?)
+        }
+        QueryMsg::Ownership {} => to_json_binary(&cw_ownable::get_ownership(_deps.storage)?),
     }
 }
 
@@ -100,11 +124,26 @@ fn query_controller_by_multisig(deps: Deps, multisig: Addr) -> StdResult<ICACont
     })
 }
 
+fn query_multisig_by_creator(deps: Deps, creator: Addr) -> StdResult<MultisigByCreator> {
+    let multisigs = state::CREATOR_MULTISIG.load(deps.storage, &creator)?;
+    let res_controllers: Result<Vec<Addr>, _> = multisigs
+        .iter()
+        .map(|sig| state::MULTISIG_ICA.load(deps.storage, sig))
+        .collect();
+    let controllers = res_controllers.unwrap();
+
+    Ok(MultisigByCreator {
+        controllers,
+        multisigs,
+    })
+}
+
 mod execute {
     use crate::utils;
     use cosmwasm_std::to_json_binary;
-    use cw_ica_controller::types::{
-        callbacks::IcaControllerCallbackMsg, msg::options::ChannelOpenInitOptions,
+    use cw_ica_controller::{
+        helpers::CwIcaControllerCode,
+        types::{callbacks::IcaControllerCallbackMsg, msg::options::ChannelOpenInitOptions},
     };
     use multisig::msg::InstantiateMsg as MultisigInstantiateMsg;
 
@@ -113,7 +152,7 @@ mod execute {
     pub fn deploy_multisig_ica(
         deps: DepsMut,
         env: Env,
-        _info: MessageInfo,
+        info: MessageInfo,
         multisig_instantiate_msg: MultisigInstantiateMsg,
         channel_open_init_options: ChannelOpenInitOptions,
         salt: String,
@@ -153,9 +192,13 @@ mod execute {
             )?;
 
         let mut state = state::STATE.load(deps.storage)?;
+        let mut created_by = state::CREATOR_MULTISIG.load(deps.storage, &info.sender)?;
+
         state.multisigs.push(multisig_addr.to_string());
+        created_by.push(multisig_addr.clone());
 
         state::MULTISIG_ICA.save(deps.storage, &multisig_addr, &cw_ica_controller_address)?;
+        state::CREATOR_MULTISIG.save(deps.storage, &info.sender, &created_by)?;
         state::ICA_MULTISIG.save(deps.storage, &cw_ica_controller_address, &multisig_addr)?;
         state::STATE.save(deps.storage, &state)?;
 
@@ -190,6 +233,32 @@ mod execute {
 
         state::STATE.save(deps.storage, &state)?;
 
+        Ok(Response::default())
+    }
+
+    pub fn update_state(
+        deps: DepsMut,
+        _env: Env,
+        info: MessageInfo,
+        multisig_code_id: Option<u64>,
+        controller_code_id: Option<u64>,
+        proxy_addr: Option<Addr>,
+    ) -> Result<Response, ContractError> {
+        cw_ownable::assert_owner(deps.storage, &info.sender)?;
+
+        let mut state = state::STATE.load(deps.storage)?;
+
+        if let Some(multisig) = multisig_code_id {
+            state.cw3_multisig_code_id = multisig;
+        }
+        if let Some(controller) = controller_code_id {
+            state.cw_ica_controller_code = CwIcaControllerCode::new(controller);
+        }
+        if let Some(proxy) = proxy_addr {
+            state.proxy = proxy
+        }
+
+        state::STATE.save(deps.storage, &state)?;
         Ok(Response::default())
     }
 }
