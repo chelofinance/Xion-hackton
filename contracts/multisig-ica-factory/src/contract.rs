@@ -22,10 +22,10 @@ const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
 pub fn instantiate(
     deps: DepsMut,
     _env: Env,
-    _info: MessageInfo,
+    info: MessageInfo,
     msg: InstantiateMsg,
 ) -> Result<Response, ContractError> {
-    cw_ownable::initialize_owner(deps.storage, deps.api, None)?;
+    cw_ownable::initialize_owner(deps.storage, deps.api, Some(&info.sender.to_string()))?;
     cw2::set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
 
     // Store the state of the contract.
@@ -158,6 +158,7 @@ mod execute {
         salt: String,
     ) -> Result<Response, ContractError> {
         let state = state::STATE.load(deps.storage)?;
+        //multisig_instantiate_msg.proxy = state.proxy; TODO after multisig is ready
 
         let (multisig_init_cosmos_msg, multisig_addr) = utils::instantiate2::contract(
             deps.api,
@@ -264,4 +265,70 @@ mod execute {
 }
 
 #[cfg(test)]
-mod tests {}
+mod tests {
+    use super::*;
+    use cosmwasm_std::{
+        from_binary,
+        testing::{mock_dependencies, mock_env, mock_info},
+    };
+    use cw_ownable::Ownership;
+
+    #[test]
+    fn proper_initialization() {
+        let mut deps = mock_dependencies();
+
+        let msg = InstantiateMsg {
+            cw_ica_controller_code_id: 123,
+            cw3_multisig_code_id: 456,
+            proxy: Addr::unchecked("proxy"),
+        };
+        let info = mock_info("owner", &[]);
+        let env = mock_env();
+
+        // Instantiate the contract
+        let res = instantiate(deps.as_mut(), env.clone(), info.clone(), msg).unwrap();
+        let owner_query = query(deps.as_ref(), env.clone(), QueryMsg::Ownership {}).unwrap();
+        let ownership: Ownership<String> = from_binary(&owner_query).unwrap();
+
+        assert_eq!(0, res.messages.len());
+        assert_eq!(ownership.owner.is_some(), true);
+        assert_eq!(ownership.owner.unwrap(), info.sender.to_string());
+    }
+
+    #[test]
+    fn update_state_only_by_owner() {
+        let mut deps = mock_dependencies();
+        let msg = InstantiateMsg {
+            cw_ica_controller_code_id: 123,
+            cw3_multisig_code_id: 456,
+            proxy: Addr::unchecked("proxy"),
+        };
+        let owner_info = mock_info("owner", &[]);
+        let env = mock_env();
+
+        // Instantiate the contract with "owner" as the owner
+        instantiate(deps.as_mut(), env.clone(), owner_info, msg).unwrap();
+
+        // Attempt to update state as the owner
+        let owner_info = mock_info("owner", &[]);
+        let update_msg = ExecuteMsg::UpdateState {
+            cw3_multisig_code_id: Some(789),
+            cw_ica_controller_code_id: Some(321),
+            proxy: Some(Addr::unchecked("new_proxy")),
+        };
+
+        let update_res = execute(deps.as_mut(), env.clone(), owner_info, update_msg);
+        assert!(update_res.is_ok());
+
+        // Attempt to update state as a non-owner
+        let non_owner_info = mock_info("non_owner", &[]);
+        let update_msg = ExecuteMsg::UpdateState {
+            cw3_multisig_code_id: Some(111),
+            cw_ica_controller_code_id: Some(222),
+            proxy: Some(Addr::unchecked("another_proxy")),
+        };
+
+        let update_res = execute(deps.as_mut(), env, non_owner_info, update_msg);
+        assert!(update_res.is_err());
+    }
+}
