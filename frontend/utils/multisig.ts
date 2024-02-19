@@ -60,7 +60,7 @@ export async function createIcaMultisig(client: any, account: any, ica_factory: 
 
         const instantiate_events = instantiateResponse?.events.filter((e: any) => e.type === 'instantiate');
         const ica_multisig_address: string | undefined = instantiate_events
-            ?.find((e: any) => e.attributes.find((attr: any) => attr.key === 'code_id' && attr.value === '190'))
+            ?.find((e: any) => e.attributes.find((attr: any) => attr.key === 'code_id' && attr.value === '197'))
             ?.attributes.find((attr: any) => attr.key === '_contract_address')?.value;
         console.log('ica_multisig_address:', ica_multisig_address);
 

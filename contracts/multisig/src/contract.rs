@@ -43,6 +43,7 @@ pub fn instantiate(
         threshold: msg.threshold,
         total_weight,
         max_voting_period: msg.max_voting_period,
+        proxy: msg.proxy,
     };
     CONFIG.save(deps.storage, &cfg)?;
 
@@ -61,70 +62,62 @@ pub fn execute(
     info: MessageInfo,
     msg: ExecuteMsg,
 ) -> Result<Response<Empty>, ContractError> {
+    // Load the config once
+    let cfg = CONFIG.load(deps.storage)?;
+
+    // Validate the info.sender equal to cfg.proxy if it is set. Then creates a new MessageInfo with sender
+    fn validate_sender(info: &MessageInfo, cfg: &Config, sender: Option<Addr>) -> MessageInfo {
+        if let Some(proxy) = &cfg.proxy {
+            if info.sender == *proxy {
+                return MessageInfo {
+                    sender: sender.unwrap_or_else(|| info.sender.clone()),
+                    ..info.clone()
+                };
+            }
+        }
+        info.clone()
+    }
+
     match msg {
         ExecuteMsg::AddMember {
             address,
             fee,
             sender,
-        } => {
-            let info_with_custom_sender = MessageInfo {
-                sender: sender.unwrap_or(info.sender),
-                ..info
-            };
-            add_member(deps, info_with_custom_sender, address, fee)
-        }
+        } => add_member(deps, validate_sender(&info, &cfg, sender), address, fee),
         ExecuteMsg::Propose {
             title,
             description,
             msgs,
             latest,
             sender,
-        } => {
-            let info_with_custom_sender = MessageInfo {
-                sender: sender.unwrap_or(info.sender),
-                ..info
-            };
-            execute_propose(
-                deps,
-                env,
-                info_with_custom_sender,
-                title,
-                description,
-                msgs,
-                latest,
-            )
-        }
+        } => execute_propose(
+            deps,
+            env,
+            validate_sender(&info, &cfg, sender),
+            title,
+            description,
+            msgs,
+            latest,
+        ),
         ExecuteMsg::Vote {
             proposal_id,
             vote,
             sender,
-        } => {
-            let info_with_custom_sender = MessageInfo {
-                sender: sender.unwrap_or(info.sender),
-                ..info
-            };
-            execute_vote(deps, env, info_with_custom_sender, proposal_id, vote)
-        }
+        } => execute_vote(
+            deps,
+            env,
+            validate_sender(&info, &cfg, sender),
+            proposal_id,
+            vote,
+        ),
         ExecuteMsg::Execute {
             proposal_id,
             sender,
-        } => {
-            let info_with_custom_sender = MessageInfo {
-                sender: sender.unwrap_or(info.sender),
-                ..info
-            };
-            execute_execute(deps, env, info_with_custom_sender, proposal_id)
-        }
+        } => execute_execute(deps, env, validate_sender(&info, &cfg, sender), proposal_id),
         ExecuteMsg::Close {
             proposal_id,
             sender,
-        } => {
-            let info_with_custom_sender = MessageInfo {
-                sender: sender.unwrap_or(info.sender),
-                ..info
-            };
-            execute_close(deps, env, info_with_custom_sender, proposal_id)
-        }
+        } => execute_close(deps, env, validate_sender(&info, &cfg, sender), proposal_id),
     }
 }
 
@@ -554,6 +547,7 @@ mod tests {
             voters,
             threshold,
             max_voting_period,
+            proxy: None,
         };
         instantiate(deps, mock_env(), info, instantiate_msg)
     }
@@ -590,6 +584,7 @@ mod tests {
                 quorum: Decimal::percent(1),
             },
             max_voting_period,
+            proxy: None,
         };
         let err = instantiate(
             deps.as_mut(),

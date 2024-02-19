@@ -19,17 +19,17 @@ export type SupportedNetworks = "xion-testnet";
 const contracts: Record<SupportedNetworks, Contracts> = {
     "xion-testnet": {
         channelOpenInitOptions: {
-            connectionId: "connection-44",
-            counterpartyConnectionId: "connection-212"
+            connectionId: "connection-43",
+            counterpartyConnectionId: "connection-211"
         },
         cw3FixedMultisig: {
-            codeId: "190"
+            codeId: "197"
         },
         icaFactory: {
-            address: "xion1l33tz82g5n6kq6gtceyjhsk0fcqqrytwr5dzglaq5pulq96np4vqm6k8ce"
+            address: "xion1q4tfcucajg7dkllgayds5ur00rqngrheqjvs0d7nyyxrvlq3ynqq8n5m4l"
         },
         proxyMultisig: {
-            address: "xion1y88tpcx8e8uz5y22an704ap558k6t7jw5r0e7n9e2scparmt82qsj74n96"
+            address: "xion1q4r32n96ntq2cdrn9xggngwej6p8pgluttyzwr02x8d8c0u3eakq4ekckk"
         }
     }
 }

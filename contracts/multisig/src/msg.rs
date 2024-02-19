@@ -8,6 +8,7 @@ pub struct InstantiateMsg {
     pub voters: Vec<Voter>,
     pub threshold: Threshold,
     pub max_voting_period: Duration,
+    pub proxy: Option<Addr>,
 }
 
 #[cw_serde]
