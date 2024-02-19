@@ -68,15 +68,11 @@ export const produceProposal = (
           },
         },
       ],
-      packet_memo: "packet meme by 0xR360",
+      packet_memo: "Created by Chelo",
     },
   };
-  console.log(
-    controllerMessage.send_cosmos_msgs.messages,
-    controllerMessage.send_cosmos_msgs.messages[0].stargate.value
-  );
 
-  console.log(JSON.stringify(controllerMessage));
+  console.log("controllerMessage", controllerMessage);
   return {
     title: "ICA transaction",
     description: "some desc :)",
@@ -88,44 +84,6 @@ export const produceProposal = (
             msg: Buffer.from(JSON.stringify(controllerMessage)).toString(
               "base64"
             ),
-            funds: [],
-          },
-        },
-      },
-    ],
-  };
-};
-
-export const addMemberProposal = (
-  memberAddress: string,
-  amount: string,
-  multisigAddress: string
-) => {
-  const encodeMessage = (message: object) => {
-    return Buffer.from(JSON.stringify(message)).toString("base64");
-  };
-
-  const fee = {
-    amount,
-    denom: "inj",
-  };
-
-  const addMemberMessage = encodeMessage({
-    add_member: {
-      address: memberAddress,
-      fee
-    },
-  });
-
-  return {
-    title: "Add Member",
-    description: "Add Member",
-    msgs: [
-      {
-        wasm: {
-          execute: {
-            contract_addr: multisigAddress,
-            msg: addMemberMessage,
             funds: [],
           },
         },
