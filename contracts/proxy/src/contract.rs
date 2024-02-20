@@ -18,9 +18,20 @@ pub fn instantiate(
 pub fn execute(
     _deps: DepsMut,
     _env: Env,
-    _info: MessageInfo,
-    msg: ExecuteMsg,
+    info: MessageInfo,
+    mut msg: ExecuteMsg,
 ) -> Result<Response, ContractError> {
+    // Update the sender field to the actual sender
+    match &mut msg.payload {
+        multisig::msg::ExecuteMsg::AddMember { sender, .. }
+        | multisig::msg::ExecuteMsg::Propose { sender, .. }
+        | multisig::msg::ExecuteMsg::Vote { sender, .. }
+        | multisig::msg::ExecuteMsg::Execute { sender, .. }
+        | multisig::msg::ExecuteMsg::Close { sender, .. } => {
+            *sender = Some(info.sender.clone());
+        }
+    }
+
     let cosmsg = CosmosMsg::Wasm(WasmMsg::Execute {
         contract_addr: msg.contract_addr.to_string(),
         msg: to_json_binary(&msg.payload)?,
