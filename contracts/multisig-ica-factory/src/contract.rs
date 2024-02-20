@@ -153,12 +153,12 @@ mod execute {
         deps: DepsMut,
         env: Env,
         info: MessageInfo,
-        multisig_instantiate_msg: MultisigInstantiateMsg,
+        mut multisig_instantiate_msg: MultisigInstantiateMsg,
         channel_open_init_options: ChannelOpenInitOptions,
         salt: String,
     ) -> Result<Response, ContractError> {
         let state = state::STATE.load(deps.storage)?;
-        //multisig_instantiate_msg.proxy = state.proxy; TODO after multisig is ready
+        multisig_instantiate_msg.proxy = Some(state.proxy);
 
         let (multisig_init_cosmos_msg, multisig_addr) = utils::instantiate2::contract(
             deps.api,
