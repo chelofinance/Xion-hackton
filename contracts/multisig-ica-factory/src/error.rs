@@ -13,6 +13,9 @@ pub enum ContractError {
     #[error("Unauthorized")]
     Unauthorized,
 
+    #[error("{0}")]
+    OwnershipError(#[from] cw_ownable::OwnershipError),
+
     #[error("error when computing the instantiate2 address: {0}")]
     Instantiate2AddressError(#[from] cosmwasm_std::Instantiate2AddressError),
 }

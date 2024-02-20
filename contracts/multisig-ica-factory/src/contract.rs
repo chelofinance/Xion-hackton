@@ -8,8 +8,8 @@ use cosmwasm_std::{
 
 use crate::error::ContractError;
 use crate::msg::{
-    CallbacksResponses, ExecuteMsg, ICAControllerResponse, InstantiateMsg, MultisigsResponses,
-    QueryMsg,
+    CallbacksResponses, ExecuteMsg, ICAControllerResponse, InstantiateMsg, MultisigByCreator,
+    MultisigsResponses, QueryMsg,
 };
 use crate::state;
 
@@ -22,16 +22,20 @@ const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
 pub fn instantiate(
     deps: DepsMut,
     _env: Env,
-    _info: MessageInfo,
+    info: MessageInfo,
     msg: InstantiateMsg,
 ) -> Result<Response, ContractError> {
-    // Set the contract version using the cw2 standard.
+    cw_ownable::initialize_owner(deps.storage, deps.api, Some(&info.sender.to_string()))?;
     cw2::set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
 
     // Store the state of the contract.
     state::STATE.save(
         deps.storage,
-        &state::ContractState::new(msg.cw_ica_controller_code_id, msg.cw3_multisig_code_id),
+        &state::ContractState::new(
+            msg.cw_ica_controller_code_id,
+            msg.cw3_multisig_code_id,
+            msg.proxy,
+        ),
     )?;
 
     Ok(Response::default())
@@ -61,6 +65,22 @@ pub fn execute(
         ExecuteMsg::ReceiveIcaCallback(callback_msg) => {
             execute::receive_ica_callback(deps, env, info, callback_msg)
         }
+        ExecuteMsg::UpdateState {
+            cw3_multisig_code_id,
+            cw_ica_controller_code_id,
+            proxy,
+        } => execute::update_state(
+            deps,
+            env,
+            info,
+            cw3_multisig_code_id,
+            cw_ica_controller_code_id,
+            proxy,
+        ),
+        ExecuteMsg::UpdateOwnership(action) => {
+            cw_ownable::update_ownership(deps, &env.block, &info.sender, action)?;
+            Ok(Response::default())
+        }
     }
 }
 
@@ -73,6 +93,10 @@ pub fn query(_deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
         QueryMsg::QueryControllerByMultisig(multisig) => {
             to_json_binary(&query_controller_by_multisig(_deps, multisig)?)
         }
+        QueryMsg::QueryMultisigByCreator(creator) => {
+            to_json_binary(&query_multisig_by_creator(_deps, creator)?)
+        }
+        QueryMsg::Ownership {} => to_json_binary(&cw_ownable::get_ownership(_deps.storage)?),
     }
 }
 
@@ -100,11 +124,26 @@ fn query_controller_by_multisig(deps: Deps, multisig: Addr) -> StdResult<ICACont
     })
 }
 
+fn query_multisig_by_creator(deps: Deps, creator: Addr) -> StdResult<MultisigByCreator> {
+    let multisigs = state::CREATOR_MULTISIG.load(deps.storage, &creator)?;
+    let res_controllers: Result<Vec<Addr>, _> = multisigs
+        .iter()
+        .map(|sig| state::MULTISIG_ICA.load(deps.storage, sig))
+        .collect();
+    let controllers = res_controllers.unwrap();
+
+    Ok(MultisigByCreator {
+        controllers,
+        multisigs,
+    })
+}
+
 mod execute {
     use crate::utils;
     use cosmwasm_std::to_json_binary;
-    use cw_ica_controller::types::{
-        callbacks::IcaControllerCallbackMsg, msg::options::ChannelOpenInitOptions,
+    use cw_ica_controller::{
+        helpers::CwIcaControllerCode,
+        types::{callbacks::IcaControllerCallbackMsg, msg::options::ChannelOpenInitOptions},
     };
     use multisig::msg::InstantiateMsg as MultisigInstantiateMsg;
 
@@ -113,12 +152,13 @@ mod execute {
     pub fn deploy_multisig_ica(
         deps: DepsMut,
         env: Env,
-        _info: MessageInfo,
+        info: MessageInfo,
         multisig_instantiate_msg: MultisigInstantiateMsg,
         channel_open_init_options: ChannelOpenInitOptions,
         salt: String,
     ) -> Result<Response, ContractError> {
         let state = state::STATE.load(deps.storage)?;
+        //multisig_instantiate_msg.proxy = state.proxy; TODO after multisig is ready
 
         let (multisig_init_cosmos_msg, multisig_addr) = utils::instantiate2::contract(
             deps.api,
@@ -153,9 +193,13 @@ mod execute {
             )?;
 
         let mut state = state::STATE.load(deps.storage)?;
+        let mut created_by = state::CREATOR_MULTISIG.load(deps.storage, &info.sender)?;
+
         state.multisigs.push(multisig_addr.to_string());
+        created_by.push(multisig_addr.clone());
 
         state::MULTISIG_ICA.save(deps.storage, &multisig_addr, &cw_ica_controller_address)?;
+        state::CREATOR_MULTISIG.save(deps.storage, &info.sender, &created_by)?;
         state::ICA_MULTISIG.save(deps.storage, &cw_ica_controller_address, &multisig_addr)?;
         state::STATE.save(deps.storage, &state)?;
 
@@ -192,7 +236,99 @@ mod execute {
 
         Ok(Response::default())
     }
+
+    pub fn update_state(
+        deps: DepsMut,
+        _env: Env,
+        info: MessageInfo,
+        multisig_code_id: Option<u64>,
+        controller_code_id: Option<u64>,
+        proxy_addr: Option<Addr>,
+    ) -> Result<Response, ContractError> {
+        cw_ownable::assert_owner(deps.storage, &info.sender)?;
+
+        let mut state = state::STATE.load(deps.storage)?;
+
+        if let Some(multisig) = multisig_code_id {
+            state.cw3_multisig_code_id = multisig;
+        }
+        if let Some(controller) = controller_code_id {
+            state.cw_ica_controller_code = CwIcaControllerCode::new(controller);
+        }
+        if let Some(proxy) = proxy_addr {
+            state.proxy = proxy
+        }
+
+        state::STATE.save(deps.storage, &state)?;
+        Ok(Response::default())
+    }
 }
 
 #[cfg(test)]
-mod tests {}
+mod tests {
+    use super::*;
+    use cosmwasm_std::{
+        from_binary,
+        testing::{mock_dependencies, mock_env, mock_info},
+    };
+    use cw_ownable::Ownership;
+
+    #[test]
+    fn proper_initialization() {
+        let mut deps = mock_dependencies();
+
+        let msg = InstantiateMsg {
+            cw_ica_controller_code_id: 123,
+            cw3_multisig_code_id: 456,
+            proxy: Addr::unchecked("proxy"),
+        };
+        let info = mock_info("owner", &[]);
+        let env = mock_env();
+
+        // Instantiate the contract
+        let res = instantiate(deps.as_mut(), env.clone(), info.clone(), msg).unwrap();
+        let owner_query = query(deps.as_ref(), env.clone(), QueryMsg::Ownership {}).unwrap();
+        let ownership: Ownership<String> = from_binary(&owner_query).unwrap();
+
+        assert_eq!(0, res.messages.len());
+        assert_eq!(ownership.owner.is_some(), true);
+        assert_eq!(ownership.owner.unwrap(), info.sender.to_string());
+    }
+
+    #[test]
+    fn update_state_only_by_owner() {
+        let mut deps = mock_dependencies();
+        let msg = InstantiateMsg {
+            cw_ica_controller_code_id: 123,
+            cw3_multisig_code_id: 456,
+            proxy: Addr::unchecked("proxy"),
+        };
+        let owner_info = mock_info("owner", &[]);
+        let env = mock_env();
+
+        // Instantiate the contract with "owner" as the owner
+        instantiate(deps.as_mut(), env.clone(), owner_info, msg).unwrap();
+
+        // Attempt to update state as the owner
+        let owner_info = mock_info("owner", &[]);
+        let update_msg = ExecuteMsg::UpdateState {
+            cw3_multisig_code_id: Some(789),
+            cw_ica_controller_code_id: Some(321),
+            proxy: Some(Addr::unchecked("new_proxy")),
+        };
+
+        let update_res = execute(deps.as_mut(), env.clone(), owner_info, update_msg);
+        assert!(update_res.is_ok());
+
+        // Attempt to update state as a non-owner
+        let non_owner_info = mock_info("non_owner", &[]);
+        let update_msg = ExecuteMsg::UpdateState {
+            cw3_multisig_code_id: Some(111),
+            cw_ica_controller_code_id: Some(222),
+            proxy: Some(Addr::unchecked("another_proxy")),
+        };
+
+        let update_res = execute(deps.as_mut(), env, non_owner_info, update_msg);
+        assert!(update_res.is_err());
+    }
+}
