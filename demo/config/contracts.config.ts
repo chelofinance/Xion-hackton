@@ -9,7 +9,7 @@ export type Contracts = {
     icaFactory: {
         address: string;
     };
-    hardcodedIcaMultisig: {
+    proxyMultisig: {
         address: string;
     };
 };
@@ -19,17 +19,17 @@ export type SupportedNetworks = "xion-testnet";
 const contracts: Record<SupportedNetworks, Contracts> = {
     "xion-testnet": {
         channelOpenInitOptions: {
-            connectionId: "connection-42",
-            counterpartyConnectionId: "connection-210"
+            connectionId: "connection-43",
+            counterpartyConnectionId: "connection-211"
         },
         cw3FixedMultisig: {
-            codeId: "158"
+            codeId: "202"
         },
         icaFactory: {
-            address: "xion1qmjxqd2j3vgcjrc9ea70qae2rkf28tced4sv50twmuxshzrxyfsq7saj9e"
+            address: "xion1g9egyh7npeuz35nlnmgz2fauehvytq02ehu2caley4gkgfkxek9sf4lwtz"
         },
-        hardcodedIcaMultisig: {
-            address: "xion1tnrxmr69uqnyacq74njadhrezmqwstllkjn9adqhd0fs0qhalf8smkrmt6"
+        proxyMultisig: {
+            address: "xion17j75yzhznj0r575dvf3ec7d3un6r4xqk2pgs2hvujkcmythtr3vq7ajcxw"
         }
     }
 }

@@ -69,11 +69,8 @@ export const chainConfigMap: Record<AppChains, ContractsDict> = {
     icaAccount: {
       address: 'inj1tfvcvjkpw02eeldx2lhtw0xysg3msehyarqe5lwygf3dk40vt9uqhuzlg3',
     },
-    nomosFactory: {
-      address: 'xion1qmjxqd2j3vgcjrc9ea70qae2rkf28tced4sv50twmuxshzrxyfsq7saj9e',
-    },
     icaFactory: {
-      address: 'xion1qmjxqd2j3vgcjrc9ea70qae2rkf28tced4sv50twmuxshzrxyfsq7saj9e',
+      address: 'xion1l33tz82g5n6kq6gtceyjhsk0fcqqrytwr5dzglaq5pulq96np4vqm6k8ce',
     },
   },
 };

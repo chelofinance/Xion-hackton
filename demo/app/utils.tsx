@@ -3,7 +3,6 @@
 import { v4 as uuidv4 } from "uuid";
 import {
   produceProposal,
-  addMemberProposal,
   INJECTIVE_CONTRACT_MSG_URI,
 } from "./propose";
 import Contracts from "@/config/contracts.config";
@@ -130,6 +129,11 @@ function generateIcaMsg(msg: any) {
   return ibcMsg;
 }
 
+export async function getAbstractAddress(client: any, account: any) {
+  const abstractAccount = await client?.getAccount(account.bech32Address);
+  return abstractAccount?.address || "";
+}
+
 export async function createProposal(
   client: any,
   account: any,
@@ -142,17 +146,28 @@ export async function createProposal(
   console.log("icaControllerAddress", icaControllerAddress);
   console.log("icaAccountAddress", icaAccountAddress);
 
+  let proposal_msg = produceProposal(injectiveMsg, icaControllerAddress);
+  proposal_msg.sender = account.bech32Address;
+
   const proposalMsg = {
-    propose: produceProposal(injectiveMsg, icaControllerAddress),
+    propose: proposal_msg
   };
 
   console.log("proposalMsg", proposalMsg);
 
+  console.log("msg", JSON.stringify({
+    contract_addr: icaMultisigAddress,
+    payload: proposalMsg,
+  }))
+
   try {
     const executionResponse = await client?.execute(
       account.bech32Address,
-      icaMultisigAddress,
-      proposalMsg,
+      contracts.proxyMultisig.address,
+      {
+        contract_addr: icaMultisigAddress,
+        payload: proposalMsg,
+      },
       "auto"
     );
     console.log("executionResponse", executionResponse);
@@ -173,20 +188,29 @@ export async function voteProposal(
   account: any,
   icaMultisigAddress: string,
   proposalId: string,
-  vote: any
+  vote: string
 ) {
   const msg = {
     vote: {
       proposal_id: proposalId,
       vote,
+      sender: account.bech32Address,
     },
   };
+
+  console.log("fullmsg", JSON.stringify({
+    contract_addr: icaMultisigAddress,
+    payload: msg,
+  }));
 
   try {
     const executionResponse = await client?.execute(
       account.bech32Address,
-      icaMultisigAddress,
-      msg,
+      contracts.proxyMultisig.address,
+      {
+        contract_addr: icaMultisigAddress,
+        payload: msg,
+      },
       "auto"
     );
     console.log("executionResponse", executionResponse);
@@ -205,14 +229,23 @@ export async function executeProposal(
   const msg = {
     execute: {
       proposal_id: proposalId,
+      sender: account.bech32Address,
     },
   };
+
+  console.log("fullmsg", JSON.stringify({
+    contract_addr: icaMultisigAddress,
+    payload: msg,
+  }));
 
   try {
     const executionResponse = await client?.execute(
       account.bech32Address,
-      icaMultisigAddress,
-      msg,
+      contracts.proxyMultisig.address,
+      {
+        contract_addr: icaMultisigAddress,
+        payload: msg,
+      },
       "auto"
     );
     console.log("executionResponse", executionResponse);
@@ -242,6 +275,26 @@ export async function getProposalList(client: any, icaMultisigAddress: string) {
   return [];
 }
 
+export async function getMemberList(client: any, icaMultisigAddress: string) {
+  const msg = {
+    list_voters: {},
+  };
+
+  try {
+    const queryResponse = await client?.queryContractSmart(
+      icaMultisigAddress,
+      msg
+    );
+    console.log("queryResponse", queryResponse);
+    alert(JSON.stringify(queryResponse));
+    return queryResponse;
+  } catch (error) {
+    console.log("error", error);
+    alert(error);
+  }
+  return [];
+}
+
 export async function getBalance(client: any, address: string) {
   try {
     const accountBalance = await client?.getBalance(address, "uxion");
@@ -260,30 +313,41 @@ export async function getBalance(client: any, address: string) {
 export async function addMember(
   client: any,
   account: any,
+  icaMultisigAddress: string,
   memberAddress: string,
   amount: string,
-  multisigAddress: string
 ) {
-  const proposalMsg = {
-    propose: addMemberProposal(memberAddress, amount, multisigAddress),
+  const msg = {
+    add_member: {
+      address: memberAddress,
+      fee: {
+        amount,
+        denom: "inj",
+      },
+      sender: account.bech32Address,
+    }
   };
 
-  console.log("proposalMsg", proposalMsg);
+  console.log("msg1", msg);
+
+  console.log("msg2", JSON.stringify({
+    contract_addr: icaMultisigAddress,
+    payload: msg,
+  }))
 
   try {
     const executionResponse = await client?.execute(
       account.bech32Address,
-      multisigAddress,
-      proposalMsg,
+      contracts.proxyMultisig.address,
+      {
+        contract_addr: icaMultisigAddress,
+        payload: msg,
+      },
       "auto",
     );
     console.log("executionResponse", executionResponse);
 
-    const proposal_id = executionResponse?.events
-      .find((e: any) => e.type === "wasm")
-      ?.attributes.find((a: any) => a.key === "proposal_id")?.value;
-    console.log("proposal_id", proposal_id);
-    return { proposal_id };
+    return executionResponse;
   } catch (error) {
     console.log("error", error);
     alert(error);

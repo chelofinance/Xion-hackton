@@ -9,9 +9,6 @@ export type ContractsDict = {
     icaController: {
         address: string;
     };
-    nomosFactory: {
-        address: string;
-    };
     icaFactory: {
         address: string;
     };

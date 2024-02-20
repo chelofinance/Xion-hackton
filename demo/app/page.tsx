@@ -11,7 +11,7 @@ import Contracts from "@/config/contracts.config";
 import {
   createIcaMultisig, createProposal, executeProposal, getBalance,
   getIcaAccountAddress, getIcaControllerAddress, getProposalList,
-  voteProposal, addMember
+  voteProposal, addMember, getAbstractAddress, getMemberList
 } from "./utils";
 
 
@@ -23,7 +23,6 @@ export default function Page(): JSX.Element {
 
   const [_, setIsOpen] = useModal();
   const [loading, setLoading] = useState(false);
-  const [addMemberLoading, setAddMemberLoading] = useState(false);
   const [abstractAddress, setAbstractAddress] = useState<string>("");
   const [memberAddresses, setMemberAddresses] = useState<string[]>([]);
   const [icaMultisigAddress, setIcaMultisigAddress] = useState<string>("");
@@ -48,7 +47,7 @@ export default function Page(): JSX.Element {
   );
 
   const [newMemberAddress, setNewMemberAddress] = useState<string>("");
-  const [feeAmount, setFeeAmount] = useState<string>("0");
+  const [feeAmount, setFeeAmount] = useState<string>("1000000000000000");
 
   useEffect(() => {
     async function fetchData() {
@@ -56,12 +55,12 @@ export default function Page(): JSX.Element {
         console.log("client", client);
         console.log("isConnected", isConnected);
 
-        const abstract_addr = await getAbstractAddress();
+        const abstract_addr = await getAbstractAddress(client, account);
         setAbstractAddress(abstract_addr);
         setMemberAddresses(abstract_addr ? [abstract_addr] : []);
 
         // For testing, let's hardcode the multisig. Ideally this should be the last created one.
-        setIcaMultisigAddress(contracts.hardcodedIcaMultisig.address);
+        // setIcaMultisigAddress(contracts.hardcodedIcaMultisig.address); // ToDo use local storage
       }
     }
 
@@ -88,11 +87,6 @@ export default function Page(): JSX.Element {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [icaControllerAddress]);
 
-  async function getAbstractAddress() {
-    const abstractAccount = await client?.getAccount(account.bech32Address);
-    return abstractAccount?.address || "";
-  }
-
   async function getIcaAccountAddressHandler() {
     setLoading(true);
     const ica_account_address = await getIcaAccountAddress(client, icaControllerAddress);
@@ -105,6 +99,13 @@ export default function Page(): JSX.Element {
   async function createIcaMultisigHandler() {
     setLoading(true);
     const ica_multisig_address_response = await createIcaMultisig(client, account, contracts.icaFactory.address, memberAddresses);
+    // if (ica_multisig_address_response?.ica_multisig_address) {
+    //   // To avoid Unauthorized error, we need to add the proxy as a member to the new multisig
+    //   // The reason to do this is that AbstraxionProvider needs a hardcoded contract address to grant execution permission.
+    //   // ToDo: This can be fixed by removing the proxy contract when Xion Abstraxion allow executing new contract addresses
+    //   const response = await addMember(client, account, ica_multisig_address_response.ica_multisig_address, contracts.proxyMultisig.address, "1")
+    //   console.log("response", response);
+    // }
     setIcaMultisigAddress(ica_multisig_address_response?.ica_multisig_address || "");
     setChannelInitInfo(ica_multisig_address_response?.channel_init_info || {});
     setLoading(false);
@@ -128,7 +129,14 @@ export default function Page(): JSX.Element {
     setLoading(false);
   }
 
-  async function voteProposalHandler(proposalId: any, vote: any) {
+  async function getMembersListHandler() {
+    setLoading(true);
+    const response = await getMemberList(client, icaMultisigAddress);
+    console.log("response", response);
+    setLoading(false);
+  }
+
+  async function voteProposalHandler(proposalId: any, vote: string) {
     setLoading(true);
     const response = await voteProposal(
       client,
@@ -183,18 +191,13 @@ export default function Page(): JSX.Element {
   }
 
   async function addMemberHandler() {
-    setAddMemberLoading(true);
+    setLoading(true);
 
-    const response = await addMember(client,
-      account,
-      newMemberAddress,
-      feeAmount,
-      icaMultisigAddress)
+    const response = await addMember(client, account, icaMultisigAddress, newMemberAddress, feeAmount)
 
     console.log("response", response);
-    await getProposalListHandler();
     setNewMemberAddress("");
-    setAddMemberLoading(false);
+    setLoading(false);
   }
 
   return (
@@ -259,6 +262,16 @@ export default function Page(): JSX.Element {
         </Button>
       )}
       {icaMultisigAddress && (
+        <Button
+          disabled={loading}
+          fullWidth
+          onClick={getMembersListHandler}
+          structure="base"
+        >
+          {loading ? "LOADING..." : "Get Members"}
+        </Button>
+      )}
+      {icaMultisigAddress && (
         <div>
           <div>
             <label htmlFor="proposal">Proposal</label>
@@ -306,12 +319,12 @@ export default function Page(): JSX.Element {
               }} /> uxion <br />
             <br />
             <Button
-              disabled={addMemberLoading}
+              disabled={loading}
               fullWidth
               onClick={addMemberHandler}
               structure="base"
             >
-              {addMemberLoading ? "LOADING..." : "Add Member"}
+              {loading ? "LOADING..." : "Add Member"}
             </Button>
           </div>
         </div>
@@ -413,13 +426,13 @@ export default function Page(): JSX.Element {
                   <td>
                     <button
                       disabled={loading}
-                      onClick={() => voteProposalHandler(proposal.id, true)}
+                      onClick={() => voteProposalHandler(proposal.id, "yes")}
                     >
                       {loading ? "LOADING..." : "Yes"}
                     </button>
                     <button
                       disabled={loading}
-                      onClick={() => voteProposalHandler(proposal.id, false)}
+                      onClick={() => voteProposalHandler(proposal.id, "no")}
                     >
                       {loading ? "LOADING..." : "No"}
                     </button>
