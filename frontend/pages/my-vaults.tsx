@@ -3,13 +3,12 @@ import Main from '@/components/Main';
 import Heading from '@/components/Heading';
 import Card from '@/components/Card';
 import {formatNumber, formatUSD} from '@/utils/number';
-import {useMemo, useRef, useState} from 'react';
+import {useCallback, useMemo, useRef, useState} from 'react';
 import useOraclePrice from '@/hooks/useOraclePrice';
 import BigNumber from 'bignumber.js';
 import useMyNFTVaults from '@/hooks/useMyNFTVaults';
 import {useAtom} from 'jotai';
 import {userWalletAtom} from '@/store/states';
-import useBalance from '@/hooks/useBalance';
 import NFTVaultLinkCard from '@/components/NFTVaultLinkCard';
 import AccountAddress from '@/components/AccountAddress';
 import BalanceTotal from '@/components/overlays/AccountOverlay/BalanceTotal';
@@ -26,40 +25,33 @@ import useAddMember from '@/hooks/useAddMember';
 import TextInput from '@/components/TextInput';
 import { MyNFTVault } from '@/types/asset';
 import CoinAmount from '@/components/CoinAmount';
-
-// const CONFIG = chainConfigMap[AppChains.XION_TESTNET];
-
-// const createKeplrSigner = async () => {
-//   (window as any).keplr.defaultOptions = {
-//     sign: {preferNoSetFee: true},
-//   };
-//   const offlineSigner: any = await (window as any).keplr.getOfflineSignerAuto(INJECTIVE_ID);
-
-//   return offlineSigner;
-// };
+import useDepositToVaultMultisig from '@/hooks/useDepositToVaultMultisig';
+import useBalanceOnInjective from '@/hooks/useBalanceOnInjective';
+import useBalanceOnXion from '@/hooks/useBalanceOnXion';
 
 const MyVaults: NextPage = () => {
     const router = useRouter();
 
     const [userWallet] = useAtom(userWalletAtom);
 
-
-
-    // const formattedBalanceAmount = useMemo(
-    //   () => formatNumber(balance.shifted, balance.decimals),
-    //   [balance.shifted, balance.decimals]
-    // );
-
     const {getOraclePrice} = useOraclePrice();
 
     const myVaults = useMyNFTVaults(userWallet?.account.address);
 
-    const [selectedVault, setSelectedVault] = useState<MyNFTVault | undefined>(myVaults[0]);
+    // const [selectedVault, setSelectedVault] = useState<MyNFTVault | undefined>(() => myVaults[0]);
+    const selectedVault = myVaults[0];
 
-    const { getBalance } = useBalance(selectedVault?.ica.icaMultisigAddress);
-    const vaultBalance = getBalance(TokenSymbols.INJ);
+    const { getBalance: getMyBalanceOnXion } = useBalanceOnXion(userWallet?.account.address);
+    const myINJBalance = getMyBalanceOnXion(TokenSymbols.INJ);
+    const myXIONBalance = getMyBalanceOnXion(TokenSymbols.XION);
 
-    const formattedVaultBalanceUSD = useMemo(() => formatUSD(vaultBalance.usd), [vaultBalance.usd]);
+    const { getBalance: getBalanceOnXion } = useBalanceOnXion(selectedVault?.ica.icaControllerAddress);
+    const multisigBalance = getBalanceOnXion(TokenSymbols.INJ);
+
+    const { depositToVaultMultisig, isProcessing: isDepositToVaultProcessing } = useDepositToVaultMultisig();
+
+    const { getBalance: getBalanceOnInjective } = useBalanceOnInjective(selectedVault?.ica.icaMultisigAddress);
+    const vaultBalance = getBalanceOnInjective(TokenSymbols.INJ);
 
     const myNFTVaultsValueUSD = useMemo(() => {
         return myVaults.reduce((accm, vault) => {
@@ -92,37 +84,119 @@ const MyVaults: NextPage = () => {
         setNewMemberAddress(debouncedValue);
     };
 
+    /**
+     * 
+     * @todo need additional floww to input deposit amount using form
+     */
+    const handleDepositToVault = useCallback(async () => {
+        if (!selectedVault || !userWallet) return;
+
+        const result = await depositToVaultMultisig(selectedVault, {
+            symbol: TokenSymbols.INJ,
+            depositAmount: 1,
+            senderAddress: userWallet.account.address,
+        });
+
+        if (result?.isSuccess) {
+            // refetch balance
+        }
+    }, [depositToVaultMultisig]);
+
+    const handleTransferToVault = useCallback(async () => {
+        //
+    }, []);
+
     const Content =
         userWallet === null ? (
             <AccountButton />
         ) : (
             <div className="w-full flex items-stretch gap-x-14 text-body">
-                <div className="w-1/3 space-y-14 pb-[5rem]">
+                <section className="w-1/3 flex flex-col gap-y-8">
+                    <Heading tagName="h3">My balance</Heading>
+
                     <Card color="glass">
                         <div className="space-y-4 p-4">
                             <AccountAddress wallet={userWallet} />
-                            <div className="flex items-baseline gap-x-4">
-                                <BalanceTotal formattedNumber={formattedTotalUSD} isLoading={false} />
-                                <span className="Font_caption_sm">Total holdings</span>
+
+                            <div className="space-y-1">
+                                <BalanceTotal formattedNumber={formatUSD(myINJBalance.usd.plus(myXIONBalance.usd))} isLoading={false} />
+                                <CoinAmount size="sm" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(myINJBalance.shifted, myINJBalance.decimals)} />
+                                <CoinAmount size="sm" symbol={TokenSymbols.XION} formattedAmount={formatNumber(myXIONBalance.shifted, myXIONBalance.decimals)} />
                             </div>
                         </div>
                     </Card>
-                </div>
+                </section>
 
                 {selectedVault && (
                     <section className="grow shrink flex flex-col gap-y-8">
-                        <Heading tagName="h3">Vault Summary</Heading>
+                        <Heading tagName="h3">Vault summary</Heading>
 
-                        <Card color="glass" className="flex justify-between items-center p-4">
-                            <div className="space-y-1">
-                                <BalanceTotal formattedNumber={formattedVaultBalanceUSD} isLoading={false} />
-                                <CoinAmount size="sm" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(vaultBalance.shifted, vaultBalance.decimals)} />
+                        <Card color="glass" className="flex flex-col justify-between items-stretch gap-y-4 p-4">
+                            <div className="flex items-center justify-between gap-x-4">
+                                <div className="flex items-center gap-x-2">
+                                    <div className="Font_label_14px">Vault balance</div>
+
+                                    <CopyHelper toCopy={selectedVault.ica.icaMultisigAddress} className="text-caption">
+                                        <span className="w-fit truncate Font_caption_xs">
+                                            {shortenAddress(selectedVault.ica.icaMultisigAddress, 4, 4)}
+                                        </span>
+                                    </CopyHelper>
+                                </div>
+
+
+                                <ChainLabel chain={AllChains.INJECTIVE_TESTNET} size="sm" />
                             </div>
 
-                            <Button size="sm" label="Deposit" iconType="arrow_forward" />
+                            <div>
+
+                                <div className="space-y-1">
+                                    <BalanceTotal formattedNumber={formatUSD(vaultBalance.usd)} isLoading={false} />
+                                    <CoinAmount size="sm" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(vaultBalance.shifted, vaultBalance.decimals)} />
+                                </div>
+
+                            </div>
                         </Card>
 
-                        <div className="flex flex-col gap-y-2">
+                        <Card color="glass" className="flex flex-col justify-between items-stretch gap-y-4 p-4">
+                            <div className="flex items-center justify-between gap-x-4">
+                                <div className="flex items-center gap-x-2">
+                                    <div className="Font_label_14px">Multisig balance</div>
+
+                                    <CopyHelper toCopy={selectedVault.ica.icaControllerAddress} className="text-caption">
+                                        <span className="w-fit truncate Font_caption_xs">
+                                            {shortenAddress(selectedVault.ica.icaControllerAddress, 4, 4)}
+                                        </span>
+                                    </CopyHelper>
+                                </div>
+                                <ChainLabel chain={AllChains.XION_TESTNET} size="sm" />
+                            </div>
+
+                            <div className="flex justify-between items-center">
+                                <div className="space-y-1">
+                                    <BalanceTotal formattedNumber={formatUSD(multisigBalance.usd)} isLoading={false} />
+                                    <CoinAmount size="sm" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(multisigBalance.shifted, multisigBalance.decimals)} />
+                                </div>
+                            </div>
+
+                            <div className="flex items-center justify-end gap-x-2">
+                                <Button 
+                                    size="sm" 
+                                    iconType="arrow_forward"
+                                    label="Transfer to vault"
+                                    status={multisigBalance.shifted.gt(0) ? 'enabled' : 'disabled'}
+                                    onClick={handleTransferToVault} 
+                                />
+                                <Button 
+                                    size="sm" 
+                                    label="Deposit" 
+                                    iconType="arrow_forward" 
+                                    status={isDepositToVaultProcessing ? 'processing' : 'enabled'}
+                                    onClick={handleDepositToVault} 
+                                />
+                            </div>
+                        </Card>
+
+                        {/* <div className="flex flex-col gap-y-2">
                             <CopyHelper toCopy={selectedVault.ica.icaMultisigAddress} className="text-body">
                                 <div className="flex items-center gap-x-4">
                                     <div className="flex items-center">
@@ -148,7 +222,7 @@ const MyVaults: NextPage = () => {
                                     </span>
                                 </div>
                             </CopyHelper>
-                        </div>
+                        </div> */}
 
                         <section className="space-y-4 mt-4">
                             <Heading tagName="h4">Proposals</Heading>
@@ -203,7 +277,7 @@ const MyVaults: NextPage = () => {
                         </div>
 
                         <section className="space-y-4 mt-4">
-                            <Heading tagName="h4">Add Member</Heading>
+                            <Heading tagName="h4">Add member</Heading>
 
                             <TextInput
                                 form={form.current}
@@ -246,7 +320,7 @@ const MyVaults: NextPage = () => {
 
     return (
         <Main className="flex flex-col items-stretch min-h-screen pt-app_header_height pb-page_bottom md:mx-page_x">
-            <Heading tagName="h2">My Vaults</Heading>
+            <Heading tagName="h2">Portfolio</Heading>
 
             <div className="mt-10">{Content}</div>
         </Main>

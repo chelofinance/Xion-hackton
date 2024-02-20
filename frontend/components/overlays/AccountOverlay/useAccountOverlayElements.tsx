@@ -5,7 +5,7 @@ import { formatNumber, formatUSD } from '@/utils/number';
 import { useCallback, useMemo } from 'react';
 import BalanceTotal from './BalanceTotal';
 import Button from '@/components/Button';
-import useBalance from '@/hooks/useBalance';
+import useBalance from '@/hooks/useBalanceOnInjective';
 import CoinAmount from '@/components/CoinAmount';
 import useMyNFTVaults from '@/hooks/useMyNFTVaults';
 import useOraclePrice from '@/hooks/useOraclePrice';

@@ -1053,12 +1053,28 @@
     "@babel/helper-validator-identifier" "^7.22.5"
     to-fast-properties "^2.0.0"
 
-"@burnt-labs/abstraxion@^1.0.0-alpha.26":
-  version "1.0.0-alpha.26"
-  resolved "https://registry.yarnpkg.com/@burnt-labs/abstraxion/-/abstraxion-1.0.0-alpha.26.tgz#23f8136e70bcd708d6cdecdcf114523b9b1a828c"
-  integrity sha512-uCCf6D1Wwi1L/S1wTc/ZyrZYuLeBV7hlOvbW7Cnr531sYG8Gir3PVJqNpZ686Ahb7e9TtBpQIHXQ+AmbLhLv1g==
+"@burnt-labs/abstraxion-core@1.0.0-alpha.30":
+  version "1.0.0-alpha.30"
+  resolved "https://registry.yarnpkg.com/@burnt-labs/abstraxion-core/-/abstraxion-core-1.0.0-alpha.30.tgz#d2655424d065245ab4d2876c7a30a438ad02e63b"
+  integrity sha512-ug9ZmB2BKAoS2CFGppsjQvlovGMXlsUvZ6FU3dOtXoXUv+BbATv9pzkp7VfdaXhztqhWon7xosxy8UOegsjPLA==
   dependencies:
-    "@burnt-labs/constants" "0.0.1-alpha.3"
+    "@burnt-labs/constants" "0.1.0-alpha.5"
+    "@burnt-labs/signers" "0.1.0-alpha.5"
+    "@cosmjs/cosmwasm-stargate" "^0.31.3"
+    "@cosmjs/proto-signing" "^0.31.3"
+    "@cosmjs/stargate" "^0.31.3"
+    "@cosmjs/tendermint-rpc" "^0.31.1"
+    cosmjs-types "^0.8.0"
+    graz "^0.0.51"
+    jose "^5.1.3"
+
+"@burnt-labs/abstraxion@^1.0.0-alpha.28":
+  version "1.0.0-alpha.30"
+  resolved "https://registry.yarnpkg.com/@burnt-labs/abstraxion/-/abstraxion-1.0.0-alpha.30.tgz#907e4bc622b4d7d2908d02835200b872f52a6c87"
+  integrity sha512-PQH1UcBSxiFjj5JDumXZnCy7DFuRcQwcNVpyTt67DcrdbFfL32VPc33Uhz9ACYF3iz7hgIapiJfcRjPPwPld+g==
+  dependencies:
+    "@burnt-labs/abstraxion-core" "1.0.0-alpha.30"
+    "@burnt-labs/constants" "0.1.0-alpha.5"
     "@burnt-labs/signers" "0.1.0-alpha.5"
     "@burnt-labs/ui" "0.1.0-alpha.5"
     "@cosmjs/cosmwasm-stargate" "^0.31.3"
@@ -1070,10 +1086,10 @@
     graz "^0.0.51"
     jose "^5.1.3"
 
-"@burnt-labs/constants@0.0.1-alpha.3":
-  version "0.0.1-alpha.3"
-  resolved "https://registry.yarnpkg.com/@burnt-labs/constants/-/constants-0.0.1-alpha.3.tgz#c15cbe7a2d676d06094906009fc2a0353425f5f2"
-  integrity sha512-70lYZHbhYDnxumdzJPbJX9RvZighX40HFw3UJ7dIzTwgStlam52AhwXKPuoi26MKD+WakX44h+aRU56W0/1AbA==
+"@burnt-labs/constants@0.1.0-alpha.5":
+  version "0.1.0-alpha.5"
+  resolved "https://registry.yarnpkg.com/@burnt-labs/constants/-/constants-0.1.0-alpha.5.tgz#7d23c67803211a269d89eb55100028ea60c42f4e"
+  integrity sha512-UWS8ny025hsb7mKAA6spnYpGYRNdsue68TCJ+hST8Mo93+CGt4IjFmEsyFs7UzrYxvkcvE19T4o+wf2g5kJyCA==
 
 "@burnt-labs/signers@0.1.0-alpha.5":
   version "0.1.0-alpha.5"

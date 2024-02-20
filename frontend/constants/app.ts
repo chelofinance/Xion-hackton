@@ -82,9 +82,10 @@ export const TEST_VAULT = chainConfigMap[AppChains.XION_TESTNET];
 
 export const abstraxionProviderConfig = {
   contracts: [
-    chainConfigMap[AppChains.XION_TESTNET].icaFactory.address,
-    chainConfigMap[AppChains.XION_TESTNET].cw3FixedMultisig.address,
+    TEST_VAULT.icaFactory.address,
+    TEST_VAULT.cw3FixedMultisig.address,
   ],
+  rpcUrl: 'https://testnet-rpc.xion-api.com:443',
 };
 
 export const INJECTIVE_RPC = 'https://testnet.sentry.tm.injective.network:443';
@@ -99,9 +100,17 @@ export enum TokenSymbols {
   XION = 'XION',
 }
 
-export const COIN_DICT: Record<TokenSymbols, { denom: string; decimals: number; }> = {
-  [TokenSymbols.INJ]: { denom: 'inj', decimals: 18, },
-  [TokenSymbols.XION]: { denom: 'uxion', decimals: 6 },
+export type CoinData = { denomOn: Record<AllChains, string>; decimals: number; };
+
+export const COIN_DICT: Record<TokenSymbols, CoinData> = {
+  [TokenSymbols.INJ]: { denomOn: {
+    [AllChains.INJECTIVE_TESTNET]: 'inj',
+    [AllChains.XION_TESTNET]: 'ibc/0166AE2224341A3F70943E315DAC6EDF012A638D0F9358794FF7525BA1DFC191',
+  }, decimals: 18, },
+  [TokenSymbols.XION]: { denomOn: {
+    [AllChains.INJECTIVE_TESTNET]: 'ibc/6AB81EFD48DC233A206FAD0FB6F2691A456246C4A7F98D0CD37E2853DD0493EA',
+    [AllChains.XION_TESTNET]: 'uxion',
+  }, decimals: 6 },
 };
 
 export const PRICE_ORACLE_DICT: Record<TokenSymbols, number> = {
