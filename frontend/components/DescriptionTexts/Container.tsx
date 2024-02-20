@@ -19,7 +19,7 @@ const Title = ({ children, href }: { children: ReactNode; href?: string }) => {
 };
 
 const Block = ({ children }: { children: ReactNode }) => {
-  return <dd className="text-caption Font_body_sm">{children}</dd>;
+  return <dd className="text-caption_on_primary Font_body_sm">{children}</dd>;
 };
 
 const getTitle = (children: ReactNode) => getReactElements(children, Title);

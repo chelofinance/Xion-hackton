@@ -76,8 +76,8 @@ const Container = ({
       ? 'border-disabled bg-disabled'
       : 'bg-ground transition-colors Transition_500 border-primary_line_light bg-glass focus-within:bg-white hover:bg-white'
   }`;
-  const iconColorClassName = 'text-caption_dark';
-  const colorClassName = `placeholder:text-caption_dark text-black ${
+  const iconColorClassName = 'text-caption_on_primary';
+  const colorClassName = `placeholder:text-caption_on_primary text-black ${
     disabled ? '' : 'transition-colors Transition_500 focus-within:text-black group-hover/text-input:text-black'
   }`;
   const fontClassName = 'placeholder:Font_caption_md Font_body_md';

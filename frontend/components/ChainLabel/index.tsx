@@ -15,12 +15,19 @@ const CHAIN_REP_TOKEN_SYMBOL_DICT: Record<AllChains, TokenSymbols> = {
   [AllChains.XION_TESTNET]: TokenSymbols.XION,
 };
 
-const ChainLabel_SIZE_DICT: Record<ChainLabelSize, { px: number; className: string }> = {
+const CHAIN_LABEL_SIZE_DICT: Record<ChainLabelSize, { px: number; className: string }> = {
   sm: { px: 16, className: 'w-4 h-4' },
   md: { px: 20, className: 'w-5 h-5' },
   lg: { px: 24, className: 'w-6 h-6' },
   xl: { px: 32, className: 'w-8 h-8' },
 };
+
+const CHAIN_LABEL_FONT_DICT: Record<ChainLabelSize, string> = {
+  sm: 'Font_label_12px',
+  md: 'Font_label_14px',
+  lg: 'Font_label_14px',
+  xl: 'Font_label_14px',
+}
 
 type ChainLabelProps = {
   chain: AllChains;
@@ -46,8 +53,9 @@ const ChainLabel = ({ chain, color = 'body', size = 'md', logoURL: injectedLogoU
   }, []);
 
   const colorClassName = COLOR_CLASS_DICT[color];
-  const pxSizes = { width: ChainLabel_SIZE_DICT[size].px, height: ChainLabel_SIZE_DICT[size].px };
-  const sizeClassName = ChainLabel_SIZE_DICT[size].className;
+  const fontClassName = CHAIN_LABEL_FONT_DICT[size];
+  const pxSizes = { width: CHAIN_LABEL_SIZE_DICT[size].px, height: CHAIN_LABEL_SIZE_DICT[size].px };
+  const sizeClassName = CHAIN_LABEL_SIZE_DICT[size].className;
   const opacityClassName = `transition-opacity ${isLoaded ? 'opacity-100' : 'opacity-0'}`;
 
   const Logo =
@@ -69,7 +77,7 @@ const ChainLabel = ({ chain, color = 'body', size = 'md', logoURL: injectedLogoU
   ) : (
     <div className="flex items-center gap-x-2">
       {Logo}
-      <div className={`Font_label_14px ${colorClassName}`}>{chain}</div>
+      <div className={`${fontClassName} ${colorClassName}`}>{chain}</div>
     </div>
   );
 };

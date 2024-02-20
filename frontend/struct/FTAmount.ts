@@ -2,8 +2,6 @@ import BigNumber from 'bignumber.js';
 import type { Coin } from '@cosmjs/stargate';
 import { TokenSymbols } from '@/constants/app';
 
-const DECIMAL_PLACES = 18;
-
 /**
  * 
  * @description fungible token amount structure
@@ -11,14 +9,16 @@ const DECIMAL_PLACES = 18;
 class FTAmount {
   private coin: Coin;
   public priceOracle: number;
-  public decimals = DECIMAL_PLACES;
+  public decimals: number;
 
   constructor(
     coin: Coin,
+    decimals: number,
     priceOracle?: number,
   ) {
     this.coin = coin;
-    this.priceOracle = priceOracle ?? 0;
+    this.decimals = decimals;
+    this.priceOracle = priceOracle ?? 1;
   }
 
   public get unshifted(): BigNumber {

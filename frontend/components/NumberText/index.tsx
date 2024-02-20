@@ -56,7 +56,7 @@ const NumberText = ({
         <>
           <span className="flex items-baseline">
             <span className={sizeClassNames.integer}>
-              {animate ? <CountUpNumber formattedNumber={integer} locale={locale} isStarted={isFractionsAnimated} /> : integer}
+              {animate ? <CountUpNumber formattedNumber={integer} locale={locale} isStarted={!fractions || isFractionsAnimated} /> : integer}
             </span>
 
             {fractions && (

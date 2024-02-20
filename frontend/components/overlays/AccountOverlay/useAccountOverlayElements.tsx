@@ -5,7 +5,7 @@ import { formatNumber, formatUSD } from '@/utils/number';
 import { useCallback, useMemo } from 'react';
 import BalanceTotal from './BalanceTotal';
 import Button from '@/components/Button';
-import useBalance from '@/hooks/useBalance';
+import useBalance from '@/hooks/useBalanceOnInjective';
 import CoinAmount from '@/components/CoinAmount';
 import useMyNFTVaults from '@/hooks/useMyNFTVaults';
 import useOraclePrice from '@/hooks/useOraclePrice';
@@ -20,12 +20,12 @@ export type AccountOverlayProps = Omit<OverlayProps, 'ariaLabel'> & {
 
 const useAccountOverlayElements = (props: AccountOverlayProps) => {
   const { wallet, onClose: onCloseModal } = props;
-  const balance = useBalance(wallet);
+  // const balance = useBalance(wallet);
 
-  const formattedBalanceAmount = useMemo(
-    () => formatNumber(balance.shifted, balance.decimals),
-    [balance.shifted, balance.decimals]
-  );
+  // const formattedBalanceAmount = useMemo(
+  //   () => formatNumber(balance.shifted, balance.decimals),
+  //   [balance.shifted, balance.decimals]
+  // );
 
   // const { getOraclePrice } = useOraclePrice();
 

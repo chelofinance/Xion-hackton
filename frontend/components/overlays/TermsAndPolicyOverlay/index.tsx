@@ -28,7 +28,7 @@ const TermsAndPolicyOverlay = (props: Omit<OverlayProps, 'ariaLabel'>) => {
       <CardLink color="on_primary" label="Terms of Use" href="/terms-of-use" className="mb-3" />
       <CardLink color="on_primary" label="Privacy Policy" href="/privacy-policy" className="mb-modal_gap" />
 
-      <p className="text-caption Font_body_sm mb-5">This app uses the following third party services:</p>
+      <p className="text-caption_on_primary Font_body_sm mb-5">This app uses the following third party services:</p>
 
       <dl className="space-y-5">
         {THRD_PARTY_SERVICES.map(({ title, href, description }) => (
