@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js';
-import { FORMAT_LOCALE_FALLBACK, MAX_DECIMALS } from '@/constants/app';
-import { ethers } from 'ethers';
+import {FORMAT_LOCALE_FALLBACK, MAX_DECIMALS} from '@/constants/app';
+import {ethers} from 'ethers';
 
 /**
  *
@@ -54,7 +54,7 @@ export const formatNumber = (
 };
 
 export const formatUSD = (value: BigNumber | number | undefined | null, options?: FormatAmountOptions): string => {
-  return formatNumber(value, 2, { currencySymbol: '$', ...options });
+  return formatNumber(value, 2, {currencySymbol: '$', ...options});
 };
 
 export const getDecimalSeperator = (locale: string): string => {
@@ -71,7 +71,7 @@ export const getFormattedNumberParts = (formattedNumber: string, locale: string)
   return [integer, fractions !== '' ? fractions : null];
 };
 
-export const unformatNumber = (formattedValue: string, locale: string): { number: number; decimals: number; prefix?: string } => {
+export const unformatNumber = (formattedValue: string, locale: string): {number: number; decimals: number; prefix?: string} => {
   const [integer, fractions] = getFormattedNumberParts(formattedValue, locale);
 
   const integerNumberStartIndex = Array.from(integer).findIndex((char) => Number.isSafeInteger(Number(char)));
@@ -84,7 +84,7 @@ export const unformatNumber = (formattedValue: string, locale: string): { number
 
   const number = Number.isSafeInteger(parsedInteger) ? parsedInteger + parsedFractions : 0;
   const decimals = fractions?.length ?? 0;
-  return { number, decimals, prefix };
+  return {number, decimals, prefix};
 };
 
-export const simpleFormat = (number: bigint | string | number, decimals: number) => ethers.formatUnits(number, decimals);
+export const simpleFormat = (number: bigint | string | number, decimals: number = 18) => ethers.formatUnits(number, decimals);

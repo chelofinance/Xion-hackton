@@ -4,9 +4,9 @@ import Main from '@/components/Main';
 import Heading from '@/components/Heading';
 import NFTTumbnail from '@/components/NFTThumbnail';
 import Card from '@/components/Card';
-import {formatNumber} from '@/utils/number';
+import {formatNumber, simpleFormat} from '@/utils/number';
 import CoinAmount from '@/components/CoinAmount';
-import { TokenSymbols} from '@/constants/app';
+import {TokenSymbols} from '@/constants/app';
 import Button from '@/components/Button';
 import {ButtonStatus} from '@/components/Button/types';
 import {useAbstraxionAccount, useAbstraxionSigningClient} from '@burnt-labs/abstraxion';
@@ -38,7 +38,7 @@ const CreateVault: NextPage = () => {
   const [status, setStatus] = React.useState<ButtonStatus>('enabled');
   const {client} = useAbstraxionSigningClient();
   const router = useRouter();
-  const { address } = router.query;
+  const {address} = router.query;
 
   const {data: account} = useAbstraxionAccount();
   const [vault, setVault] = React.useState('');
@@ -74,7 +74,7 @@ const CreateVault: NextPage = () => {
         buyContract: nft.buyContractAddress,
         nftContract: nft.collection.contractAddress,
         tokenId: nft.tokenId,
-        cost: new BigNumber(nft.fixedPrice.value).shiftedBy(18).toString(),
+        cost: new BigNumber(nft.fixedPrice.value.toString()).shiftedBy(18).toString(),
       });
       const {proposal_id} = await createProposal({
         client,
@@ -107,8 +107,7 @@ const CreateVault: NextPage = () => {
     init();
   }, []);
 
-  if (!nft)
-    return <PageLoader />;
+  if (!nft) return <PageLoader />;
 
   return (
     <Main className="flex flex-col items-stretch min-h-screen pt-app_header_height pb-page_bottom md:mx-page_x">
@@ -140,10 +139,10 @@ const CreateVault: NextPage = () => {
                 <div className="h-6 flex flex-col justify-center Font_label_14px">Fixed price</div>
 
                 <div className="flex flex-col gap-y-2 items-end">
-                  <CoinAmount size="xl" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(nft.fixedPrice.value)} />
+                  <CoinAmount size="xl" symbol={TokenSymbols.INJ} formattedAmount={simpleFormat(nft.fixedPrice.value, 18)} />
                 </div>
               </div>
-              
+
               <div className="flex justify-between w-full">
                 <div className="h-6 flex flex-col justify-center Font_label_14px">Vault balance</div>
 

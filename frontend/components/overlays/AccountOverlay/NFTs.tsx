@@ -1,14 +1,14 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 import LabelText from '@/components/LabelText';
 import LoadingRows from '@/components/LoadingRows';
 import NFTCard from '@/components/NFT';
 import OverlayGrid from '@/components/OverlayGrid';
-import { shortenAddress } from '@/utils/text';
+import {shortenAddress} from '@/utils/text';
 import CaptionText from '@/components/CaptionText';
 import NumberText from '@/components/NumberText';
-import { formatNumber } from '@/utils/number';
-import type { NFT } from '@/types/asset';
-import { TEXT_COLOR_CLASS_DICT } from '@/components/styles';
+import {formatNumber, simpleFormat} from '@/utils/number';
+import type {NFT} from '@/types/asset';
+import {TEXT_COLOR_CLASS_DICT} from '@/components/styles';
 
 /**
  *
@@ -28,7 +28,7 @@ type NFTsProps = {
   isNFTsLoading: boolean;
 };
 
-const NFTs = ({ ownedNFTs, isNFTsLoading }: NFTsProps) => {
+const NFTs = ({ownedNFTs, isNFTsLoading}: NFTsProps) => {
   const isNFTsExpandable = useMemo<boolean>(() => {
     return ownedNFTs.length > 5 ?? false;
   }, [ownedNFTs.length]);
@@ -90,7 +90,7 @@ const NFTs = ({ ownedNFTs, isNFTsLoading }: NFTsProps) => {
                   <NumberText
                     color="on_primary"
                     size="sm"
-                    formattedNumber={formatNumber(hoveredNFT.fixedPrice.value, 4)}
+                    formattedNumber={simpleFormat(hoveredNFT.fixedPrice.value, 4)}
                     unit={hoveredNFT.fixedPrice.symbol}
                   />
                 </span>
