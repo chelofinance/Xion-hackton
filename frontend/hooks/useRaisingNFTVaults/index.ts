@@ -46,7 +46,7 @@ const useRaisingNFTVaults = (collectionId: string = chainConfigMap[AppChains.XIO
                 createdByAddress: tkn.minter.wallet.injAddress,
                 contractAddress: tkn.family.collection_id,
                 floorPrice: {
-                    value: BigInt(tkn.onChainInfo.sellOrderInfo?.order.price.native[0].amount || 0),
+                    value: BigNumber(tkn.onChainInfo.sellOrderInfo?.order.price.native[0].amount || 0),
                     symbol: TokenSymbols.INJ,
                 },
             },
@@ -55,7 +55,7 @@ const useRaisingNFTVaults = (collectionId: string = chainConfigMap[AppChains.XIO
             description: tkn.description,
             imgSrc: tkn.mediaThumbnail,
             fixedPrice: {
-                value: BigInt(tkn.onChainInfo.sellOrderInfo?.order.price.native[0].amount || 0),
+                value: BigNumber(tkn.onChainInfo.sellOrderInfo?.order.price.native[0].amount || 0),
                 symbol: TokenSymbols.INJ,
             },
             ownerAddress: tkn.owner.wallet.injAddress,

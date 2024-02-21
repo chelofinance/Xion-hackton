@@ -87,4 +87,5 @@ export const unformatNumber = (formattedValue: string, locale: string): {number:
   return {number, decimals, prefix};
 };
 
-export const simpleFormat = (number: bigint | string | number, decimals: number = 18) => ethers.formatUnits(number, decimals);
+export const simpleFormat = (number: BigNumber | bigint | string | number, decimals: number = 18) =>
+  ethers.formatUnits(number.toString(), decimals);

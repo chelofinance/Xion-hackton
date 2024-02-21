@@ -3,6 +3,7 @@ import Mixpanel from '@/analytics/mixpanel/Mixpanel';
 import XION_CHAIN_LOGO from '@/resources/logos/chain_logo_xion.png';
 import type {NFTVault, RaisingNFT} from '@/types/asset';
 import {ContractsDict} from '@/types/contract';
+import BigNumber from 'bignumber.js';
 
 export const googleAnalytics = new GoogleAnalytics('google analytics');
 export const mixpanel = new Mixpanel('mixpanel');
@@ -129,7 +130,7 @@ export const RAISING_NFTS: readonly RaisingNFT[] = [
       contractAddress: 'inj1m6spa200qevzfnrt9ca2ez5dgmd7725l0ruc74',
       createdByAddress: 'inj1p9jgmcs9hefl39u3qwrkhr2vqcv89383sekapq',
       floorPrice: {
-        value: BigInt(0.01),
+        value: BigNumber(0.01),
         symbol: TokenSymbols.INJ,
       },
     },
@@ -144,7 +145,7 @@ export const RAISING_NFTS: readonly RaisingNFT[] = [
     ownerAddress: 'injf1414o124802494hgdjfidhfdjfhqye01911881',
     buyContractAddress: 'inj1qt5ztu5l3cdkcwzsv2pe9u2mk3fq56rdckr0r7',
     fixedPrice: {
-      value: BigInt(0.01),
+      value: BigNumber(0.01),
       symbol: TokenSymbols.INJ,
     },
     chain: AllChains.INJECTIVE_TESTNET,
@@ -159,7 +160,7 @@ export const RAISING_NFTS: readonly RaisingNFT[] = [
       contractAddress: 'inj1m6spa200qevzfnrt9ca2ez5dgmd7725l0ruc74',
       createdByAddress: 'inj1p9jgmcs9hefl39u3qwrkhr2vqcv89383sekapq',
       floorPrice: {
-        value: BigInt(0.01),
+        value: BigNumber(0.01),
         symbol: TokenSymbols.INJ,
       },
     },
@@ -171,7 +172,7 @@ export const RAISING_NFTS: readonly RaisingNFT[] = [
     ownerAddress: 'inj1p9jgmcs9hefl39u3qwrkhr2vqcv89383sekapq',
     buyContractAddress: 'inj1qt5ztu5l3cdkcwzsv2pe9u2mk3fq56rdckr0r7',
     fixedPrice: {
-      value: BigInt(0.01),
+      value: BigNumber(0.01),
       symbol: TokenSymbols.INJ,
     },
     chain: AllChains.INJECTIVE_TESTNET,
@@ -186,7 +187,7 @@ export const RAISING_NFTS: readonly RaisingNFT[] = [
       contractAddress: 'inj1m6spa200qevzfnrt9ca2ez5dgmd7725l0ruc74',
       createdByAddress: 'inj1p9jgmcs9hefl39u3qwrkhr2vqcv89383sekapq',
       floorPrice: {
-        value: BigInt(0.01),
+        value: BigNumber(0.01),
         symbol: TokenSymbols.INJ,
       },
     },
@@ -198,7 +199,7 @@ export const RAISING_NFTS: readonly RaisingNFT[] = [
     ownerAddress: 'inj1p9jgmcs9hefl39u3qwrkhr2vqcv89383sekapq',
     buyContractAddress: 'inj1qt5ztu5l3cdkcwzsv2pe9u2mk3fq56rdckr0r7',
     fixedPrice: {
-      value: BigInt(0.01),
+      value: BigNumber(0.01),
       symbol: TokenSymbols.INJ,
     },
     chain: AllChains.INJECTIVE_TESTNET,

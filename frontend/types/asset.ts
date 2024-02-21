@@ -7,7 +7,7 @@ export type NFTCollection = Readonly<{
   contractAddress: string;
   createdByAddress: string;
   floorPrice: {
-    value: bigint;
+    value: BigNumber;
     symbol: TokenSymbols;
   };
 }>;
@@ -22,7 +22,7 @@ export type NFT = Readonly<{
   //   address: string;
   // };
   fixedPrice: {
-    value: bigint;
+    value: BigNumber;
     symbol: TokenSymbols;
   };
   ownerAddress: string;

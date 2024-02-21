@@ -60,7 +60,7 @@ const RaisingVault: NextPage = () => {
   const {getOraclePrice} = useOraclePrice();
   const oraclePrice = nft ? getOraclePrice(nft.fixedPrice.symbol) : 0;
 
-  const maxDepositAmount = nft ? nft.fixedPrice.value - BigInt(tmpRaisedAmount) : 0;
+  const maxDepositAmount = nft ? Number(nft.fixedPrice.value) - tmpRaisedAmount : 0;
   const maxDepositAmountUSD = useMemo(
     () => new BigNumber(maxDepositAmount.toString()).times(oraclePrice),
     [maxDepositAmount, oraclePrice]
