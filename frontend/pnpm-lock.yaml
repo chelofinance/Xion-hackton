@@ -9,8 +9,8 @@ dependencies:
     specifier: ^3.9.2
     version: 3.9.2(@types/react@18.0.20)(graphql-ws@5.14.3)(graphql@16.8.1)(react-dom@18.2.0)(react@18.2.0)
   '@burnt-labs/abstraxion':
-    specifier: ^1.0.0-alpha.26
-    version: 1.0.0-alpha.26(@types/react@18.0.20)(graphql-ws@5.14.3)(react-dom@18.2.0)(react@18.2.0)
+    specifier: ^1.0.0-alpha.28
+    version: 1.0.0-alpha.30(@types/react@18.0.20)(graphql-ws@5.14.3)(react-dom@18.2.0)(react@18.2.0)
   '@cosmjs/cosmwasm-stargate':
     specifier: ^0.32.2
     version: 0.32.2
@@ -29,6 +29,9 @@ dependencies:
   '@injectivelabs/core-proto-ts':
     specifier: ^0.0.21
     version: 0.0.21
+  '@injectivelabs/networks':
+    specifier: ^1.14.5
+    version: 1.14.5(google-protobuf@3.21.2)
   '@injectivelabs/sdk-ts':
     specifier: ^1.14.5
     version: 1.14.5(@types/react@18.0.20)(graphql-ws@5.14.3)(react-dom@18.2.0)(react@18.2.0)
@@ -62,6 +65,9 @@ dependencies:
   copy-to-clipboard:
     specifier: ^3.3.2
     version: 3.3.2
+  ethers:
+    specifier: ^6.11.1
+    version: 6.11.1
   graphql-ws:
     specifier: ^5.14.3
     version: 5.14.3(graphql@16.8.1)
@@ -176,6 +182,10 @@ packages:
     resolution: {integrity: sha512-1Yjs2SvM8TflER/OD3cOjhWWOZb58A2t7wpE2S9XfBYTiIl+XFhQG2bjy4Pu1I+EAlCNUzRDYDdFwFYUKvXcIA==}
     engines: {node: '>=0.10.0'}
     dev: true
+
+  /@adraffy/ens-normalize@1.10.1:
+    resolution: {integrity: sha512-96Z2IP3mYmF1Xg2cDm8f1gWGf/HUVedQ3FMifV4kG/PQ4yEP51xDtRAEfhVNt5f/uzpNkZHwWQuUcu6D6K+Ekw==}
+    dev: false
 
   /@ampproject/remapping@2.2.1:
     resolution: {integrity: sha512-lFMjJTrFL3j7L9yBxwYfCq2k6qqwHyzuUl/XBnif78PWTJYyL/dfowQHWE3sp6U6ZzqWiiIZnpTMO96zhkjwtg==}
@@ -1303,13 +1313,53 @@ packages:
       '@babel/helper-validator-identifier': 7.22.20
       to-fast-properties: 2.0.0
 
-  /@burnt-labs/abstraxion@1.0.0-alpha.26(@types/react@18.0.20)(graphql-ws@5.14.3)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-uCCf6D1Wwi1L/S1wTc/ZyrZYuLeBV7hlOvbW7Cnr531sYG8Gir3PVJqNpZ686Ahb7e9TtBpQIHXQ+AmbLhLv1g==}
+  /@burnt-labs/abstraxion-core@1.0.0-alpha.30(@types/react@18.0.20)(graphql-ws@5.14.3)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-ug9ZmB2BKAoS2CFGppsjQvlovGMXlsUvZ6FU3dOtXoXUv+BbATv9pzkp7VfdaXhztqhWon7xosxy8UOegsjPLA==}
+    dependencies:
+      '@burnt-labs/constants': 0.1.0-alpha.5
+      '@burnt-labs/signers': 0.1.0-alpha.5(@types/react@18.0.20)(graphql-ws@5.14.3)
+      '@cosmjs/cosmwasm-stargate': 0.31.3
+      '@cosmjs/proto-signing': 0.31.3
+      '@cosmjs/stargate': 0.31.3
+      '@cosmjs/tendermint-rpc': 0.31.3
+      cosmjs-types: 0.8.0
+      graz: 0.0.51(@types/react@18.0.20)(react-dom@18.2.0)(react@18.2.0)
+      jose: 5.2.1
+    transitivePeerDependencies:
+      - '@azure/app-configuration'
+      - '@azure/cosmos'
+      - '@azure/data-tables'
+      - '@azure/identity'
+      - '@azure/keyvault-secrets'
+      - '@azure/storage-blob'
+      - '@capacitor/preferences'
+      - '@netlify/blobs'
+      - '@planetscale/database'
+      - '@react-native-async-storage/async-storage'
+      - '@types/react'
+      - '@upstash/redis'
+      - '@vercel/kv'
+      - bufferutil
+      - debug
+      - encoding
+      - graphql-ws
+      - immer
+      - react
+      - react-dom
+      - react-native
+      - subscriptions-transport-ws
+      - supports-color
+      - utf-8-validate
+    dev: false
+
+  /@burnt-labs/abstraxion@1.0.0-alpha.30(@types/react@18.0.20)(graphql-ws@5.14.3)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-PQH1UcBSxiFjj5JDumXZnCy7DFuRcQwcNVpyTt67DcrdbFfL32VPc33Uhz9ACYF3iz7hgIapiJfcRjPPwPld+g==}
     peerDependencies:
       react: ^18.2.0
       react-dom: 18.2.0
     dependencies:
-      '@burnt-labs/constants': 0.0.1-alpha.3
+      '@burnt-labs/abstraxion-core': 1.0.0-alpha.30(@types/react@18.0.20)(graphql-ws@5.14.3)(react-dom@18.2.0)(react@18.2.0)
+      '@burnt-labs/constants': 0.1.0-alpha.5
       '@burnt-labs/signers': 0.1.0-alpha.5(@types/react@18.0.20)(graphql-ws@5.14.3)
       '@burnt-labs/ui': 0.1.0-alpha.5(@types/react@18.0.20)(react-dom@18.2.0)(react@18.2.0)
       '@cosmjs/cosmwasm-stargate': 0.31.3
@@ -1347,8 +1397,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@burnt-labs/constants@0.0.1-alpha.3:
-    resolution: {integrity: sha512-70lYZHbhYDnxumdzJPbJX9RvZighX40HFw3UJ7dIzTwgStlam52AhwXKPuoi26MKD+WakX44h+aRU56W0/1AbA==}
+  /@burnt-labs/constants@0.1.0-alpha.5:
+    resolution: {integrity: sha512-UWS8ny025hsb7mKAA6spnYpGYRNdsue68TCJ+hST8Mo93+CGt4IjFmEsyFs7UzrYxvkcvE19T4o+wf2g5kJyCA==}
     dev: false
 
   /@burnt-labs/signers@0.1.0-alpha.5(@types/react@18.0.20)(graphql-ws@5.14.3):
@@ -2814,6 +2864,17 @@ packages:
     requiresBuild: true
     optional: true
 
+  /@noble/curves@1.2.0:
+    resolution: {integrity: sha512-oYclrNgRaM9SsBUBVbb8M6DTV7ZHRTKugureoYEncY5c65HOmRzvSiTE3y5CYaPYJA/GVkrhXEoF0M3Ya9PMnw==}
+    dependencies:
+      '@noble/hashes': 1.3.2
+    dev: false
+
+  /@noble/hashes@1.3.2:
+    resolution: {integrity: sha512-MVC8EAQp7MvEcm30KWENFjgR+Mkmf+D189XJTkFIlwohU5hcBbn1ZkKq7KVTi2Hme3PMGF390DaL52beVrIihQ==}
+    engines: {node: '>= 16'}
+    dev: false
+
   /@noble/hashes@1.3.3:
     resolution: {integrity: sha512-V7/fPHgl+jsVPXqqeOzT8egNj2iBIVt+ECeMMG8TdcnTikP3oaBtUVqpT/gYCR68aEBJSF+XbYUxStjbFMqIIA==}
     engines: {node: '>= 16'}
@@ -4058,6 +4119,10 @@ packages:
     resolution: {integrity: sha512-fh+pAqt4xRzPfqA6eh3Z2y6fyZavRIumvjhaCL753+TVkGKGhpPeyrJG2JftD0T9q4GF00KjefsQ+PQNDdWQaQ==}
     dev: false
 
+  /@types/node@18.15.13:
+    resolution: {integrity: sha512-N+0kuo9KgrUQ1Sn/ifDXsvg0TTleP7rIy4zOBGECxAljqvqfqpTfzx0Q1NUedOixRMBfe2Whhb056a42cWs26Q==}
+    dev: false
+
   /@types/node@18.7.18:
     resolution: {integrity: sha512-m+6nTEOadJZuTPkKR/SYK3A2d7FZrgElol9UP1Kae90VVU4a6mxnPuLiIW1m4Cq4gZ/nWb9GrdVXJCoCazDAbg==}
 
@@ -4879,6 +4944,10 @@ packages:
 
   /aes-js@3.0.0:
     resolution: {integrity: sha512-H7wUZRn8WpTq9jocdxQ2c8x2sKo9ZVmzfRE13GiNJXfp7NcKYEdvl3vspKjXox6RIG2VtaRe4JFvxG4rqp2Zuw==}
+    dev: false
+
+  /aes-js@4.0.0-beta.5:
+    resolution: {integrity: sha512-G965FqalsNyrPqgEGON7nIx1e/OVENSgiEIzyC63haUMuvNnwIgIjMs52hlTCKhkBny7A2ORNlfY9Zu+jmGk1Q==}
     dev: false
 
   /agent-base@6.0.2:
@@ -6569,6 +6638,22 @@ packages:
       '@ethersproject/wallet': 5.7.0
       '@ethersproject/web': 5.7.1
       '@ethersproject/wordlists': 5.7.0
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+    dev: false
+
+  /ethers@6.11.1:
+    resolution: {integrity: sha512-mxTAE6wqJQAbp5QAe/+o+rXOID7Nw91OZXvgpjDa1r4fAbq2Nu314oEZSbjoRLacuCzs7kUC3clEvkCQowffGg==}
+    engines: {node: '>=14.0.0'}
+    dependencies:
+      '@adraffy/ens-normalize': 1.10.1
+      '@noble/curves': 1.2.0
+      '@noble/hashes': 1.3.2
+      '@types/node': 18.15.13
+      aes-js: 4.0.0-beta.5
+      tslib: 2.4.0
+      ws: 8.5.0
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -9918,6 +10003,10 @@ packages:
   /tslib@1.14.1:
     resolution: {integrity: sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==}
 
+  /tslib@2.4.0:
+    resolution: {integrity: sha512-d6xOpEDfsi2CZVlPQzGeux8XMwLT9hssAsaPYExaQMuYskwb+x1x7J371tWlbBdWHroy99KnVB6qIkUbs5X3UQ==}
+    dev: false
+
   /tslib@2.6.2:
     resolution: {integrity: sha512-AEYxH93jGFPn/a2iVAwW87VuUIkR1FVUKB77NwMF7nBTDkDrrT/Hpt/IrCJ0QXhW27jTBDcf5ZY7w6RiqTMw2Q==}
 
@@ -10619,6 +10708,19 @@ packages:
   /ws@7.5.9:
     resolution: {integrity: sha512-F+P9Jil7UiSKSkppIiD94dN07AwvFixvLIj1Og1Rl9GGMuNipJnV9JzjD6XuqmAeiswGvUmNLjr5cFuXwNS77Q==}
     engines: {node: '>=8.3.0'}
+    peerDependencies:
+      bufferutil: ^4.0.1
+      utf-8-validate: ^5.0.2
+    peerDependenciesMeta:
+      bufferutil:
+        optional: true
+      utf-8-validate:
+        optional: true
+    dev: false
+
+  /ws@8.5.0:
+    resolution: {integrity: sha512-BWX0SWVgLPzYwF8lTzEy1egjhS4S4OEAHfsO8o65WOVsrnSRGaSiUaa9e0ggGlkMTtBlmOpEXiie9RUcBO86qg==}
+    engines: {node: '>=10.0.0'}
     peerDependencies:
       bufferutil: ^4.0.1
       utf-8-validate: ^5.0.2

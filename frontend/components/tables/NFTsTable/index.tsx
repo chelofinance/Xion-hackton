@@ -3,7 +3,7 @@ import Table from '@/components/Table';
 import Heading from '@/components/Heading';
 import useUserAgent from '@/hooks/useUserAgent';
 import Card from '@/components/Card';
-import {formatNumber, formatUSD} from '@/utils/number';
+import {formatNumber, formatUSD, simpleFormat} from '@/utils/number';
 import type {TooltipLayer} from '@/components/Tooltip/styles';
 import ProgressBar from '@/components/ProgressBar';
 import CoinAmount from '@/components/CoinAmount';
@@ -37,52 +37,54 @@ const NFTsTable = ({className = '', tooltipLayer}: NFTsTableProps) => {
 
   const rows = useMemo<readonly NFTsTableRow[]>(() => {
     return (
-      nfts.map((item) => {
-        const id = `${item.collection.contractAddress}${item.tokenId}`;
+      nfts
+        .filter((nft) => nft.onSale)
+        .map((item) => {
+          const id = `${item.collection.contractAddress}${item.tokenId}`;
 
-        const nftName = item.nftName;
+          const nftName = item.nftName;
 
-        const nft = <NFTTumbnail imgSrc={item.imgSrc} name={item.nftName} />;
+          const nft = <NFTTumbnail imgSrc={item.imgSrc} name={item.nftName} />;
 
-        const oraclePrice = getOraclePrice(item.fixedPrice.symbol);
+          const oraclePrice = getOraclePrice(item.fixedPrice.symbol);
 
-        const price = item.fixedPrice.value;
-        const priceUSD = new BigNumber(price).times(oraclePrice);
-        const priceFormatted = (
-          <div className="flex flex-col gap-y-1 items-end">
-            <CoinAmount size="md" color="body" symbol={item.fixedPrice.symbol} formattedAmount={formatNumber(price, 6)} />
-            <CaptionAmount size="sm" formattedAmount={formatUSD(priceUSD, { compact: true })} />
-          </div>
-        );
+          const price = Number(simpleFormat(item.fixedPrice.value, 18));
+          const priceUSD = new BigNumber(price).times(oraclePrice);
+          const priceFormatted = (
+            <div className="flex flex-col gap-y-1 items-end">
+              <CoinAmount size="md" color="body" symbol={item.fixedPrice.symbol} formattedAmount={formatNumber(price, 6)} />
+              <CaptionAmount size="sm" formattedAmount={formatUSD(priceUSD, {compact: true})} />
+            </div>
+          );
 
-        const raisedAmountUSD = new BigNumber(item.raisedAmount).times(oraclePrice);
-        const raisedAmountUSDFormatted = (
-          <ProgressBar
-            currentNumber={raisedAmountUSD.toNumber()}
-            targetNumber={price}
-            formatOptions={{currencySymbol: '$', compact: true}}
-            currentNumberCaption="raised"
-            className="!w-[300px]"
-          />
-        );
+          const raisedAmountUSD = new BigNumber(item.raisedAmount).times(oraclePrice);
+          const raisedAmountUSDFormatted = (
+            <ProgressBar
+              currentNumber={raisedAmountUSD.toNumber()}
+              targetNumber={price}
+              formatOptions={{currencySymbol: '$', compact: true}}
+              currentNumberCaption="raised"
+              className="!w-[300px]"
+            />
+          );
 
-        const participants = item.participants;
-        const participantsFormatted = formatNumber(participants, 0);
+          const participants = item.participants;
+          const participantsFormatted = formatNumber(participants, 0);
 
-        return {
-          id,
-          nft,
-          nftName,
-          price,
-          priceFormatted,
-          raisedAmountUSD,
-          raisedAmountUSDFormatted,
-          participants,
-          participantsFormatted,
-        };
-      }) ?? []
+          return {
+            id,
+            nft,
+            nftName,
+            price,
+            priceFormatted,
+            raisedAmountUSD,
+            raisedAmountUSDFormatted,
+            participants,
+            participantsFormatted,
+          };
+        }) ?? []
     );
-  }, []);
+  }, [nfts]);
 
   const router = useRouter();
 
@@ -140,7 +142,7 @@ const NFTsTable = ({className = '', tooltipLayer}: NFTsTableProps) => {
             widthPx: 400,
           },
         ]}
-      // isLoading={isExchangesDataLoading || isExchangesMetadataLoading}
+      //isLoading={isExchangesDataLoading || isExchangesMetadataLoading}
       >
         <Table.FieldRow />
       </Table>

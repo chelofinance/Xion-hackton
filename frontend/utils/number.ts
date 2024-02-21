@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js';
 import { FORMAT_LOCALE_FALLBACK, MAX_DECIMALS } from '@/constants/app';
+import { ethers } from 'ethers';
 
 /**
  *
@@ -85,3 +86,5 @@ export const unformatNumber = (formattedValue: string, locale: string): { number
   const decimals = fractions?.length ?? 0;
   return { number, decimals, prefix };
 };
+
+export const simpleFormat = (number: bigint | string | number, decimals: number) => ethers.formatUnits(number, decimals);
