@@ -13,6 +13,7 @@ import useOraclePrice from '@/hooks/useOraclePrice';
 import BigNumber from 'bignumber.js';
 import {useRouter} from 'next/router';
 import useRaisingNFTVaults from '@/hooks/useRaisingNFTVaults';
+import { COIN_DICT } from '@/constants/app';
 
 type NFTsTableRow = {
   id: string;
@@ -48,7 +49,8 @@ const NFTsTable = ({className = '', tooltipLayer}: NFTsTableProps) => {
 
           const oraclePrice = getOraclePrice(item.fixedPrice.symbol);
 
-          const price = Number(simpleFormat(item.fixedPrice.value, 18));
+          const price = item.fixedPrice.value.toNumber();
+          //  Number(simpleFormat(item.fixedPrice.value, COIN_DICT[item.fixedPrice.symbol].decimals));
           const priceUSD = new BigNumber(price).times(oraclePrice);
           const priceFormatted = (
             <div className="flex flex-col gap-y-1 items-end">

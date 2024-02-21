@@ -1,5 +1,3 @@
-import type { Account } from "@cosmjs/stargate";
-
 export type WalletType = 'abstraxion';
 
 export type Wallet = Readonly<{

@@ -4,9 +4,9 @@ import Main from '@/components/Main';
 import Heading from '@/components/Heading';
 import NFTTumbnail from '@/components/NFTThumbnail';
 import Card from '@/components/Card';
-import {formatNumber, simpleFormat} from '@/utils/number';
+import {formatNumber} from '@/utils/number';
 import CoinAmount from '@/components/CoinAmount';
-import {TokenSymbols} from '@/constants/app';
+import {COIN_DICT, TokenSymbols} from '@/constants/app';
 import Button from '@/components/Button';
 import {ButtonStatus} from '@/components/Button/types';
 import {useAbstraxionAccount, useAbstraxionSigningClient} from '@burnt-labs/abstraxion';
@@ -139,7 +139,7 @@ const CreateVault: NextPage = () => {
                 <div className="h-6 flex flex-col justify-center Font_label_14px">Fixed price</div>
 
                 <div className="flex flex-col gap-y-2 items-end">
-                  <CoinAmount size="xl" symbol={TokenSymbols.INJ} formattedAmount={simpleFormat(nft.fixedPrice.value, 18)} />
+                  <CoinAmount size="xl" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(nft.fixedPrice.value, COIN_DICT[nft.fixedPrice.symbol].decimals)} />
                 </div>
               </div>
 

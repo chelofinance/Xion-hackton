@@ -32,21 +32,11 @@ export const transferOnXion = async (signingClient: any, args: HandleDepositArgs
         amount: [
             {
                 denom: COIN_DICT[TokenSymbols.XION].denomOn[AllChains.XION_TESTNET],
-                amount: '1',
+                amount: '0',
             },
         ],
-        gas: '30000',
+        gas: '200000',
     };
-
-    console.log('sendTokens', {
-      senderAddress,
-      recipientAddress,
-      amount: [{
-        denom,
-        amount,
-    }],
-    fee,      
-    });
 
     try {     
       const response = await (signingClient as SigningStargateClient | undefined)?.sendTokens(
