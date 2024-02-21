@@ -90,7 +90,7 @@ const NFTs = ({ownedNFTs, isNFTsLoading}: NFTsProps) => {
                   <NumberText
                     color="on_primary"
                     size="sm"
-                    formattedNumber={simpleFormat(hoveredNFT.fixedPrice.value, 4)}
+                    formattedNumber={formatNumber(hoveredNFT.fixedPrice.value, 4)}
                     unit={hoveredNFT.fixedPrice.symbol}
                   />
                 </span>

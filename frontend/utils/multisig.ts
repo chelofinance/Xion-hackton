@@ -1,7 +1,7 @@
 // This is a copy from /demo/app/utils.tsx
 
 import {v4 as uuidv4} from 'uuid';
-import {produceProposal, INJECTIVE_CONTRACT_MSG_URI} from './propose';
+import {produceProposal} from './propose';
 import Contracts from 'config/contracts.config';
 
 const contracts = Contracts['xion-testnet'];
@@ -21,6 +21,7 @@ export async function getIcaControllerAddress(client: any, ica_multisig_address:
 }
 
 export type CreateIcaMultisigResult = {
+    instantiateResponse: any;
     ica_multisig_address: string | undefined;
     channel_init_info: {
         src_channel_id: string | undefined;
@@ -29,7 +30,7 @@ export type CreateIcaMultisigResult = {
     };
 }
 
-export async function createIcaMultisig(client: any, account: any, ica_factory: string, memberAddresses: string[]): Promise<CreateIcaMultisigResult | null> {
+export async function createIcaMultisig(client: any, account: { bech32Address: string }, ica_factory: string, memberAddresses: string[]): Promise<CreateIcaMultisigResult | null> {
     const voters = memberAddresses.map((address) => ({addr: address, weight: 1}));
 
     const msg = {
@@ -73,6 +74,7 @@ export async function createIcaMultisig(client: any, account: any, ica_factory: 
         )?.value;
 
         return {
+            instantiateResponse,
             ica_multisig_address,
             channel_init_info: {
                 src_channel_id,

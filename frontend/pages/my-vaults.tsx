@@ -2,7 +2,7 @@ import type {NextPage} from 'next';
 import Main from '@/components/Main';
 import Heading from '@/components/Heading';
 import Card from '@/components/Card';
-import {formatNumber, formatUSD, simpleFormat} from '@/utils/number';
+import {formatNumber, formatUSD} from '@/utils/number';
 import {useCallback, useMemo, useRef, useState} from 'react';
 import useOraclePrice from '@/hooks/useOraclePrice';
 import BigNumber from 'bignumber.js';
@@ -28,6 +28,7 @@ import CoinAmount from '@/components/CoinAmount';
 import useDepositToVaultMultisig from '@/hooks/useDepositToVaultMultisig';
 import useBalanceOnInjective from '@/hooks/useBalanceOnInjective';
 import useBalanceOnXion from '@/hooks/useBalanceOnXion';
+import useCreateVault from '@/hooks/useCreateVault';
 
 const MyVaults: NextPage = () => {
     const router = useRouter();
@@ -109,6 +110,8 @@ const MyVaults: NextPage = () => {
         //
     }, []);
 
+    const { createVault, isProcessing: isCreateVaultProcessing } = useCreateVault(userWallet);
+
     const Content =
         userWallet === null ? (
             <AccountButton />
@@ -139,6 +142,8 @@ const MyVaults: NextPage = () => {
                             </div>
                         </div>
                     </Card>
+
+                    <Button iconType="add" label="Create vault" onClick={createVault} />
                 </section>
 
                 {selectedVault && (
@@ -146,10 +151,18 @@ const MyVaults: NextPage = () => {
                         <Heading tagName="h3">Vault summary</Heading>
 
                         <Card color="glass" className="flex flex-col justify-between items-stretch gap-y-4 p-4">
-                            <div className="flex items-center justify-between gap-x-4">
-                                <div className="flex items-center gap-x-2">
-                                    <div className="Font_label_14px">Vault balance</div>
+                            <div className="Font_label_14px">Balance</div>
 
+                            <div className="space-y-1">
+                                <BalanceTotal formattedNumber={formatUSD(vaultBalance.usd.plus(multisigBalance.usd))} isLoading={false} />
+                                
+                                <div className="flex items-center gap-x-2">
+                                    <CoinAmount
+                                        size="sm"
+                                        symbol={TokenSymbols.INJ}
+                                        chain={AllChains.INJECTIVE_TESTNET}
+                                        formattedAmount={formatNumber(vaultBalance.shifted, vaultBalance.decimals)}
+                                    />
                                     <CopyHelper toCopy={selectedVault.ica.icaMultisigAddress} className="text-caption">
                                         <span className="w-fit truncate Font_caption_xs">
                                             {shortenAddress(selectedVault.ica.icaMultisigAddress, 4, 4)}
@@ -157,56 +170,31 @@ const MyVaults: NextPage = () => {
                                     </CopyHelper>
                                 </div>
 
-                                <ChainLabel chain={AllChains.INJECTIVE_TESTNET} size="sm" />
-                            </div>
-
-                            <div>
-                                <div className="space-y-1">
-                                    <BalanceTotal formattedNumber={formatUSD(vaultBalance.usd)} isLoading={false} />
+                                <div className="flex items-center gap-x-2">
                                     <CoinAmount
                                         size="sm"
                                         symbol={TokenSymbols.INJ}
-                                        formattedAmount={formatNumber(vaultBalance.shifted, vaultBalance.decimals)}
+                                        chain={AllChains.XION_TESTNET}
+                                        formattedAmount={formatNumber(multisigBalance.shifted, multisigBalance.decimals)}
                                     />
-                                </div>
-                            </div>
-                        </Card>
-
-                        <Card color="glass" className="flex flex-col justify-between items-stretch gap-y-4 p-4">
-                            <div className="flex items-center justify-between gap-x-4">
-                                <div className="flex items-center gap-x-2">
-                                    <div className="Font_label_14px">Multisig balance</div>
-
                                     <CopyHelper toCopy={selectedVault.ica.icaControllerAddress} className="text-caption">
                                         <span className="w-fit truncate Font_caption_xs">
                                             {shortenAddress(selectedVault.ica.icaControllerAddress, 4, 4)}
                                         </span>
                                     </CopyHelper>
                                 </div>
-                                <ChainLabel chain={AllChains.XION_TESTNET} size="sm" />
-                            </div>
-
-                            <div className="flex justify-between items-center">
-                                <div className="space-y-1">
-                                    <BalanceTotal formattedNumber={formatUSD(multisigBalance.usd)} isLoading={false} />
-                                    <CoinAmount
-                                        size="sm"
-                                        symbol={TokenSymbols.INJ}
-                                        formattedAmount={formatNumber(multisigBalance.shifted, multisigBalance.decimals)}
-                                    />
-                                </div>
                             </div>
 
                             <div className="flex items-center justify-end gap-x-2">
                                 <Button
-                                    size="sm"
+                                    // size="sm"
                                     iconType="arrow_forward"
-                                    label="Transfer to vault"
+                                    label="Merge balance"
                                     status={multisigBalance.shifted.gt(0) ? 'enabled' : 'disabled'}
                                     onClick={handleTransferToVault}
                                 />
                                 <Button
-                                    size="sm"
+                                    // size="sm"
                                     label="Deposit"
                                     iconType="arrow_forward"
                                     status={isDepositToVaultProcessing ? 'processing' : 'enabled'}
@@ -289,7 +277,7 @@ const MyVaults: NextPage = () => {
                                     href="raising-vault"
                                     nftVault={nft}
                                     amountLabel="Fixed price"
-                                    formattedAmount={simpleFormat(nft.fixedPrice.value, 18)}
+                                    formattedAmount={formatNumber(nft.fixedPrice.value, 18)}
                                     vaultAddress={selectedVault.ica.icaMultisigAddress}
                                 />
                             ))}

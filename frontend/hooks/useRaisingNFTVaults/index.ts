@@ -1,4 +1,4 @@
-import {RAISING_NFTS, chainConfigMap, AppChains, AllChains, TokenSymbols} from '@/constants/app';
+import {RAISING_NFTS, chainConfigMap, AppChains, AllChains, TokenSymbols, COIN_DICT} from '@/constants/app';
 import QUERY_TALIS_TOKENS, {QueryTalisTokenResponse} from '@/data/graphql/queries/queryTalisTokens';
 import {RaisingNFT} from '@/types/asset';
 import {useQuery} from '@apollo/client';

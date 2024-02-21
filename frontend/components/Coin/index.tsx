@@ -1,7 +1,8 @@
 import Image from 'next/image';
 import useCoinLogoURL from '@/components/useCoinLogoURL';
 import { useCallback, useState } from 'react';
-import { TokenSymbols } from '@/constants/app';
+import { AllChains, TokenSymbols } from '@/constants/app';
+import ChainLabel from '../ChainLabel';
 
 export type CoinSize = 'sm' | 'md' | 'lg' | 'xl';
 
@@ -14,11 +15,12 @@ const COIN_SIZE_DICT: Record<CoinSize, { px: number; className: string }> = {
 
 type CoinProps = {
   symbol?: TokenSymbols;
+  chain?: AllChains;
   size?: CoinSize;
   logoURL?: string;
 };
 
-const Coin = ({ symbol, size = 'md', logoURL: injectedLogoURL }: CoinProps) => {
+const Coin = ({ symbol, chain, size = 'md', logoURL: injectedLogoURL }: CoinProps) => {
   const logoURL = useCoinLogoURL(symbol);
   const renderingLogoURL = injectedLogoURL ?? logoURL;
 
@@ -38,14 +40,22 @@ const Coin = ({ symbol, size = 'md', logoURL: injectedLogoURL }: CoinProps) => {
   const opacityClassName = `transition-opacity ${isLoaded ? 'opacity-100' : 'opacity-0'}`;
 
   return !isError && renderingLogoURL ? (
-    <Image
-      alt={`${symbol} logo`}
-      src={renderingLogoURL}
-      {...pxSizes}
-      className={`rounded-full ${sizeClassName} ${opacityClassName}`}
-      onLoadingComplete={onLoaded}
-      onError={onError}
-    />
+    <div className="relative">
+      <Image
+        alt={`${symbol} logo`}
+        src={renderingLogoURL}
+        {...pxSizes}
+        className={`rounded-full ${sizeClassName} ${opacityClassName}`}
+        onLoadingComplete={onLoaded}
+        onError={onError}
+      />
+
+      {chain && (
+        <div className="absolute -right-0.5 bottom-0 rounded-full bg-ground border border-solid border-primary_line_light">
+          <ChainLabel size="xs" logoOnly chain={chain} />
+        </div>
+      )}
+    </div>
   ) : (
     <div aria-hidden className={`${sizeClassName} rounded-full animate-pulse`}></div>
   );

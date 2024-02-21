@@ -6,7 +6,7 @@ import useCoinLogoURL from '@/components/useCoinLogoURL';
 
 export type ChainLabelColor = TextColor;
 
-export type ChainLabelSize = 'sm' | 'md' | 'lg' | 'xl';
+export type ChainLabelSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 const COLOR_CLASS_DICT = TEXT_COLOR_CLASS_DICT;
 
@@ -16,6 +16,7 @@ const CHAIN_REP_TOKEN_SYMBOL_DICT: Record<AllChains, TokenSymbols> = {
 };
 
 const CHAIN_LABEL_SIZE_DICT: Record<ChainLabelSize, { px: number; className: string }> = {
+  xs: { px: 8, className: 'w-2 h-2' },
   sm: { px: 16, className: 'w-4 h-4' },
   md: { px: 20, className: 'w-5 h-5' },
   lg: { px: 24, className: 'w-6 h-6' },
@@ -23,6 +24,7 @@ const CHAIN_LABEL_SIZE_DICT: Record<ChainLabelSize, { px: number; className: str
 };
 
 const CHAIN_LABEL_FONT_DICT: Record<ChainLabelSize, string> = {
+  xs: 'Font_label_12px',
   sm: 'Font_label_12px',
   md: 'Font_label_14px',
   lg: 'Font_label_14px',
@@ -35,9 +37,10 @@ type ChainLabelProps = {
   size?: ChainLabelSize;
   logoURL?: string;
   logoOnly?: boolean;
+  className?: string;
 };
 
-const ChainLabel = ({ chain, color = 'body', size = 'md', logoURL: injectedLogoURL, logoOnly = false }: ChainLabelProps) => {
+const ChainLabel = ({ chain, color = 'body', size = 'md', logoURL: injectedLogoURL, logoOnly = false, className = '' }: ChainLabelProps) => {
   const logoURL = useCoinLogoURL(CHAIN_REP_TOKEN_SYMBOL_DICT[chain]);
   const renderingLogoURL = injectedLogoURL ?? logoURL;
 
@@ -73,9 +76,9 @@ const ChainLabel = ({ chain, color = 'body', size = 'md', logoURL: injectedLogoU
     );
 
   return logoOnly ? (
-    Logo
+    <div className={className}>{Logo}</div>
   ) : (
-    <div className="flex items-center gap-x-2">
+    <div className={`${className} flex items-center gap-x-2`}>
       {Logo}
       <div className={`${fontClassName} ${colorClassName}`}>{chain}</div>
     </div>

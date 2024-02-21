@@ -5,7 +5,7 @@ import NFTTumbnail from '@/components/NFTThumbnail';
 import Card from '@/components/Card';
 import {formatNumber, formatUSD, simpleFormat} from '@/utils/number';
 import CoinAmount from '@/components/CoinAmount';
-import {AppChains, chainConfigMap, CHAIN_METADATA_DICT, INJECTIVE_ID, TokenSymbols} from '@/constants/app';
+import {AppChains, chainConfigMap, CHAIN_METADATA_DICT, INJECTIVE_ID, TokenSymbols, COIN_DICT} from '@/constants/app';
 import Button, {ButtonProps} from '@/components/Button';
 import ProgressBar from '@/components/ProgressBar';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
@@ -67,7 +67,7 @@ const RaisingVault: NextPage = () => {
   );
   const minDepositAmount = 0.000000000000000001;
 
-  const [depositAmount, setDepositAmount] = useState<number>(Number(simpleFormat(maxDepositAmount, 18)));
+  const [depositAmount, setDepositAmount] = useState<number>(maxDepositAmount);
   const [isDepositAmountValid, setIsDepositAmountValid] = useState<boolean>(true);
 
   const onChange = useCallback((debouncedValue: string, isValid: boolean) => {
@@ -306,7 +306,7 @@ const RaisingVault: NextPage = () => {
               <div className="h-6 flex flex-col justify-center Font_label_14px">Fixed price</div>
 
               <div className="flex flex-col gap-y-2 items-end">
-                <CoinAmount size="md" symbol={TokenSymbols.INJ} formattedAmount={simpleFormat(nft.fixedPrice.value)} />
+                <CoinAmount size="md" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(nft.fixedPrice.value, COIN_DICT[nft.fixedPrice.symbol].decimals)} />
                 <CaptionAmount size="sm" formattedAmount={formattedPriceUSD} />
               </div>
               {/* </div> */}
@@ -346,7 +346,7 @@ const RaisingVault: NextPage = () => {
                     size="xl"
                     color="on_primary"
                     symbol={TokenSymbols.INJ}
-                    formattedAmount={simpleFormat(maxDepositAmount)}
+                    formattedAmount={formatNumber(maxDepositAmount, COIN_DICT[nft.fixedPrice.symbol].decimals)}
                   />
                   <div className="flex items-center justify-between">
                     <span className="Font_caption_md_num text-ground">{formatUSD(maxDepositAmountUSD)}</span>
