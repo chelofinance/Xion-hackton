@@ -11,7 +11,7 @@ export type AppApolloClients = {
 
 const NOMOS_GRAPHQL_JWT = process.env.NEXT_PUBLIC_HASURA_JWT_CONSTANTINE_3;
 const NOMOS_GRAPHQL_ENDPOINT = "https://testnet-fallback.hasura.app/v1/graphql";
-const TALIS_GRAPHQL_ENDPOINT = "https://injective.talis.art/api/graphql";
+const TALIS_GRAPHQL_ENDPOINT = "https://injective-staging.talis.art/api/graphql";
 
 const getApolloClient = (httpURI: string, jwt?: string): ApolloClient<NormalizedCacheObject> => {
   const httpLink = createHttpLink({

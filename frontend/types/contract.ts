@@ -1,4 +1,7 @@
 export type ContractsDict = {
+    nfts: {
+        collectionId: string;
+    };
     cw3FixedMultisig: {
         codeId: number;
         address: string;

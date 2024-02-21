@@ -7,7 +7,7 @@ export type NFTCollection = Readonly<{
   contractAddress: string;
   createdByAddress: string;
   floorPrice: {
-    value: number;
+    value: BigNumber;
     symbol: TokenSymbols;
   };
 }>;
@@ -18,11 +18,11 @@ export type NFT = Readonly<{
   nftName: string;
   description: string;
   imgSrc: string;
-  // contract: { 
+  // contract: {
   //   address: string;
   // };
   fixedPrice: {
-    value: number;
+    value: BigNumber;
     symbol: TokenSymbols;
   };
   ownerAddress: string;
@@ -50,18 +50,18 @@ export type RaisingNFT = NFT &
     chain: AllChains;
     participants: number;
     raisedAmount: number;
+    onSale: boolean;
   }>;
 
 /**
- * 
+ *
  * @todo replace with array of NFTs
  */
-export type NFTVault =
-  Readonly<{
-    nfts: readonly RaisingNFT[];
-    ica: ICA;
-    multisig: Multisig;
-  }>;
+export type NFTVault = Readonly<{
+  nfts: readonly RaisingNFT[];
+  ica: ICA;
+  multisig: Multisig;
+}>;
 
 export type MyNFTVault = NFTVault &
   Readonly<{

@@ -3,7 +3,7 @@ import Main from '@/components/Main';
 import Heading from '@/components/Heading';
 import NFTTumbnail from '@/components/NFTThumbnail';
 import Card from '@/components/Card';
-import {formatNumber, formatUSD} from '@/utils/number';
+import {formatNumber, formatUSD, simpleFormat} from '@/utils/number';
 import CoinAmount from '@/components/CoinAmount';
 import {AppChains, chainConfigMap, CHAIN_METADATA_DICT, INJECTIVE_ID, TokenSymbols} from '@/constants/app';
 import Button, {ButtonProps} from '@/components/Button';
@@ -24,9 +24,9 @@ import {injectiveClient, transferInjective} from '@/utils/injective';
 import {useRouter} from 'next/router';
 import PageLoader from '@/components/PageLoader';
 import Tag from '@/components/Tag';
-import { createIcaBuyMsg } from '@/utils/ica';
-import { createProposal, executeProposal } from '@/utils/multisig';
-import { useAbstraxionAccount, useAbstraxionSigningClient } from '@burnt-labs/abstraxion';
+import {createIcaBuyMsg} from '@/utils/ica';
+import {createProposal, executeProposal} from '@/utils/multisig';
+import {useAbstraxionAccount, useAbstraxionSigningClient} from '@burnt-labs/abstraxion';
 import {InjectiveSigningStargateClient} from '@injectivelabs/sdk-ts/dist/cjs/core/stargate';
 
 const CONFIG = chainConfigMap[AppChains.XION_TESTNET];
@@ -42,7 +42,7 @@ const createKeplrSigner = async () => {
 
 const RaisingVault: NextPage = () => {
   const router = useRouter();
-  const { address } = router.query;
+  const {address} = router.query;
 
   const nft = useRaisingNFTVault(address as string | undefined);
   const [tmpRaisedAmount, setTmpRaisedAmount] = useState<number>(nft?.raisedAmount ?? 0);
@@ -57,14 +57,17 @@ const RaisingVault: NextPage = () => {
 
   const form = useRef<HTMLFormElement>(null);
 
-  const { getOraclePrice } = useOraclePrice();
+  const {getOraclePrice} = useOraclePrice();
   const oraclePrice = nft ? getOraclePrice(nft.fixedPrice.symbol) : 0;
 
-  const maxDepositAmount = nft ? nft.fixedPrice.value - tmpRaisedAmount : 0;
-  const maxDepositAmountUSD = useMemo(() => new BigNumber(maxDepositAmount).times(oraclePrice), [maxDepositAmount, oraclePrice]);
+  const maxDepositAmount = nft ? Number(nft.fixedPrice.value) - tmpRaisedAmount : 0;
+  const maxDepositAmountUSD = useMemo(
+    () => new BigNumber(maxDepositAmount.toString()).times(oraclePrice),
+    [maxDepositAmount, oraclePrice]
+  );
   const minDepositAmount = 0.000000000000000001;
 
-  const [depositAmount, setDepositAmount] = useState<number>(maxDepositAmount);
+  const [depositAmount, setDepositAmount] = useState<number>(Number(simpleFormat(maxDepositAmount, 18)));
   const [isDepositAmountValid, setIsDepositAmountValid] = useState<boolean>(true);
 
   const onChange = useCallback((debouncedValue: string, isValid: boolean) => {
@@ -82,7 +85,7 @@ const RaisingVault: NextPage = () => {
     };
   }, [isDepositAmountValid]);
 
-  const priceUSD = useMemo(() => new BigNumber(nft?.fixedPrice.value ?? 0).times(oraclePrice), [oraclePrice]);
+  const priceUSD = useMemo(() => new BigNumber(nft?.fixedPrice.value.toString() ?? 0).times(oraclePrice), [oraclePrice]);
   const raisedAmountUSD = useMemo(() => new BigNumber(tmpRaisedAmount).times(oraclePrice), [oraclePrice, tmpRaisedAmount]);
 
   const formattedCompactPriceUSD = priceUSD.gte(1000) ? ` (${formatUSD(priceUSD, {compact: true, semiequate: true})})` : '';
@@ -112,41 +115,35 @@ const RaisingVault: NextPage = () => {
   );
 
   const goToNFTPage = useCallback(() => {
-    if (nft)
-      router.push(`/nft/${nft.collection.contractAddress}${nft.tokenId}`);
+    if (nft) router.push(`/nft/${nft.collection.contractAddress}${nft.tokenId}`);
   }, [nft]);
 
   const [userWallet] = useAtom(userWalletAtom);
 
   const myRaisingVaults = useMyNFTVaults(userWallet?.account.address);
 
-  const { myNFT, myVault } = useMemo<{
+  const {myNFT, myVault} = useMemo<{
     myNFT: RaisingNFT | undefined;
-    myVault: MyNFTVault | undefined
-  }>(
-    () => {
-      const myVault = myRaisingVaults.find((myVault) => myVault.nfts.find(nft => nft.tokenId === nft?.tokenId));
-      const myNFT = myVault?.nfts.find(nft => nft.tokenId === nft?.tokenId);
+    myVault: MyNFTVault | undefined;
+  }>(() => {
+    const myVault = myRaisingVaults.find((myVault) => myVault.nfts.find((nft) => nft.tokenId === nft?.tokenId));
+    const myNFT = myVault?.nfts.find((nft) => nft.tokenId === nft?.tokenId);
 
-      return {
-        myNFT,
-        myVault,
-      }
-
-    },
-    [myRaisingVaults, nft?.tokenId]
-  );
+    return {
+      myNFT,
+      myVault,
+    };
+  }, [myRaisingVaults, nft?.tokenId]);
 
   const myNFTPriceUSD = useMemo<BigNumber>(() => {
     if (!myNFT) return new BigNumber(0);
     const oraclePrice = getOraclePrice(myNFT.fixedPrice.symbol);
-    const priceUSD = new BigNumber(myNFT.fixedPrice.value).times(oraclePrice);
+    const priceUSD = new BigNumber(myNFT.fixedPrice.value.toString()).times(oraclePrice);
     return priceUSD;
   }, [myNFT]);
 
   const isRaisedAll = useMemo<boolean>(() => maxDepositAmount === 0, [maxDepositAmount]);
   const isOwningVault = useMemo<boolean>(() => nft?.ownerAddress === myVault?.ica.icaMultisigAddress, [nft, myVault]);
-
 
   const handleDeposit = async () => {
     try {
@@ -205,7 +202,7 @@ const RaisingVault: NextPage = () => {
         buyContract: nft.buyContractAddress,
         nftContract: nft.collection.contractAddress,
         tokenId: nft.tokenId,
-        cost: new BigNumber(nft.fixedPrice.value).shiftedBy(18).toString(),
+        cost: new BigNumber(nft.fixedPrice.value.toString()).shiftedBy(18).toString(),
       });
       const {proposal_id} = await createProposal({
         client,
@@ -229,9 +226,8 @@ const RaisingVault: NextPage = () => {
       console.log('ERR:', err);
     }
   };
-  
-  if (nft === undefined)
-    return <PageLoader />;
+
+  if (nft === undefined) return <PageLoader />;
 
   return (
     <Main className="flex flex-col items-stretch min-h-screen pt-app_header_height pb-page_bottom md:mx-page_x">
@@ -250,13 +246,7 @@ const RaisingVault: NextPage = () => {
                 label={`See in chain explorer`}
                 onClick={() => openExplorer(nft.collection.contractAddress)}
               />
-              <Button
-                type="outline"
-                size="xs"
-                iconType="external_link"
-                label={`See NFT details`}
-                onClick={goToNFTPage}
-              />
+              <Button type="outline" size="xs" iconType="external_link" label={`See NFT details`} onClick={goToNFTPage} />
               {/* <Button 
                 type="outline" 
                 size="xs"
@@ -316,27 +306,29 @@ const RaisingVault: NextPage = () => {
               <div className="h-6 flex flex-col justify-center Font_label_14px">Fixed price</div>
 
               <div className="flex flex-col gap-y-2 items-end">
-                <CoinAmount size="md" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(nft.fixedPrice.value)} />
+                <CoinAmount size="md" symbol={TokenSymbols.INJ} formattedAmount={simpleFormat(nft.fixedPrice.value)} />
                 <CaptionAmount size="sm" formattedAmount={formattedPriceUSD} />
               </div>
               {/* </div> */}
             </Card>
 
-            {isRaisedAll && <Card color="glass" className="flex items-stretch justify-between gap-x-4 p-4 text-body">
-              <div className="h-6 flex flex-col justify-center Font_label_14px">Vault balance</div>
+            {isRaisedAll && (
+              <Card color="glass" className="flex items-stretch justify-between gap-x-4 p-4 text-body">
+                <div className="h-6 flex flex-col justify-center Font_label_14px">Vault balance</div>
 
-              <div className="flex flex-col gap-y-2 items-end">
-                <CoinAmount size="md" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(tmpRaisedAmount)} />
-                <CaptionAmount size="sm" formattedAmount={formattedPriceUSD} />
-              </div>
-            </Card>}
+                <div className="flex flex-col gap-y-2 items-end">
+                  <CoinAmount size="md" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(tmpRaisedAmount)} />
+                  <CaptionAmount size="sm" formattedAmount={formattedPriceUSD} />
+                </div>
+              </Card>
+            )}
 
             {isRaisedAll && (
               <div className="flex justify-end items-center gap-x-4">
                 <Button
                   color="primary"
                   size="lg"
-                  label={myNFT ? isOwningVault ? 'Sell NFT' : 'Buy NFT' : 'Cannot join anymore'}
+                  label={myNFT ? (isOwningVault ? 'Sell NFT' : 'Buy NFT') : 'Cannot join anymore'}
                   iconType="arrow_forward"
                   className="w-full md:w-fit"
                   status={myNFT ? 'enabled' : 'disabled'}
@@ -345,21 +337,23 @@ const RaisingVault: NextPage = () => {
               </div>
             )}
 
-            {!isRaisedAll && <Card color="primary" className="flex items-stretch justify-between gap-x-4 p-4">
-              <div className="h-6 flex flex-col justify-center Font_label_14px">Deposit up to</div>
+            {!isRaisedAll && (
+              <Card color="primary" className="flex items-stretch justify-between gap-x-4 p-4">
+                <div className="h-6 flex flex-col justify-center Font_label_14px">Deposit up to</div>
 
-              <div className="flex flex-col gap-y-2 items-end">
-                <CoinAmount
-                  size="xl"
-                  color="on_primary"
-                  symbol={TokenSymbols.INJ}
-                  formattedAmount={formatNumber(maxDepositAmount)}
-                />
-                <div className="flex items-center justify-between">
-                  <span className="Font_caption_md_num text-ground">{formatUSD(maxDepositAmountUSD)}</span>
+                <div className="flex flex-col gap-y-2 items-end">
+                  <CoinAmount
+                    size="xl"
+                    color="on_primary"
+                    symbol={TokenSymbols.INJ}
+                    formattedAmount={simpleFormat(maxDepositAmount)}
+                  />
+                  <div className="flex items-center justify-between">
+                    <span className="Font_caption_md_num text-ground">{formatUSD(maxDepositAmountUSD)}</span>
+                  </div>
                 </div>
-              </div>
-            </Card>}
+              </Card>
+            )}
 
             {!isRaisedAll && !isDepositFormOpen && (
               <div className="flex justify-end items-center gap-x-4">

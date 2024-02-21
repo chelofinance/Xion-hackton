@@ -2,7 +2,7 @@ import type {NextPage} from 'next';
 import Main from '@/components/Main';
 import Heading from '@/components/Heading';
 import Card from '@/components/Card';
-import {formatNumber, formatUSD} from '@/utils/number';
+import {formatNumber, formatUSD, simpleFormat} from '@/utils/number';
 import {useCallback, useMemo, useRef, useState} from 'react';
 import useOraclePrice from '@/hooks/useOraclePrice';
 import BigNumber from 'bignumber.js';
@@ -23,7 +23,7 @@ import Tag from '@/components/Tag';
 import useProposals from '@/hooks/useProposals';
 import useAddMember from '@/hooks/useAddMember';
 import TextInput from '@/components/TextInput';
-import { MyNFTVault } from '@/types/asset';
+import {MyNFTVault} from '@/types/asset';
 import CoinAmount from '@/components/CoinAmount';
 import useDepositToVaultMultisig from '@/hooks/useDepositToVaultMultisig';
 import useBalanceOnInjective from '@/hooks/useBalanceOnInjective';
@@ -41,16 +41,16 @@ const MyVaults: NextPage = () => {
     // const [selectedVault, setSelectedVault] = useState<MyNFTVault | undefined>(() => myVaults[0]);
     const selectedVault = myVaults[0];
 
-    const { getBalance: getMyBalanceOnXion } = useBalanceOnXion(userWallet?.account.address);
+    const {getBalance: getMyBalanceOnXion} = useBalanceOnXion(userWallet?.account.address);
     const myINJBalance = getMyBalanceOnXion(TokenSymbols.INJ);
     const myXIONBalance = getMyBalanceOnXion(TokenSymbols.XION);
 
-    const { getBalance: getBalanceOnXion } = useBalanceOnXion(selectedVault?.ica.icaControllerAddress);
+    const {getBalance: getBalanceOnXion} = useBalanceOnXion(selectedVault?.ica.icaControllerAddress);
     const multisigBalance = getBalanceOnXion(TokenSymbols.INJ);
 
-    const { depositToVaultMultisig, isProcessing: isDepositToVaultProcessing } = useDepositToVaultMultisig();
+    const {depositToVaultMultisig, isProcessing: isDepositToVaultProcessing} = useDepositToVaultMultisig();
 
-    const { getBalance: getBalanceOnInjective } = useBalanceOnInjective(selectedVault?.ica.icaMultisigAddress);
+    const {getBalance: getBalanceOnInjective} = useBalanceOnInjective(selectedVault?.ica.icaMultisigAddress);
     const vaultBalance = getBalanceOnInjective(TokenSymbols.INJ);
 
     const myNFTVaultsValueUSD = useMemo(() => {
@@ -60,7 +60,7 @@ const MyVaults: NextPage = () => {
                 if (!isOwned) return accm;
 
                 const oraclePrice = getOraclePrice(nft.fixedPrice.symbol);
-                const priceUSD = new BigNumber(nft.fixedPrice.value).times(oraclePrice);
+                const priceUSD = new BigNumber(nft.fixedPrice.value.toString()).times(oraclePrice);
                 return accm.plus(priceUSD);
             }, new BigNumber(0));
 
@@ -71,7 +71,10 @@ const MyVaults: NextPage = () => {
         }, new BigNumber(0));
     }, [getOraclePrice, myVaults, userWallet?.account.address]);
 
-    const formattedTotalUSD = useMemo(() => formatUSD(vaultBalance.usd.plus(myNFTVaultsValueUSD)), [vaultBalance.usd, myNFTVaultsValueUSD]);
+    const formattedTotalUSD = useMemo(
+        () => formatUSD(vaultBalance.usd.plus(myNFTVaultsValueUSD)),
+        [vaultBalance.usd, myNFTVaultsValueUSD]
+    );
 
     const {proposals, voteProposal} = useProposals(selectedVault?.ica.icaControllerAddress ?? '');
 
@@ -85,7 +88,7 @@ const MyVaults: NextPage = () => {
     };
 
     /**
-     * 
+     *
      * @todo need additional floww to input deposit amount using form
      */
     const handleDepositToVault = useCallback(async () => {
@@ -119,9 +122,20 @@ const MyVaults: NextPage = () => {
                             <AccountAddress wallet={userWallet} />
 
                             <div className="space-y-1">
-                                <BalanceTotal formattedNumber={formatUSD(myINJBalance.usd.plus(myXIONBalance.usd))} isLoading={false} />
-                                <CoinAmount size="sm" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(myINJBalance.shifted, myINJBalance.decimals)} />
-                                <CoinAmount size="sm" symbol={TokenSymbols.XION} formattedAmount={formatNumber(myXIONBalance.shifted, myXIONBalance.decimals)} />
+                                <BalanceTotal
+                                    formattedNumber={formatUSD(myINJBalance.usd.plus(myXIONBalance.usd))}
+                                    isLoading={false}
+                                />
+                                <CoinAmount
+                                    size="sm"
+                                    symbol={TokenSymbols.INJ}
+                                    formattedAmount={formatNumber(myINJBalance.shifted, myINJBalance.decimals)}
+                                />
+                                <CoinAmount
+                                    size="sm"
+                                    symbol={TokenSymbols.XION}
+                                    formattedAmount={formatNumber(myXIONBalance.shifted, myXIONBalance.decimals)}
+                                />
                             </div>
                         </div>
                     </Card>
@@ -143,17 +157,18 @@ const MyVaults: NextPage = () => {
                                     </CopyHelper>
                                 </div>
 
-
                                 <ChainLabel chain={AllChains.INJECTIVE_TESTNET} size="sm" />
                             </div>
 
                             <div>
-
                                 <div className="space-y-1">
                                     <BalanceTotal formattedNumber={formatUSD(vaultBalance.usd)} isLoading={false} />
-                                    <CoinAmount size="sm" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(vaultBalance.shifted, vaultBalance.decimals)} />
+                                    <CoinAmount
+                                        size="sm"
+                                        symbol={TokenSymbols.INJ}
+                                        formattedAmount={formatNumber(vaultBalance.shifted, vaultBalance.decimals)}
+                                    />
                                 </div>
-
                             </div>
                         </Card>
 
@@ -174,24 +189,28 @@ const MyVaults: NextPage = () => {
                             <div className="flex justify-between items-center">
                                 <div className="space-y-1">
                                     <BalanceTotal formattedNumber={formatUSD(multisigBalance.usd)} isLoading={false} />
-                                    <CoinAmount size="sm" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(multisigBalance.shifted, multisigBalance.decimals)} />
+                                    <CoinAmount
+                                        size="sm"
+                                        symbol={TokenSymbols.INJ}
+                                        formattedAmount={formatNumber(multisigBalance.shifted, multisigBalance.decimals)}
+                                    />
                                 </div>
                             </div>
 
                             <div className="flex items-center justify-end gap-x-2">
-                                <Button 
-                                    size="sm" 
+                                <Button
+                                    size="sm"
                                     iconType="arrow_forward"
                                     label="Transfer to vault"
                                     status={multisigBalance.shifted.gt(0) ? 'enabled' : 'disabled'}
-                                    onClick={handleTransferToVault} 
+                                    onClick={handleTransferToVault}
                                 />
-                                <Button 
-                                    size="sm" 
-                                    label="Deposit" 
-                                    iconType="arrow_forward" 
+                                <Button
+                                    size="sm"
+                                    label="Deposit"
+                                    iconType="arrow_forward"
                                     status={isDepositToVaultProcessing ? 'processing' : 'enabled'}
-                                    onClick={handleDepositToVault} 
+                                    onClick={handleDepositToVault}
                                 />
                             </div>
                         </Card>
@@ -270,7 +289,7 @@ const MyVaults: NextPage = () => {
                                     href="raising-vault"
                                     nftVault={nft}
                                     amountLabel="Fixed price"
-                                    formattedAmount={formatNumber(nft.fixedPrice.value)}
+                                    formattedAmount={simpleFormat(nft.fixedPrice.value, 18)}
                                     vaultAddress={selectedVault.ica.icaMultisigAddress}
                                 />
                             ))}
