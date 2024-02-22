@@ -268,7 +268,7 @@ mod execute {
 mod tests {
     use super::*;
     use cosmwasm_std::{
-        from_binary,
+        from_json,
         testing::{mock_dependencies, mock_env, mock_info},
     };
     use cw_ownable::Ownership;
@@ -288,7 +288,7 @@ mod tests {
         // Instantiate the contract
         let res = instantiate(deps.as_mut(), env.clone(), info.clone(), msg).unwrap();
         let owner_query = query(deps.as_ref(), env.clone(), QueryMsg::Ownership {}).unwrap();
-        let ownership: Ownership<String> = from_binary(&owner_query).unwrap();
+        let ownership: Ownership<String> = from_json(&owner_query).unwrap();
 
         assert_eq!(0, res.messages.len());
         assert_eq!(ownership.owner.is_some(), true);
