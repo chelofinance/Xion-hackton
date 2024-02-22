@@ -10,8 +10,8 @@ pub const STATE: Item<ContractState> = Item::new("state");
 /// The mapping of the multisig contract addresses to the `cw-ica-controller`
 /// contract addresses that they own.
 pub const MULTISIG_ICA: Map<&Addr, Addr> = Map::new("multisig_ica");
-/// The mapping of the multisig contract addresses to the `cw-ica-controller`
-/// contract addresses that they own.
+/// The mapping of the multisig contract addresses to the `creator`/`member(ToDo)`
+/// multisig addresses that they own/member.
 pub const CREATOR_MULTISIG: Map<&Addr, Vec<Addr>> = Map::new("creator_multisig");
 /// The mapping of the `cw-ica-controller` contract addresses to the multisig
 /// contract addresses that own them. This is the reverse of [`MULTISIG_ICA`].

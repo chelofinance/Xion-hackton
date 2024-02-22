@@ -193,7 +193,7 @@ mod execute {
             )?;
 
         let mut state = state::STATE.load(deps.storage)?;
-        let mut created_by = state::CREATOR_MULTISIG.load(deps.storage, &info.sender)?;
+        let mut created_by = state::CREATOR_MULTISIG.load(deps.storage, &info.sender).unwrap_or_default();
 
         state.multisigs.push(multisig_addr.to_string());
         created_by.push(multisig_addr.clone());
