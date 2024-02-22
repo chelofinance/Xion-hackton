@@ -11,7 +11,7 @@ import Contracts from "@/config/contracts.config";
 import {
   createIcaMultisig, createProposal, executeProposal, getBalance,
   getIcaAccountAddress, getIcaControllerAddress, getProposalList,
-  voteProposal, addMember, getAbstractAddress, getMemberList
+  voteProposal, addMember, getAbstractAddress, getMemberList, getMultisigs
 } from "./utils";
 
 
@@ -25,6 +25,7 @@ export default function Page(): JSX.Element {
   const [loading, setLoading] = useState(false);
   const [abstractAddress, setAbstractAddress] = useState<string>("");
   const [memberAddresses, setMemberAddresses] = useState<string[]>([]);
+  const [multisigs, setMultisigs] = useState<string[]>([]);
   const [icaMultisigAddress, setIcaMultisigAddress] = useState<string>("");
   const [icaControllerAddress, setIcaControllerAddress] = useState<string>("");
   const [channelInitInfo, setChannelInitInfo] = useState<any>({});
@@ -57,10 +58,9 @@ export default function Page(): JSX.Element {
 
         const abstract_addr = await getAbstractAddress(client, account);
         setAbstractAddress(abstract_addr);
-        setMemberAddresses(abstract_addr ? [abstract_addr] : []);
+        setMemberAddresses(abstract_addr ? [abstract_addr] : []); // This is for new multisig creation
 
-        // For testing, let's hardcode the multisig. Ideally this should be the last created one.
-        // setIcaMultisigAddress(contracts.hardcodedIcaMultisig.address); // ToDo use local storage
+        getMultisigsHandler();
       }
     }
 
@@ -99,13 +99,7 @@ export default function Page(): JSX.Element {
   async function createIcaMultisigHandler() {
     setLoading(true);
     const ica_multisig_address_response = await createIcaMultisig(client, account, contracts.icaFactory.address, memberAddresses);
-    // if (ica_multisig_address_response?.ica_multisig_address) {
-    //   // To avoid Unauthorized error, we need to add the proxy as a member to the new multisig
-    //   // The reason to do this is that AbstraxionProvider needs a hardcoded contract address to grant execution permission.
-    //   // ToDo: This can be fixed by removing the proxy contract when Xion Abstraxion allow executing new contract addresses
-    //   const response = await addMember(client, account, ica_multisig_address_response.ica_multisig_address, contracts.proxyMultisig.address, "1")
-    //   console.log("response", response);
-    // }
+    getMembersListHandler();
     setIcaMultisigAddress(ica_multisig_address_response?.ica_multisig_address || "");
     setChannelInitInfo(ica_multisig_address_response?.channel_init_info || {});
     setLoading(false);
@@ -149,8 +143,11 @@ export default function Page(): JSX.Element {
     setLoading(false);
   }
 
-  async function getMultisigList() {
-    // ToDO - We need an indexer for this. Better to save on local storage
+  async function getMultisigsHandler() {
+    setLoading(true);
+    const response = await getMultisigs(client, account)
+    setMultisigs(response?.multisigs || [])
+    setLoading(false);
   }
 
   async function getProposalListHandler() {
@@ -261,6 +258,15 @@ export default function Page(): JSX.Element {
           {loading ? "LOADING..." : "Get Balances"}
         </Button>
       )}
+      {abstractAddress && (
+        <select className="info-container" value={icaMultisigAddress} onChange={(e) => setIcaMultisigAddress(e.target.value)}>
+          {multisigs.map((option, index) => (
+            <option className="info-content" key={index} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+      )}
       {icaMultisigAddress && (
         <Button
           disabled={loading}
@@ -333,7 +339,7 @@ export default function Page(): JSX.Element {
         <div className="info-container">
           <div className="info-content">
             <p className="info-description">
-              <span className="info-bold">Granter Addresses</span>
+              <span className="info-bold">Granter Address</span>
             </p>
             <span className="info-value">{abstractAddress}</span>
           </div>
@@ -343,7 +349,7 @@ export default function Page(): JSX.Element {
         <div className="info-container">
           <div className="info-content">
             <p className="info-description">
-              <span className="info-bold">Multisig Addresses</span>
+              <span className="info-bold">Current Multisig Address</span>
             </p>
             <span className="info-value">{icaMultisigAddress}</span>
           </div>
