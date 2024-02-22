@@ -1058,60 +1058,67 @@
     "@babel/helper-validator-identifier" "^7.22.5"
     to-fast-properties "^2.0.0"
 
-"@burnt-labs/abstraxion-core@1.0.0-alpha.30":
-  version "1.0.0-alpha.30"
-  resolved "https://registry.yarnpkg.com/@burnt-labs/abstraxion-core/-/abstraxion-core-1.0.0-alpha.30.tgz#d2655424d065245ab4d2876c7a30a438ad02e63b"
-  integrity sha512-ug9ZmB2BKAoS2CFGppsjQvlovGMXlsUvZ6FU3dOtXoXUv+BbATv9pzkp7VfdaXhztqhWon7xosxy8UOegsjPLA==
+"@burnt-labs/abstraxion-core@1.0.0-alpha.32":
+  version "1.0.0-alpha.32"
+  resolved "https://registry.yarnpkg.com/@burnt-labs/abstraxion-core/-/abstraxion-core-1.0.0-alpha.32.tgz#7f8a93d1f333eb8f45a4b87d5c1adeab2656f8ca"
+  integrity sha512-PVkKZTMaO3j1HSGpwvu9Ivb3bOyhBpVd7cwUurDYmJi3zt2xNh9nqDpH41F9EY+tCBDQHLR+Bx82whVl3mcDKw==
   dependencies:
-    "@burnt-labs/constants" "0.1.0-alpha.5"
-    "@burnt-labs/signers" "0.1.0-alpha.5"
-    "@cosmjs/cosmwasm-stargate" "^0.31.3"
-    "@cosmjs/proto-signing" "^0.31.3"
-    "@cosmjs/stargate" "^0.31.3"
-    "@cosmjs/tendermint-rpc" "^0.31.1"
-    cosmjs-types "^0.8.0"
+    "@burnt-labs/constants" "0.1.0-alpha.6"
+    "@burnt-labs/signers" "0.1.0-alpha.6"
+    "@cosmjs/cosmwasm-stargate" "^0.32.2"
+    "@cosmjs/proto-signing" "^0.32.2"
+    "@cosmjs/stargate" "^0.32.2"
+    "@cosmjs/tendermint-rpc" "^0.32.2"
+    cosmjs-types "^0.9.0"
     graz "^0.0.51"
     jose "^5.1.3"
 
-"@burnt-labs/abstraxion@^1.0.0-alpha.28":
-  version "1.0.0-alpha.30"
-  resolved "https://registry.yarnpkg.com/@burnt-labs/abstraxion/-/abstraxion-1.0.0-alpha.30.tgz#907e4bc622b4d7d2908d02835200b872f52a6c87"
-  integrity sha512-PQH1UcBSxiFjj5JDumXZnCy7DFuRcQwcNVpyTt67DcrdbFfL32VPc33Uhz9ACYF3iz7hgIapiJfcRjPPwPld+g==
+"@burnt-labs/abstraxion@^1.0.0-alpha.33":
+  version "1.0.0-alpha.33"
+  resolved "https://registry.yarnpkg.com/@burnt-labs/abstraxion/-/abstraxion-1.0.0-alpha.33.tgz#f2a9d9b126a90fec34e9842f72a12cc9bb51a391"
+  integrity sha512-xaH++sL1tWgfZ+MLuQk9TpwrJa7fPJN/Qnj34LSkHEJ4HBjHuQoEEuos6zKDbXw44DEP7yktC5CxovQI+90vMw==
   dependencies:
-    "@burnt-labs/abstraxion-core" "1.0.0-alpha.30"
-    "@burnt-labs/constants" "0.1.0-alpha.5"
-    "@burnt-labs/signers" "0.1.0-alpha.5"
+    "@burnt-labs/abstraxion-core" "1.0.0-alpha.32"
+    "@burnt-labs/constants" "0.1.0-alpha.6"
+    "@burnt-labs/signers" "0.1.0-alpha.6"
     "@burnt-labs/ui" "0.1.0-alpha.5"
-    "@cosmjs/cosmwasm-stargate" "^0.31.3"
-    "@cosmjs/proto-signing" "^0.31.3"
-    "@cosmjs/stargate" "^0.31.3"
-    "@cosmjs/tendermint-rpc" "^0.31.1"
+    "@cosmjs/amino" "^0.32.2"
+    "@cosmjs/cosmwasm-stargate" "^0.32.2"
+    "@cosmjs/crypto" "^0.32.2"
+    "@cosmjs/encoding" "^0.32.2"
+    "@cosmjs/proto-signing" "^0.32.2"
+    "@cosmjs/stargate" "^0.32.2"
+    "@cosmjs/tendermint-rpc" "^0.32.2"
+    "@cosmjs/utils" "^0.32.2"
+    "@keplr-wallet/cosmos" "^0.12.67"
+    "@keplr-wallet/crypto" "^0.12.69"
     "@types/react-dom" "^18.2.18"
-    cosmjs-types "^0.8.0"
+    cosmjs-types "^0.9.0"
     graz "^0.0.51"
     jose "^5.1.3"
 
-"@burnt-labs/constants@0.1.0-alpha.5":
-  version "0.1.0-alpha.5"
-  resolved "https://registry.yarnpkg.com/@burnt-labs/constants/-/constants-0.1.0-alpha.5.tgz#7d23c67803211a269d89eb55100028ea60c42f4e"
-  integrity sha512-UWS8ny025hsb7mKAA6spnYpGYRNdsue68TCJ+hST8Mo93+CGt4IjFmEsyFs7UzrYxvkcvE19T4o+wf2g5kJyCA==
+"@burnt-labs/constants@0.1.0-alpha.6":
+  version "0.1.0-alpha.6"
+  resolved "https://registry.yarnpkg.com/@burnt-labs/constants/-/constants-0.1.0-alpha.6.tgz#14f1465bc54657f7c7a17a0a84a5ecc8eb506657"
+  integrity sha512-k6DfdDFxxY4N72d6NoAPF7CXI4BNRnKvbsz+FdXQ+ws+4CzvrVuGBXhgpa1zs+PllXrouUnq+Dmds7Gz79vJOw==
 
-"@burnt-labs/signers@0.1.0-alpha.5":
-  version "0.1.0-alpha.5"
-  resolved "https://registry.yarnpkg.com/@burnt-labs/signers/-/signers-0.1.0-alpha.5.tgz#619fb082c3e969c0174ace16e9136558864212bf"
-  integrity sha512-WMgVfnPznsNOwOGzrnfhpqfZLNg85or75hKFQFYYc9wNdUBCbSQ9RqiYkpfEYwuP/z7M8u/BjyWujUBSXurEoA==
+"@burnt-labs/signers@0.1.0-alpha.6":
+  version "0.1.0-alpha.6"
+  resolved "https://registry.yarnpkg.com/@burnt-labs/signers/-/signers-0.1.0-alpha.6.tgz#3bd5046966017156f52e7efaa0d20ad3e1d5096a"
+  integrity sha512-g7mByKD0037EXa/Se9Q6WDm2YDrt4GbFcfLugIdEh1oT0XWu4gL8oTK3jR43Wfk6s6WAoqHfcxE0BuNehnwwqw==
   dependencies:
     "@apollo/client" "^3.8.8"
-    "@cosmjs/amino" "^0.31.3"
-    "@cosmjs/cosmwasm-stargate" "^0.31.3"
-    "@cosmjs/crypto" "^0.31.3"
+    "@cosmjs/amino" "^0.32.2"
+    "@cosmjs/cosmwasm-stargate" "^0.32.2"
+    "@cosmjs/crypto" "^0.32.2"
     "@cosmjs/math" "^0.31.3"
-    "@cosmjs/proto-signing" "^0.31.3"
-    "@cosmjs/stargate" "^0.31.3"
-    "@cosmjs/tendermint-rpc" "^0.31.3"
-    "@cosmjs/utils" "^0.31.3"
+    "@cosmjs/proto-signing" "^0.32.2"
+    "@cosmjs/stargate" "^0.32.2"
+    "@cosmjs/tendermint-rpc" "^0.32.2"
+    "@cosmjs/utils" "^0.32.2"
+    "@protobuf-ts/runtime" "^2.9.3"
     bech32 "^2.0.0"
-    cosmjs-types "^0.8.0"
+    cosmjs-types "^0.9.0"
     graphql "^16.8.0"
     react "^18.2.0"
     react-dom "^18.2.0"
@@ -1200,7 +1207,7 @@
     "@cosmjs/math" "^0.32.2"
     "@cosmjs/utils" "^0.32.2"
 
-"@cosmjs/cosmwasm-stargate@^0.31.0", "@cosmjs/cosmwasm-stargate@^0.31.3":
+"@cosmjs/cosmwasm-stargate@^0.31.0":
   version "0.31.3"
   resolved "https://registry.yarnpkg.com/@cosmjs/cosmwasm-stargate/-/cosmwasm-stargate-0.31.3.tgz#13066822f111832d57c2c5acc9e697ed389713f8"
   integrity sha512-Uv9TmCn3650gdFeZm7SEfUZF3uX3lfJfFhXOk6I2ZLr/FrKximnlb+vwAfZaZnWYvlA7qrKtHIjeRNHvT23zcw==
@@ -1546,7 +1553,7 @@
     readonly-date "^1.0.0"
     xstream "^11.14.0"
 
-"@cosmjs/tendermint-rpc@^0.31.0", "@cosmjs/tendermint-rpc@^0.31.1", "@cosmjs/tendermint-rpc@^0.31.3":
+"@cosmjs/tendermint-rpc@^0.31.0", "@cosmjs/tendermint-rpc@^0.31.3":
   version "0.31.3"
   resolved "https://registry.yarnpkg.com/@cosmjs/tendermint-rpc/-/tendermint-rpc-0.31.3.tgz#d1a2bc5b3c98743631c9b55888589d352403c9b3"
   integrity sha512-s3TiWkPCW4QceTQjpYqn4xttUJH36mTPqplMl+qyocdqk5+X5mergzExU/pHZRWQ4pbby8bnR7kMvG4OC1aZ8g==
@@ -2275,6 +2282,17 @@
     delay "^4.4.0"
     mobx "^6.1.7"
 
+"@keplr-wallet/common@0.12.70":
+  version "0.12.70"
+  resolved "https://registry.yarnpkg.com/@keplr-wallet/common/-/common-0.12.70.tgz#a001a037c567a9875470091a36f87d328b12ec43"
+  integrity sha512-XtVdlYEF5dMjwBugMsuRtq9DnoK9W+VoSYPdWoNcS3lG37m8/rB0Fs+hBW46hJ00Vx/4WqGMepARsvxIubit7w==
+  dependencies:
+    "@keplr-wallet/crypto" "0.12.70"
+    "@keplr-wallet/types" "0.12.70"
+    buffer "^6.0.3"
+    delay "^4.4.0"
+    mobx "^6.1.7"
+
 "@keplr-wallet/cosmos@^0.12.20":
   version "0.12.65"
   resolved "https://registry.yarnpkg.com/@keplr-wallet/cosmos/-/cosmos-0.12.65.tgz#b0605858830efc273e1ccb9943759ef0b945c37b"
@@ -2287,6 +2305,23 @@
     "@keplr-wallet/simple-fetch" "0.12.65"
     "@keplr-wallet/types" "0.12.65"
     "@keplr-wallet/unit" "0.12.65"
+    bech32 "^1.1.4"
+    buffer "^6.0.3"
+    long "^4.0.0"
+    protobufjs "^6.11.2"
+
+"@keplr-wallet/cosmos@^0.12.67":
+  version "0.12.70"
+  resolved "https://registry.yarnpkg.com/@keplr-wallet/cosmos/-/cosmos-0.12.70.tgz#9c1289ba2de2a055265e2e08957d6fdaa39c7c44"
+  integrity sha512-8UZSP/q8wvUs8sc9ap7JMNKEDMRvtKLJ7De7bp/VCSMlJoYiv94/eF2U7Z+cdw2b/r34qyZ+VHlrzPQf9fSM9A==
+  dependencies:
+    "@ethersproject/address" "^5.6.0"
+    "@keplr-wallet/common" "0.12.70"
+    "@keplr-wallet/crypto" "0.12.70"
+    "@keplr-wallet/proto-types" "0.12.70"
+    "@keplr-wallet/simple-fetch" "0.12.70"
+    "@keplr-wallet/types" "0.12.70"
+    "@keplr-wallet/unit" "0.12.70"
     bech32 "^1.1.4"
     buffer "^6.0.3"
     long "^4.0.0"
@@ -2306,10 +2341,32 @@
     elliptic "^6.5.3"
     sha.js "^2.4.11"
 
+"@keplr-wallet/crypto@0.12.70", "@keplr-wallet/crypto@^0.12.69":
+  version "0.12.70"
+  resolved "https://registry.yarnpkg.com/@keplr-wallet/crypto/-/crypto-0.12.70.tgz#37d04b27d4c60a2139250bd3ef5b12f0dae2c0b0"
+  integrity sha512-jw8/jqG8rgkDPWdjnrBOmL1+u+Gjy+gs3hFsODZDQAzV2LNskgH0ySbBo0okVEjl735bUCl7ljfuqlmNIfdGwg==
+  dependencies:
+    "@ethersproject/keccak256" "^5.5.0"
+    bip32 "^2.0.6"
+    bip39 "^3.0.3"
+    bs58check "^2.1.2"
+    buffer "^6.0.3"
+    crypto-js "^4.0.0"
+    elliptic "^6.5.3"
+    sha.js "^2.4.11"
+
 "@keplr-wallet/proto-types@0.12.65":
   version "0.12.65"
   resolved "https://registry.yarnpkg.com/@keplr-wallet/proto-types/-/proto-types-0.12.65.tgz#6bc81f4660d1b16aa205b8e2e97543da0cae4a90"
   integrity sha512-BDRq1YS67EiTwC80UR2cYw8tVySsrTeARuKlyIBa+2Yeg1QPTMOY4a9SSnUlmleRcAqJcPDfUXKK9d52K7lEQA==
+  dependencies:
+    long "^4.0.0"
+    protobufjs "^6.11.2"
+
+"@keplr-wallet/proto-types@0.12.70":
+  version "0.12.70"
+  resolved "https://registry.yarnpkg.com/@keplr-wallet/proto-types/-/proto-types-0.12.70.tgz#28297cc241541414170e852bcf723157a7038c71"
+  integrity sha512-RubyJhQ4eB90c4DjFQbEyY6uiWAKofi1rMcCTm2JXwKrIPjozzb2b4AeqkeRl4MxlN27DfQ1X69RugBalgev5A==
   dependencies:
     long "^4.0.0"
     protobufjs "^6.11.2"
@@ -2319,10 +2376,22 @@
   resolved "https://registry.yarnpkg.com/@keplr-wallet/simple-fetch/-/simple-fetch-0.12.65.tgz#1d58ccc569e135a2ac9085a4e076f9d4a2da41cb"
   integrity sha512-IPDvle4vqQ247abIWI4v933zr6XXVGpSg/Fg2Qaorj5YiLJfcLYBOWE5xQMTgmw2c07XqyEn+wDAGUJ+yxoydg==
 
+"@keplr-wallet/simple-fetch@0.12.70":
+  version "0.12.70"
+  resolved "https://registry.yarnpkg.com/@keplr-wallet/simple-fetch/-/simple-fetch-0.12.70.tgz#38548723a64d3026aa93c6d8b54aacd7ce0d779f"
+  integrity sha512-WYBIWGQgYpJe2sUnXcq2lWpMOS5+e5Q2abMpvaIVgQlwKJC3UVh9srXFYRVKOKfxPc1sc2WZhWztAsEsz33IKg==
+
 "@keplr-wallet/types@0.12.65":
   version "0.12.65"
   resolved "https://registry.yarnpkg.com/@keplr-wallet/types/-/types-0.12.65.tgz#f5a833412185bccac06603998e0a1e046fcc8f84"
   integrity sha512-p+a4pNbeQzw5cuLl2m34KUUu46a0SBgP1yxWFldDxDQIXsxfA7jBr+gtSsbYa/r8sK0dl+JkTI3KmDWQ26JUEg==
+  dependencies:
+    long "^4.0.0"
+
+"@keplr-wallet/types@0.12.70":
+  version "0.12.70"
+  resolved "https://registry.yarnpkg.com/@keplr-wallet/types/-/types-0.12.70.tgz#55cd9a79479156da0979558b78179781a0e9c9f1"
+  integrity sha512-oOZEkWVOj/GCrKpcJR8EQKp6SvWHHzuZAwVkRnxJc9UKaaOE6kiOJnu02dl9jLhTziK2/JqUbXOsF/Hopw7xOQ==
   dependencies:
     long "^4.0.0"
 
@@ -2332,6 +2401,15 @@
   integrity sha512-vKNxxpu6rXlQCVrnOH3OcpAKu7jHDQbFYEkx7aSSoCNAhY6tPs4B25uHt4LyhsEKUANyBZSyWhhSF4YxoDYIsw==
   dependencies:
     "@keplr-wallet/types" "0.12.65"
+    big-integer "^1.6.48"
+    utility-types "^3.10.0"
+
+"@keplr-wallet/unit@0.12.70":
+  version "0.12.70"
+  resolved "https://registry.yarnpkg.com/@keplr-wallet/unit/-/unit-0.12.70.tgz#a8207c81156582da73e3bb3fc60afb6f62c25273"
+  integrity sha512-yIfwa7R+z9hJdggGF0lcJN2JEfEP75XI1m3UCzL92P09r8QR5x0ZBxf3nsyt0BQIHlGEqhYaI5orWsJ1srNEQg==
+  dependencies:
+    "@keplr-wallet/types" "0.12.70"
     big-integer "^1.6.48"
     utility-types "^3.10.0"
 
@@ -2733,6 +2811,11 @@
   version "1.0.0-next.21"
   resolved "https://registry.yarnpkg.com/@polka/url/-/url-1.0.0-next.21.tgz#5de5a2385a35309427f6011992b544514d559aa1"
   integrity sha512-a5Sab1C4/icpTZVzZc5Ghpz88yQtGOyNqYXcZgOssB2uuAr+wF/MvN6bgtW32q7HHrvBki+BsZ0OuNv6EV3K9g==
+
+"@protobuf-ts/runtime@^2.9.3":
+  version "2.9.3"
+  resolved "https://registry.yarnpkg.com/@protobuf-ts/runtime/-/runtime-2.9.3.tgz#b906223debaf42c9bd281e985a9f5652729153a4"
+  integrity sha512-nivzCpg/qYD0RX2OmHOahJALb8ndjGmUhNBcTJ0BbXoqKwCSM6vYA+vegzS3rhuaPgbyC7Ec8idlnizzUfIRuw==
 
 "@protobufjs/aspromise@^1.1.1", "@protobufjs/aspromise@^1.1.2":
   version "1.1.2"

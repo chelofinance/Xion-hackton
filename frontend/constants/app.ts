@@ -82,8 +82,7 @@ export const chainConfigMap: Record<AppChains, ContractsDict> = {
 export const TEST_VAULT = chainConfigMap[AppChains.XION_TESTNET];
 
 export const abstraxionProviderConfig = {
-  contracts: [TEST_VAULT.icaFactory.address, TEST_VAULT.cw3FixedMultisig.address],
-  rpcUrl: 'https://testnet-rpc.xion-api.com:443',
+  contracts: [TEST_VAULT.icaFactory.address, TEST_VAULT.cw3FixedMultisig.address]
 };
 
 export const INJECTIVE_RPC = 'https://testnet.sentry.tm.injective.network:443';
