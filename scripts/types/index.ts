@@ -24,6 +24,7 @@ export type Arguments = {
   action: string;
 
   contract?: string;
+  hash?: string;
   funds?: string;
   codeId?: number;
   message?: object;

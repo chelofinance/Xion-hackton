@@ -11,11 +11,14 @@ export const loadMnemonic = (path: string) => {
   return mnemonic.replace("\n", "");
 };
 
-export const loadSignerFromMnemonic = (network: NetworkConfig): Promise<OfflineDirectSigner> => {
+export const loadSignerFromMnemonic = (
+  network: NetworkConfig,
+  mnemonic?: string
+): Promise<OfflineDirectSigner> => {
   if (!process.env.MNEMONIC) {
     throw new Error("MNEMONIC environment variable is not set. See .env.sample.");
   }
-  return DirectSecp256k1HdWallet.fromMnemonic(process.env.MNEMONIC as string, {
+  return DirectSecp256k1HdWallet.fromMnemonic(mnemonic || (process.env.MNEMONIC as string), {
     prefix: network.prefix,
   });
 };

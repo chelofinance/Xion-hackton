@@ -7,6 +7,8 @@ import create_channel from "./create_channel";
 import migrate from "./migrate";
 import instantiate from "./instantiate";
 import query from "./query";
+import events from "./events";
+import confio from "./confio";
 
 export const actions: Record<string, Action> = {
   store,
@@ -17,4 +19,6 @@ export const actions: Record<string, Action> = {
   propose_ica,
   create_channel,
   propose_ica_wasm,
+  events,
+  confio,
 };
