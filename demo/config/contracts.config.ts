@@ -19,8 +19,8 @@ export type SupportedNetworks = "xion-testnet";
 const contracts: Record<SupportedNetworks, Contracts> = {
     "xion-testnet": {
         channelOpenInitOptions: {
-            connectionId: "connection-43",
-            counterpartyConnectionId: "connection-211"
+            connectionId: "connection-45",
+            counterpartyConnectionId: "connection-213"
         },
         cw3FixedMultisig: {
             codeId: "246"
