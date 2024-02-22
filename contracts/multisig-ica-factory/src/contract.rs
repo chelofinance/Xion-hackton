@@ -125,7 +125,7 @@ fn query_controller_by_multisig(deps: Deps, multisig: Addr) -> StdResult<ICACont
 }
 
 fn query_multisig_by_creator(deps: Deps, creator: Addr) -> StdResult<MultisigByCreator> {
-    let multisigs = state::CREATOR_MULTISIG.load(deps.storage, &creator)?;
+    let multisigs = state::CREATOR_MULTISIG.load(deps.storage, &creator).unwrap_or_default();
     let res_controllers: Result<Vec<Addr>, _> = multisigs
         .iter()
         .map(|sig| state::MULTISIG_ICA.load(deps.storage, sig))
