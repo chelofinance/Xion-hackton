@@ -4,7 +4,7 @@ import {v4 as uuidv4} from 'uuid';
 import {produceProposal} from './propose';
 import { SendTxResult } from '@/types/tx';
 import { GetProposalsResponse } from './xion';
-import { AppChains, chainConfigMap, channelOpenInitOptions } from '@/constants/app';
+import { AppChains, INJ_ICA_ACCOUNT_PLACEHOLDER, chainConfigMap, channelOpenInitOptions } from '@/constants/app';
 
 
 export async function getIcaAccountAddress(client: any, ica_controller_address: string) {
@@ -116,6 +116,12 @@ export async function createProposal({
     icaMultisigAddress: string;
     icaControllerAddress: string;
 }) {
+
+    if (!icaControllerAddress) {
+        // This is to avoid any proposal creation errors. ToDo - fix this properly
+        icaControllerAddress = INJ_ICA_ACCOUNT_PLACEHOLDER
+    }
+
     const proposalMsg = {
         propose: produceProposal(injectiveMsg, icaControllerAddress),
     };
