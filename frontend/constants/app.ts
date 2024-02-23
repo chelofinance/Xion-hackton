@@ -228,15 +228,6 @@ export const RAISING_NFTS_DICT: Record<string, RaisingNFT> = {
   },
 };
 
-export const TEST_VAULT = {
-  icaController: {
-    address: 'xion1az60z73mezhcyxajgucvlcs3kj72fzwu2l2m5qxmsccs6vmnappqys5pjj'
-  },
-  icaAccount: {
-    address: 'inj1tfvcvjkpw02eeldx2lhtw0xysg3msehyarqe5lwygf3dk40vt9uqhuzlg3'
-  }
-};
-
 export enum ProposalStatus {
   Pending = 'pending',
   Open = 'open',

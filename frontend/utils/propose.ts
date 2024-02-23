@@ -53,7 +53,7 @@ export const produceProposal = (msg: EncodeObject, icaControllerAddress: string)
           },
         },
       ],
-      packet_memo: 'packet meme by 0xR360',
+      packet_memo: "Created by Chelo",
     },
   };
 
@@ -71,5 +71,6 @@ export const produceProposal = (msg: EncodeObject, icaControllerAddress: string)
         },
       },
     ],
+    sender: "",// Will be updated later
   };
 };
