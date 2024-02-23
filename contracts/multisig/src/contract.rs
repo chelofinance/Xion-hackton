@@ -16,7 +16,7 @@ use cw_storage_plus::Bound;
 use cw_utils::{Expiration, ThresholdResponse};
 
 use crate::error::ContractError;
-use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg, AddMembership};
+use crate::msg::{AddMembershipMsg, ExecuteMsg, InstantiateMsg, QueryMsg};
 use crate::state::{next_id, Config, BALLOTS, CONFIG, PROPOSALS, VOTERS};
 
 // version info for migration info
@@ -84,7 +84,13 @@ pub fn execute(
             address,
             fee,
             sender,
-        } => add_member(deps, env, validate_sender(&info, &cfg, sender), address, fee),
+        } => add_member(
+            deps,
+            env,
+            validate_sender(&info, &cfg, sender),
+            address,
+            fee,
+        ),
         ExecuteMsg::Propose {
             title,
             description,
@@ -141,7 +147,7 @@ fn add_member(
 
     //execute add_membership function in cfg.ica_factory
     let ica_factory = CONFIG.load(deps.storage)?.ica_factory;
-    let add_member_msg = AddMembership {
+    let add_member_msg = AddMembershipMsg::AddMembership {
         multisig_addr: env.contract.address,
         member_addr: address.clone(),
     };

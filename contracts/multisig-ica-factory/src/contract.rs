@@ -9,7 +9,7 @@ use cosmwasm_std::{
 use crate::error::ContractError;
 use crate::msg::{
     CallbacksResponses, ExecuteMsg, ICAControllerResponse, InstantiateMsg, MultisigByCreator,
-        MultisigByMember ,   MultisigsResponses, QueryMsg,
+    MultisigByMember, MultisigsResponses, QueryMsg,
 };
 use crate::state;
 
@@ -77,11 +77,10 @@ pub fn execute(
             cw_ica_controller_code_id,
             proxy,
         ),
-        ExecuteMsg::AddMembership { multisig_addr, member_addr } => execute::add_membership(
-            deps,
+        ExecuteMsg::AddMembership {
             multisig_addr,
             member_addr,
-        ),
+        } => execute::add_membership(deps, multisig_addr, member_addr),
         ExecuteMsg::UpdateOwnership(action) => {
             cw_ownable::update_ownership(deps, &env.block, &info.sender, action)?;
             Ok(Response::default())
@@ -133,12 +132,14 @@ fn query_controller_by_multisig(deps: Deps, multisig: Addr) -> StdResult<ICACont
 }
 
 fn query_multisig_by_creator(deps: Deps, creator: Addr) -> StdResult<MultisigByCreator> {
-    let multisigs = state::CREATOR_MULTISIG.load(deps.storage, &creator).unwrap_or_default();
+    let multisigs = state::CREATOR_MULTISIG
+        .load(deps.storage, &creator)
+        .unwrap_or_default();
     let res_controllers: Result<Vec<Addr>, _> = multisigs
         .iter()
         .map(|sig| state::MULTISIG_ICA.load(deps.storage, sig))
         .collect();
-    let controllers = res_controllers.unwrap();
+    let controllers = res_controllers.unwrap_or_default();
 
     Ok(MultisigByCreator {
         controllers,
@@ -147,12 +148,14 @@ fn query_multisig_by_creator(deps: Deps, creator: Addr) -> StdResult<MultisigByC
 }
 
 fn query_multisig_by_member(deps: Deps, member: Addr) -> StdResult<MultisigByMember> {
-    let multisigs = state::MEMBER_MULTISIG.load(deps.storage, &member).unwrap_or_default();
+    let multisigs = state::MEMBER_MULTISIG
+        .load(deps.storage, &member)
+        .unwrap_or_default();
     let res_controllers: Result<Vec<Addr>, _> = multisigs
         .iter()
         .map(|sig| state::MULTISIG_ICA.load(deps.storage, sig))
         .collect();
-    let controllers = res_controllers.unwrap();
+    let controllers = res_controllers.unwrap_or_default();
 
     Ok(MultisigByMember {
         controllers,
@@ -216,7 +219,9 @@ mod execute {
             )?;
 
         let mut state = state::STATE.load(deps.storage)?;
-        let mut created_by = state::CREATOR_MULTISIG.load(deps.storage, &info.sender).unwrap_or_default();
+        let mut created_by = state::CREATOR_MULTISIG
+            .load(deps.storage, &info.sender)
+            .unwrap_or_default();
 
         state.multisigs.push(multisig_addr.to_string());
         created_by.push(multisig_addr.clone());
@@ -224,7 +229,9 @@ mod execute {
         state::MULTISIG_ICA.save(deps.storage, &multisig_addr, &cw_ica_controller_address)?;
         state::CREATOR_MULTISIG.save(deps.storage, &info.sender, &created_by)?;
 
-        let mut member_of = state::MEMBER_MULTISIG.load(deps.storage, &info.sender).unwrap_or_default();
+        let mut member_of = state::MEMBER_MULTISIG
+            .load(deps.storage, &info.sender)
+            .unwrap_or_default();
         member_of.push(multisig_addr.clone());
         state::MEMBER_MULTISIG.save(deps.storage, &info.sender, &member_of)?;
 
@@ -296,8 +303,9 @@ mod execute {
         multisig_addr: Addr,
         member_addr: Addr,
     ) -> Result<Response, ContractError> {
-
-        let mut member_of = state::MEMBER_MULTISIG.load(deps.storage, &member_addr).unwrap_or_default();
+        let mut member_of = state::MEMBER_MULTISIG
+            .load(deps.storage, &member_addr)
+            .unwrap_or_default();
         member_of.push(multisig_addr.clone());
         state::MEMBER_MULTISIG.save(deps.storage, &member_addr, &member_of)?;
 

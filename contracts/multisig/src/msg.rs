@@ -18,12 +18,13 @@ pub struct Voter {
     pub weight: u64,
 }
 
-
 // To update the members list so that we can query later
 #[cw_serde]
-pub struct AddMembership {
-    pub multisig_addr: Addr,
-    pub member_addr: Addr,
+pub enum AddMembershipMsg {
+    AddMembership {
+        multisig_addr: Addr,
+        member_addr: Addr,
+    },
 }
 
 // TODO: add some T variants? Maybe good enough as fixed Empty for now

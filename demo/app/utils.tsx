@@ -315,11 +315,11 @@ export async function getMultisigs(client: any, account: any) {
   try {
     console.log("msg", {
       factory: contracts.icaFactory.address,
-      msg: { query_multisig_by_creator: account.bech32Address }
+      msg: { query_multisig_by_member: account.bech32Address }
     })
     const multisig_list = await client?.queryContractSmart(
       contracts.icaFactory.address,
-      { query_multisig_by_creator: account.bech32Address }
+      { query_multisig_by_member: account.bech32Address }
     );
     console.log("multisig_list", multisig_list)
     return multisig_list;
