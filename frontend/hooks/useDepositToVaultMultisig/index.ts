@@ -11,7 +11,6 @@ const useDepositToVaultMultisig = () => {
 
     const depositToVaultMultisig = useCallback(
         async (vault: MyVault, args: Omit<HandleDepositArgs, 'recipientAddress'>) => {
-            console.log('depositToVaultMultisig');
             if (!abstraxionClient) {
                 console.log('Signing client not found');
                 return null;

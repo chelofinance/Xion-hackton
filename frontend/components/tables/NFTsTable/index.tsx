@@ -13,7 +13,10 @@ import useOraclePrice from '@/hooks/useOraclePrice';
 import BigNumber from 'bignumber.js';
 import {useRouter} from 'next/router';
 import useRaisingNFTVaults from '@/hooks/useRaisingNFTVaults';
-import {COIN_DICT} from '@/constants/app';
+import {COIN_DICT, TokenSymbols} from '@/constants/app';
+import useMyVaults from '@/hooks/useMyVaults';
+import {useAtom} from 'jotai';
+import {userWalletAtom} from '@/store/states';
 
 type NFTsTableRow = {
   id: string;
@@ -32,8 +35,12 @@ type NFTsTableProps = {
   tooltipLayer: TooltipLayer;
 };
 
+const coin = COIN_DICT[TokenSymbols.INJ];
+
 const NFTsTable = ({className = '', tooltipLayer}: NFTsTableProps) => {
   const {getOraclePrice} = useOraclePrice();
+  const [userWallet] = useAtom(userWalletAtom);
+  const {myVaults, updateMyVaults} = useMyVaults(userWallet?.account.address);
   const nfts = useRaisingNFTVaults();
 
   const rows = useMemo<readonly NFTsTableRow[]>(() => {
@@ -49,8 +56,7 @@ const NFTsTable = ({className = '', tooltipLayer}: NFTsTableProps) => {
 
           const oraclePrice = getOraclePrice(item.fixedPrice.symbol);
 
-          const price = item.fixedPrice.value.toNumber();
-          //  Number(simpleFormat(item.fixedPrice.value, COIN_DICT[item.fixedPrice.symbol].decimals));
+          const price = item.fixedPrice.value.div(10 ** coin.decimals).toNumber(); //price must be rounded down given decimals
           const priceUSD = new BigNumber(price).times(oraclePrice);
           const priceFormatted = (
             <div className="flex flex-col gap-y-1 items-end">
@@ -92,7 +98,8 @@ const NFTsTable = ({className = '', tooltipLayer}: NFTsTableProps) => {
 
   const onRowClick = useCallback(
     (row: NFTsTableRow) => {
-      router.push(`/raising-vault/${row.id}`);
+      const vault = router.query.vault || myVaults.length > 0 ? myVaults[0].multisigAddress : '';
+      router.push(`/raising-vault/${row.id}?vault=${vault}`);
     },
     [router]
   );

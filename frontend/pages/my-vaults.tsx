@@ -15,7 +15,7 @@ import CopyHelper from '@/components/CopyHelper';
 import {shortenAddress} from '@/utils/text';
 import Button from '@/components/Button';
 import {useRouter} from 'next/router';
-import {AllChains, PROPOSAL_STATUS_LABEL_DICT, ProposalStatus, TEST_VAULT, TokenSymbols} from '@/constants/app';
+import {AllChains, PROPOSAL_STATUS_LABEL_DICT, ProposalStatus, TokenSymbols} from '@/constants/app';
 import Tag from '@/components/Tag';
 import useProposals from '@/hooks/useProposals';
 import useAddMember from '@/hooks/useAddMember';
@@ -26,7 +26,7 @@ import useBalanceOnInjective from '@/hooks/useBalanceOnInjective';
 import useBalanceOnXion from '@/hooks/useBalanceOnXion';
 import useCreateVault from '@/hooks/useCreateVault';
 import useMyVaults from '@/hooks/useMyVaults';
-import { MyVault } from '@/types/asset';
+import {MyVault} from '@/types/asset';
 import AmountInput from '@/components/form-presets/AmountInput';
 
 const MyVaults: NextPage = () => {
@@ -35,9 +35,9 @@ const MyVaults: NextPage = () => {
     const [userWallet] = useAtom(userWalletAtom);
     const {getOraclePrice} = useOraclePrice();
 
-    const { myVaults, updateMyVaults } = useMyVaults(userWallet?.account.address);
+    const {myVaults, updateMyVaults} = useMyVaults(userWallet?.account.address);
 
-    const [selectedVault, setSelectedVault] = useState<MyVault | undefined>();
+    const [selectedVault, setSelectedVault] = useState<MyVault>();
 
     const fallbackVault = selectedVault ?? myVaults[0];
 
@@ -76,13 +76,12 @@ const MyVaults: NextPage = () => {
         [vaultBalance.usd, myNFTVaultsValueUSD]
     );
 
-    const { voteProposal} = useProposals(fallbackVault?.icaControllerAddress ?? '');
+    const {voteProposal} = useProposals(fallbackVault?.icaControllerAddress ?? '');
 
     const {addMember} = useAddMember(fallbackVault?.icaControllerAddress ?? '');
 
     const addMemberForm = useRef<HTMLFormElement>(null);
     const depositForm = useRef<HTMLFormElement>(null);
-
 
     const [newMemberAddress, setNewMemberAddress] = useState<string>('');
     const onChangeNewMemberAddress = (debouncedValue: string) => {
@@ -93,7 +92,7 @@ const MyVaults: NextPage = () => {
 
     const [depositAmount, setDepositAmount] = useState<number>(0);
     const [isDepositAmountValid, setIsDepositAmountValid] = useState<boolean>(true);
-  
+
     const onChangeDepositAmount = useCallback((debouncedValue: string, isValid: boolean) => {
       setIsDepositAmountValid(isValid);
   
@@ -115,18 +114,15 @@ const MyVaults: NextPage = () => {
         if (result?.isSuccess) {
             await updateBalanceOnXion();
         }
-    }, [depositToVaultMultisig, fallbackVault, userWallet]);
+    }, [depositToVaultMultisig, depositAmount, fallbackVault, userWallet]);
 
-    const getDepositAmountErrorMsg = useCallback(
-        (value: string) => {
-          if (value === '' || value === '0') return 'Enter amount';
-    
-          const inputAmount = parseFloat(value);
-          if (isNaN(inputAmount)) return 'Invalid number';
-          return null;
-        },
-        []
-      );
+    const getDepositAmountErrorMsg = useCallback((value: string) => {
+        if (value === '' || value === '0') return 'Enter amount';
+
+        const inputAmount = parseFloat(value);
+        if (isNaN(inputAmount)) return 'Invalid number';
+        return null;
+    }, []);
 
     const handleMergeBalance = useCallback(async () => {
         //
@@ -341,34 +337,6 @@ const MyVaults: NextPage = () => {
 
 
 
-                        {/* <div className="flex flex-col gap-y-2">
-                            <CopyHelper toCopy={fallbackVault.ica.icaMultisigAddress} className="text-body">
-                                <div className="flex items-center gap-x-4">
-                                    <div className="flex items-center">
-                                        <div className="w-[132px] Font_caption_xs mr-4 text-left">Vault address (ICA)</div>
-                                        <ChainLabel logoOnly chain={AllChains.INJECTIVE_TESTNET} />
-                                    </div>
-
-                                    <span className="w-fit truncate Font_button_md">
-                                        {shortenAddress(fallbackVault.ica.icaMultisigAddress, 4, 4)}
-                                    </span>
-                                </div>
-                            </CopyHelper>
-
-                            <CopyHelper toCopy={fallbackVault.ica.icaControllerAddress} className="text-body">
-                                <div className="flex items-center gap-x-4">
-                                    <div className="flex items-center">
-                                        <div className="w-[132px] Font_caption_xs mr-4 text-left">Multisig address</div>
-                                        <ChainLabel logoOnly chain={AllChains.XION_TESTNET} />
-                                    </div>
-
-                                    <span className="w-fit truncate Font_button_md">
-                                        {shortenAddress(fallbackVault.ica.icaControllerAddress, 4, 4)}
-                                    </span>
-                                </div>
-                            </CopyHelper>
-                        </div> */}
-
                         <section className="space-y-4 mt-4">
                             <Heading tagName="h4">Buy Proposals</Heading>
 
@@ -392,12 +360,16 @@ const MyVaults: NextPage = () => {
                                             <Button
                                                 color="on_primary"
                                                 label="No"
-                                                onClick={() => voteProposal(fallbackVault.multisigAddress, proposal.proposal.id, true)}
+                                                onClick={() =>
+                                                    voteProposal(fallbackVault.multisigAddress, proposal.proposal.id, true)
+                                                }
                                             />
                                             <Button
                                                 color="on_primary"
                                                 label="Yes"
-                                                onClick={() => voteProposal(fallbackVault.multisigAddress, proposal.proposal.id, true)}
+                                                onClick={() =>
+                                                    voteProposal(fallbackVault.multisigAddress, proposal.proposal.id, true)
+                                                }
                                             />
                                         </div>
                                     )}

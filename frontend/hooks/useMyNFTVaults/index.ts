@@ -1,4 +1,4 @@
-import {AppChains, chainConfigMap, NFT_VAULTS} from '@/constants/app';
+import {AppChains, chainConfigMap, INJ_ICA_ACCOUNT_PLACEHOLDER} from '@/constants/app';
 import type {MyNFTVault, NFTVault, ICA, Multisig, RaisingNFT} from '@/types/asset';
 import {useAbstraxionAccount, useAbstraxionSigningClient} from '@burnt-labs/abstraxion';
 import {useCallback, useEffect, useState} from 'react';
@@ -34,7 +34,6 @@ type ControllerResponse = {
  * @todo query the NFT vaults which includes me as a member
  */
 const useMyNFTVaults = (): readonly MyNFTVault[] => {
-    // const [testVault] = useAtom(testVaultAtom);
     const [myVaults, setMyVaults] = useState<MyNFTVault[]>([]);
     const {client} = useAbstraxionSigningClient();
     const {data: account, isConnected} = useAbstraxionAccount();
@@ -100,7 +99,7 @@ const useMyNFTVaults = (): readonly MyNFTVault[] => {
 
         const ica: ICA[] = controllerProps.map((cont, i) => ({
             icaMultisigAddress: cont.controller,
-            icaControllerAddress: cont.ica_info || 'relaying',
+            icaControllerAddress: cont.ica_info || INJ_ICA_ACCOUNT_PLACEHOLDER,
         }));
         console.log({ica});
         const multisig: Multisig[] = vaultProps.map((cont) => ({

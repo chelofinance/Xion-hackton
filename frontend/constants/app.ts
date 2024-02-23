@@ -228,92 +228,6 @@ export const RAISING_NFTS_DICT: Record<string, RaisingNFT> = {
   },
 };
 
-    //   codeId: 50,
-    //   address: 'xion105h6k7cv3kvt4vxeh5l86x9wnqudjl8wlx87ywwqzqcpa24m6fzsc4d2y0', //placeholder addr
-    // },
-    // icaController: {
-    //   address: 'xion1az60z73mezhcyxajgucvlcs3kj72fzwu2l2m5qxmsccs6vmnappqys5pjj',
-    // },
-    // icaAccount: {
-    //   address: 'inj1tfvcvjkpw02eeldx2lhtw0xysg3msehyarqe5lwygf3dk40vt9uqhuzlg3',
-
-export const TEST_VAULT = {
-  icaController: {
-    address: 'xion1az60z73mezhcyxajgucvlcs3kj72fzwu2l2m5qxmsccs6vmnappqys5pjj'
-  },
-  icaAccount: {
-    address: 'inj1tfvcvjkpw02eeldx2lhtw0xysg3msehyarqe5lwygf3dk40vt9uqhuzlg3'
-  }
-};
-
-export const EMPTY_NFT_VAULT: NFTVault = {
-  nfts: [],
-  ica: {
-    icaMultisigAddress: 'injf1414o124802494hgdjfidhfdjfhqye01911881',
-    icaControllerAddress: TEST_VAULT.icaController.address,
-  },
-  multisig: {
-    voters: [
-      {
-        addr: 'xion1vmk42e8fjzdqxjvkrz9gdcxxp4xpxhey6f03xykfqzw0mqxwy4qs8lr8mn',
-        weight: 1,
-        share: 0.2,
-      },
-      {
-        addr: 'xion1mg6m7kqmnc4ecx7grhm4mj2wvzdm44v3p5k8sn4p3qc2q8cda2uq4jcmt8',
-        weight: 1,
-        share: 0.45,
-      },
-      {
-        addr: 'xion14710481048488481084fdjkfjdkl',
-        weight: 1,
-        share: 0.15,
-      },
-      {
-        addr: 'xionwf1kf8080f2fjdkflskfdlsdkflskdsl',
-        weight: 1,
-        share: 0.4,
-      },
-    ],
-    govThreshold: 0.8,
-  },
-};
-
-export const NFT_VAULTS: readonly NFTVault[] = [
-  {
-    nfts: RAISING_NFTS,
-    ica: {
-      icaMultisigAddress: TEST_VAULT.icaAccount.address,
-      icaControllerAddress: TEST_VAULT.icaController.address,
-    },
-    multisig: {
-      voters: [
-        {
-          addr: 'xion1vmk42e8fjzdqxjvkrz9gdcxxp4xpxhey6f03xykfqzw0mqxwy4qs8lr8mn',
-          weight: 1,
-          share: 0.2,
-        },
-        {
-          addr: 'xion1mg6m7kqmnc4ecx7grhm4mj2wvzdm44v3p5k8sn4p3qc2q8cda2uq4jcmt8',
-          weight: 1,
-          share: 0.45,
-        },
-        {
-          addr: 'xion14710481048488481084fdjkfjdkl',
-          weight: 1,
-          share: 0.15,
-        },
-        {
-          addr: 'xionwf1kf8080f2fjdkflskfdlsdkflskdsl',
-          weight: 1,
-          share: 0.4,
-        },
-      ],
-      govThreshold: 0.8,
-    },
-  },
-];
-
 export enum ProposalStatus {
   Pending = 'pending',
   Open = 'open',
@@ -329,3 +243,8 @@ export const PROPOSAL_STATUS_LABEL_DICT: Record<ProposalStatus, string> = {
   [ProposalStatus.Passed]: 'Passed',
   [ProposalStatus.Executed]: 'Executed',
 };
+
+
+// Due to unstable relayers, ICA Account address could be empty when creating a proposal.
+// So, to avoid errors in demo, we use a placeholder address.
+export const INJ_ICA_ACCOUNT_PLACEHOLDER = 'inj1r8x942pe0sf7dd9cpr36szzaflpleav5qx59ke';
