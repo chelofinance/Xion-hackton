@@ -13,7 +13,7 @@ import useOraclePrice from '@/hooks/useOraclePrice';
 import BigNumber from 'bignumber.js';
 import {useRouter} from 'next/router';
 import useRaisingNFTVaults from '@/hooks/useRaisingNFTVaults';
-import { COIN_DICT } from '@/constants/app';
+import {COIN_DICT} from '@/constants/app';
 
 type NFTsTableRow = {
   id: string;
@@ -86,7 +86,7 @@ const NFTsTable = ({className = '', tooltipLayer}: NFTsTableProps) => {
           };
         }) ?? []
     );
-  }, [nfts]);
+  }, [nfts.length]);
 
   const router = useRouter();
 

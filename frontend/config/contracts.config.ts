@@ -11,21 +11,21 @@ export type Contracts = {
     };
 };
 
-export type SupportedNetworks = "xion-testnet";
+export type SupportedNetworks = 'xion-testnet';
 
 const contracts: Record<SupportedNetworks, Contracts> = {
-    "xion-testnet": {
+    'xion-testnet': {
         channelOpenInitOptions: {
-            connectionId: "connection-42",
-            counterpartyConnectionId: "connection-210"
+            connectionId: 'connection-49',
+            counterpartyConnectionId: 'connection-214',
         },
         icaFactory: {
-            address: "xion1l33tz82g5n6kq6gtceyjhsk0fcqqrytwr5dzglaq5pulq96np4vqm6k8ce"
+            address: 'xion12yetpccljlw9fa3emp7nn0cl4xapc99fym6pns4wjknsxupxe2aqgxlvdd',
         },
         hardcodedIcaMultisig: {
-            address: "xion1t405m8nw4c8qcgheunpt73mvlj0t5n4mahrc970yyw7evy63g8ts9f9zqs"
-        }
-    }
-}
+            address: 'xion1t405m8nw4c8qcgheunpt73mvlj0t5n4mahrc970yyw7evy63g8ts9f9zqs',
+        },
+    },
+};
 
 export default contracts;

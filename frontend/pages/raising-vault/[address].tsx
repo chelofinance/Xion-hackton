@@ -14,7 +14,7 @@ import ChainLabel from '@/components/ChainLabel';
 import AmountInput from '@/components/form-presets/AmountInput';
 import useOraclePrice from '@/hooks/useOraclePrice';
 import BigNumber from 'bignumber.js';
-import useRaisingNFTVault from '@/hooks/useRaisingNFTVault';
+import useRaisingNFTVault from '@/hooks/useRaisingNFTVaults';
 import useMyNFTVaults from '@/hooks/useMyNFTVaults';
 import {MyNFTVault, NFT, RaisingNFT} from '@/types/asset';
 import {useAtom} from 'jotai';
@@ -44,7 +44,8 @@ const RaisingVault: NextPage = () => {
   const router = useRouter();
   const {address} = router.query;
 
-  const nft = useRaisingNFTVault(address as string | undefined);
+  const nftList = useRaisingNFTVault();
+  const nft = nftList.find((nft) => nft.tokenId === address);
   const [tmpRaisedAmount, setTmpRaisedAmount] = useState<number>(nft?.raisedAmount ?? 0);
 
   const [isDepositFormOpen, setIsDepositFormOpen] = useState<boolean>(false);
@@ -120,7 +121,7 @@ const RaisingVault: NextPage = () => {
 
   const [userWallet] = useAtom(userWalletAtom);
 
-  const myRaisingVaults = useMyNFTVaults(userWallet?.account.address);
+  const myRaisingVaults = useMyNFTVaults();
 
   const {myNFT, myVault} = useMemo<{
     myNFT: RaisingNFT | undefined;
@@ -306,7 +307,11 @@ const RaisingVault: NextPage = () => {
               <div className="h-6 flex flex-col justify-center Font_label_14px">Fixed price</div>
 
               <div className="flex flex-col gap-y-2 items-end">
-                <CoinAmount size="md" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(nft.fixedPrice.value, COIN_DICT[nft.fixedPrice.symbol].decimals)} />
+                <CoinAmount
+                  size="md"
+                  symbol={TokenSymbols.INJ}
+                  formattedAmount={formatNumber(nft.fixedPrice.value, COIN_DICT[nft.fixedPrice.symbol].decimals)}
+                />
                 <CaptionAmount size="sm" formattedAmount={formattedPriceUSD} />
               </div>
               {/* </div> */}

@@ -74,7 +74,7 @@ export const chainConfigMap: Record<AppChains, ContractsDict> = {
       address: 'inj1tfvcvjkpw02eeldx2lhtw0xysg3msehyarqe5lwygf3dk40vt9uqhuzlg3',
     },
     icaFactory: {
-      address: 'xion1l33tz82g5n6kq6gtceyjhsk0fcqqrytwr5dzglaq5pulq96np4vqm6k8ce',
+      address: 'xion12yetpccljlw9fa3emp7nn0cl4xapc99fym6pns4wjknsxupxe2aqgxlvdd',
     },
   },
 };
@@ -82,7 +82,7 @@ export const chainConfigMap: Record<AppChains, ContractsDict> = {
 export const TEST_VAULT = chainConfigMap[AppChains.XION_TESTNET];
 
 export const abstraxionProviderConfig = {
-  contracts: [TEST_VAULT.icaFactory.address, TEST_VAULT.cw3FixedMultisig.address]
+  contracts: [TEST_VAULT.icaFactory.address, TEST_VAULT.cw3FixedMultisig.address],
 };
 
 export const INJECTIVE_RPC = 'https://testnet.sentry.tm.injective.network:443';
