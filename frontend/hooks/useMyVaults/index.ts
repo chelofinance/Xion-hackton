@@ -37,21 +37,19 @@ const useMyVaults = (
             return;
         }
 
-        const {multisigs, controllers} = await getVaultMultisigs(abstraxionClient, address);
+        const vaultMultisigs = await getVaultMultisigs(abstraxionClient, address);
 
         const vaults = await Promise.all(
-            multisigs.map(async (multisig, index) => {
-                const icaControllerAddress = controllers[index];
-                const voters = (await getVoters(abstraxionClient, multisig))?.voters;
-                const threshold = (await getMultisigThreshold(abstraxionClient, multisig))?.absolute_count;
-                const proposals = await getVaultProposals(multisig);
+            vaultMultisigs.map(async (vaultMultisig) => {
+                const voters = (await getVoters(abstraxionClient, vaultMultisig.multisigAddress))?.voters;
+                const threshold = (await getMultisigThreshold(abstraxionClient, vaultMultisig.multisigAddress))?.absolute_count;
+                const proposals = await getVaultProposals(vaultMultisig.multisigAddress);
 
                 const myWeight = voters?.find((voter) => voter.addr === address)?.weight ?? '1';
                 const share = parseFloat(myWeight) / parseFloat(threshold?.total_weight ?? '1');
 
                 return {
-                    multisigAddress: multisig,
-                    icaControllerAddress,
+                    ...vaultMultisig,
                     voters,
                     threshold,
                     proposals,

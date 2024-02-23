@@ -7,6 +7,7 @@ import {
   chainConfigMap,
   channelOpenInitOptions,
 } from '@/constants/app';
+import { MultisigICAVault } from '@/types/asset';
 import type {SendTxResult} from '@/types/tx';
 import { AbstraxionAccount } from '@/types/wallet';
 import {useAbstraxionAccount, useAbstraxionSigningClient} from '@burnt-labs/abstraxion';
@@ -109,6 +110,13 @@ export const getBalanceOnXion = async (
   }
 };
 
+export const getIcaAccountAddress = async (signingClient: XionSigningClient, icaControllerAddress: string) => {
+  const msg = {get_contract_state: {}};
+  const response = await signingClient?.queryContractSmart(icaControllerAddress, msg);
+  const icaAccountAddress: string | undefined = response?.contract_state?.address;
+  return icaAccountAddress;
+}
+
 export type GetVaultMultisigsResponse = {
   controllers: readonly string[];
   multisigs: readonly string[];
@@ -117,7 +125,7 @@ export type GetVaultMultisigsResponse = {
 export const getVaultMultisigs = async (
   signingClient: XionSigningClient,
   bech32Address: string
-): Promise<GetVaultMultisigsResponse> => {
+): Promise<readonly MultisigICAVault[]> => {
   const icaFactoryAddress = chainConfigMap[AppChains.XION_TESTNET].icaFactory.address;
   const msg = {
     query_multisig_by_creator: bech32Address,
@@ -126,13 +134,24 @@ export const getVaultMultisigs = async (
   try {
     const response: GetVaultMultisigsResponse | undefined = await signingClient?.queryContractSmart(icaFactoryAddress, msg);
 
-    console.log('getVaultMultisigs response:', response);
+    const vaultMutisigs = response?.multisigs.reduce<Promise<readonly MultisigICAVault[]>>(async (accmPromise, multisig, index) => {
+      const icaControllerAddress = response.controllers[index];
+      const icaAccountAddress = await getIcaAccountAddress(signingClient, icaControllerAddress);
+      
+      const accm = await accmPromise;
 
-    return response ?? {controllers: [], multisigs: []};
+      return icaControllerAddress && icaAccountAddress ? [...accm, {
+        multisigAddress: multisig,
+        icaControllerAddress,
+        icaAccountAddress,
+      }] : accm;
+    }, Promise.resolve([])) ?? [];
+
+    return vaultMutisigs;
   } catch (error) {
     console.log(`Failed to get vault multisigs: ${error}`);
 
-    return {controllers: [], multisigs: []};
+    return [];
   }
 };
 

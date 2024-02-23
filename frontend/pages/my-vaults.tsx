@@ -51,7 +51,7 @@ const MyVaults: NextPage = () => {
 
     const {depositToVaultMultisig, isProcessing: isDepositToVaultProcessing} = useDepositToVaultMultisig();
 
-    const {getBalance: getBalanceOnInjective} = useBalanceOnInjective(fallbackVault?.multisigAddress);
+    const {getBalance: getBalanceOnInjective} = useBalanceOnInjective(fallbackVault?.icaAccountAddress);
     const vaultBalance = getBalanceOnInjective(TokenSymbols.INJ);
 
     const myNFTVaultsValueUSD = useMemo(() => {

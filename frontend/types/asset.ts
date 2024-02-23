@@ -70,10 +70,13 @@ export type MyNFTVault = NFTVault &
     // shareUSD: BigNumber;
   }>;
 
-
-  export type MyVault = {
+  export type MultisigICAVault = {
     multisigAddress: string;
     icaControllerAddress: string;
+    icaAccountAddress: string;
+  };
+  
+  export type MyVault = MultisigICAVault & {
     share: number;
     voters: readonly VoterResponse[];
     threshold: {
