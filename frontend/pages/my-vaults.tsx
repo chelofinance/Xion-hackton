@@ -28,6 +28,7 @@ import useCreateVault from '@/hooks/useCreateVault';
 import useMyVaults from '@/hooks/useMyVaults';
 import {MyVault} from '@/types/asset';
 import AmountInput from '@/components/form-presets/AmountInput';
+import { useAbstraxionAccount } from '@burnt-labs/abstraxion';
 
 const MyVaults: NextPage = () => {
     const router = useRouter();
@@ -128,7 +129,9 @@ const MyVaults: NextPage = () => {
         //
     }, []);
 
-    const {createVault, isProcessing: isCreateVaultProcessing} = useCreateVault(userWallet);
+    const {data: abstraxionAccount} = useAbstraxionAccount();
+
+    const {createVault, isProcessing: isCreateVaultProcessing} = useCreateVault(abstraxionAccount);
 
     const handleCreateVault = useCallback(async () => {
         await createVault();

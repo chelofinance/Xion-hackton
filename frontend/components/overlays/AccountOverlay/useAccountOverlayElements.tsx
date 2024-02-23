@@ -29,14 +29,14 @@ const useAccountOverlayElements = (props: AccountOverlayProps) => {
 
   // const { getOraclePrice } = useOraclePrice();
 
-  // const { ownedVaults, raisingVaults } = useMyNFTVaults(wallet.account.address);
+  // const { ownedVaults, raisingVaults } = useMyNFTVaults(wallet.account.bech32Address);
 
   // const myNFTVaultsValueUSD = useMemo(() => {
   //   return ownedVaults.reduce((accm, vault) => {
   //     const oraclePrice = getOraclePrice(vault.fixedPrice.symbol);
   //     const priceUSD = new BigNumber(vault.fixedPrice.value).times(oraclePrice);
 
-  //     const share = vault.multisig.voters.find((voter) => voter.addr === wallet.account.address)?.share ?? 0;
+  //     const share = vault.multisig.voters.find((voter) => voter.addr === wallet.account.bech32Address)?.share ?? 0;
   //     const shareUSD = priceUSD.times(share);
 
   //     return accm.plus(shareUSD);

@@ -8,7 +8,7 @@ type AccountAddressProps = {
 };
 
 const AccountAddress = ({ wallet }: AccountAddressProps) => {
-  const address = wallet.account.address;
+  const address = wallet.account.bech32Address;
 
   return (
     <CopyHelper toCopy={address} className="text-body">
