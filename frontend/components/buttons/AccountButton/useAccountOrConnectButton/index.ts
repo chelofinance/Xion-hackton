@@ -56,7 +56,10 @@ const useAccountOrConnectButton = (): {
   const [, setUserWallet] = useAtom(userWalletAtom);
 
   useEffect(() => {
-    if (!isConnected) setUserWallet(null);
+    if (!isConnected || account.bech32Address === '') {
+      setUserWallet(null);
+      return;
+    }
 
     const userWallet = {
       ...abstraxion,
@@ -65,6 +68,17 @@ const useAccountOrConnectButton = (): {
     
     setUserWallet(userWallet);
   }, [account.bech32Address, isConnected]);
+
+  useEffect(() => {
+    if (isConnected && account.bech32Address !== '') {
+      const userWallet = {
+        ...abstraxion,
+        account: { address: account.bech32Address }
+      };
+      
+      setUserWallet(userWallet);
+    }
+  }, []);
 
   return {
     buttonProps,

@@ -6,7 +6,7 @@ import NFTTumbnail from '@/components/NFTThumbnail';
 import Card from '@/components/Card';
 import {formatNumber} from '@/utils/number';
 import CoinAmount from '@/components/CoinAmount';
-import {COIN_DICT, TokenSymbols} from '@/constants/app';
+import {COIN_DICT, TEST_VAULT, TokenSymbols} from '@/constants/app';
 import Button from '@/components/Button';
 import {ButtonStatus} from '@/components/Button/types';
 import {useAbstraxionAccount, useAbstraxionSigningClient} from '@burnt-labs/abstraxion';
@@ -56,7 +56,7 @@ const CreateVault: NextPage = () => {
     try {
       const keplrSigner = await createKeplrSigner();
       const {client} = await injectiveClient(keplrSigner);
-      const balance = await client.getBalance(CONFIG.icaAccount.address, 'inj');
+      const balance = await client.getBalance(TEST_VAULT.icaAccount.address, 'inj');
 
       setCosmos({client, signer: keplrSigner});
       setVaultBalance(balance.amount);
@@ -70,7 +70,7 @@ const CreateVault: NextPage = () => {
 
     try {
       const proposal = createIcaBuyMsg({
-        ica: CONFIG.icaAccount.address,
+        ica: TEST_VAULT.icaAccount.address,
         buyContract: nft.buyContractAddress,
         nftContract: nft.collection.contractAddress,
         tokenId: nft.tokenId,
@@ -80,10 +80,10 @@ const CreateVault: NextPage = () => {
         client,
         account,
         injectiveMsg: proposal,
-        icaMultisigAddress: CONFIG.cw3FixedMultisig.address,
-        icaControllerAddress: CONFIG.icaController.address,
+        icaMultisigAddress: CONFIG.proxyMultisig.address,
+        icaControllerAddress: TEST_VAULT.icaController.address,
       });
-      await executeProposal(client, account, CONFIG.cw3FixedMultisig.address, Number(proposal_id));
+      await executeProposal(client, account, CONFIG.proxyMultisig.address, Number(proposal_id));
     } catch (err) {
       console.log('ERR:', err);
     }
@@ -94,10 +94,10 @@ const CreateVault: NextPage = () => {
       const {proposal_id} = await createChannelProposal({
         client,
         account,
-        icaMultisigAddress: CONFIG.cw3FixedMultisig.address,
-        icaControllerAddress: CONFIG.icaController.address,
+        icaMultisigAddress: CONFIG.proxyMultisig.address,
+        icaControllerAddress: TEST_VAULT.icaController.address,
       });
-      await executeProposal(client, account, CONFIG.cw3FixedMultisig.address, Number(proposal_id));
+      await executeProposal(client, account, CONFIG.proxyMultisig.address, Number(proposal_id));
     } catch (err) {
       console.log('ERR:', err);
     }

@@ -3,6 +3,7 @@
 import {v4 as uuidv4} from 'uuid';
 import {produceProposal} from './propose';
 import Contracts from 'config/contracts.config';
+import { SendTxResult } from '@/types/tx';
 
 const contracts = Contracts['xion-testnet'];
 
@@ -30,7 +31,9 @@ export type CreateIcaMultisigResult = {
     };
 }
 
-export async function createIcaMultisig(client: any, account: { bech32Address: string }, ica_factory: string, memberAddresses: string[]): Promise<CreateIcaMultisigResult | null> {
+export async function createIcaMultisig(client: any, account: { bech32Address: string }, ica_factory: string, memberAddresses: string[]): Promise<
+SendTxResult<CreateIcaMultisigResult>
+> {
     const voters = memberAddresses.map((address) => ({addr: address, weight: 1}));
 
     const msg = {
@@ -74,18 +77,24 @@ export async function createIcaMultisig(client: any, account: { bech32Address: s
         )?.value;
 
         return {
-            instantiateResponse,
-            ica_multisig_address,
-            channel_init_info: {
-                src_channel_id,
-                src_port_id,
-                destination_port,
-            },
+            isSuccess: true,
+            response: {
+                instantiateResponse,
+                ica_multisig_address,
+                channel_init_info: {
+                    src_channel_id,
+                    src_port_id,
+                    destination_port,
+                },
+            }
         };
     } catch (error) {
         console.log('error', error);
-        alert(error);
-        return null;
+        // alert(error);
+        return {
+            isSuccess: false,
+            response: undefined,
+        };
     }
 }
 

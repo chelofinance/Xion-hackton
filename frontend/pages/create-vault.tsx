@@ -34,13 +34,15 @@ const CreateVault: NextPage = () => {
       const abstractAccount = await client?.getAccount(account.bech32Address);
 
       console.log('abstractAccount', abstractAccount);
-      const ica_multisig_address_response: CreateIcaMultisigResult | null = await createIcaMultisig(
+      const result = await createIcaMultisig(
         client,
         account,
         chainConfigMap[AppChains.XION_TESTNET].icaFactory.address,
         [abstractAccount?.address || '']
       );
-      setVault(ica_multisig_address_response);
+      const response = result.response ?? null;
+
+      setVault(response);
 
       setTestVault(TEST_VAULT);
 

@@ -1,5 +1,8 @@
-import { AllChains, COIN_DICT, TokenSymbols } from "@/constants/app";
-import { Coin, DeliverTxResponse, SigningStargateClient } from "@cosmjs/stargate";
+import { AllChains, AppChains, COIN_DICT, TokenSymbols, chainConfigMap } from "@/constants/app";
+import type { SendTxResult } from "@/types/tx";
+import { useAbstraxionSigningClient } from "@burnt-labs/abstraxion";
+import { DeliverTxResponse } from "@cosmjs/cosmwasm-stargate";
+import type { Coin } from "@cosmjs/stargate";
 import BigNumber from "bignumber.js";
 
 export type HandleDepositArgs = {
@@ -9,19 +12,9 @@ export type HandleDepositArgs = {
     recipientAddress: string;
 }
 
-export type SendTxResult = {
-    isSuccess: true;
-    response: DeliverTxResponse;
-} | {
-    isSuccess: false;
-    response: DeliverTxResponse | undefined;
-}
+export type XionSigningClient = ReturnType<typeof useAbstraxionSigningClient>['client'];
 
-/**
- * 
- * @description no exported type for xion signing client..
- */
-export const transferOnXion = async (signingClient: any, args: HandleDepositArgs): Promise<SendTxResult> => {
+export const transferOnXion = async (signingClient: XionSigningClient, args: HandleDepositArgs): Promise<SendTxResult<DeliverTxResponse>> => {
     const { symbol, depositAmount, senderAddress, recipientAddress } = args;
 
     const coin = COIN_DICT[symbol];
@@ -39,7 +32,7 @@ export const transferOnXion = async (signingClient: any, args: HandleDepositArgs
     };
 
     try {     
-      const response = await (signingClient as SigningStargateClient | undefined)?.sendTokens(
+      const response = await signingClient?.sendTokens(
         senderAddress,
         recipientAddress,
         [{
@@ -65,11 +58,11 @@ export const transferOnXion = async (signingClient: any, args: HandleDepositArgs
     }
 }
 
-export const getBalanceOnXion = async (signingClient: any, args: { address: string; denom: string; }): Promise<Coin> => {
+export const getBalanceOnXion = async (signingClient: XionSigningClient, args: { address: string; denom: string; }): Promise<Coin> => {
     const { address, denom } = args;
 
     try {
-        const balance = await (signingClient as SigningStargateClient | undefined)?.getBalance(address, denom);
+        const balance = await signingClient?.getBalance(address, denom);
 
         if (balance) return balance;
 
@@ -85,4 +78,26 @@ export const getBalanceOnXion = async (signingClient: any, args: { address: stri
         amount: '0',
       };
     }
+}
+
+export const getVaultMultisigs = async (signingClient: XionSigningClient, bech32Address: string) => {
+  const icaFactoryAddress = chainConfigMap[AppChains.XION_TESTNET].icaFactory.address;
+  const msg = {
+    query_multisig_by_creator: bech32Address,
+  };
+
+  try {
+    console.log('getVaultMultisigs params', {
+      icaFactoryAddress,
+      msg
+    });
+
+    const response = await signingClient?.queryContractSmart(icaFactoryAddress, msg);
+
+    console.log('getVaultMultisigs response:', response);
+
+  } catch(error) {
+    console.log(`Failed to get vault multisigs: ${error}`);
+    return [];
+  }
 }

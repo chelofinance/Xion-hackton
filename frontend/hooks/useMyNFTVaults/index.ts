@@ -1,36 +1,48 @@
-import { NFT_VAULTS } from "@/constants/app";
-import { testVaultAtom } from "@/store/states";
 import type { MyNFTVault, NFTVault } from "@/types/asset";
-import { useAtom } from "jotai";
-import { useCallback } from "react";
+import { getVaultMultisigs } from "@/utils/xion";
+import { useAbstraxionSigningClient } from "@burnt-labs/abstraxion";
+import { useCallback, useEffect, useState } from "react";
 
-/**
- * 
- * @todo query the NFT vaults which includes me as a member
- */
-const useMyNFTVaults = (address: string | undefined): readonly MyNFTVault[] => {
-    const [testVault] = useAtom(testVaultAtom);
+const useMyNFTVaults = (address: string | undefined): {
+    myVaults: readonly MyNFTVault[];
+    updateMyVaults: () => Promise<void>;
+} => {
+    const [myVaults, setMyVaults] = useState<readonly MyNFTVault[]>([]);
 
-    const myVaults: readonly NFTVault[] = testVault ? NFT_VAULTS.filter(vault => vault.multisig.voters.find(voter => voter.addr === address)) : [];
+    const { client: abstraxionClient } = useAbstraxionSigningClient();
 
-    const getMyNFTVaultDetails = useCallback((vault: NFTVault): MyNFTVault => {
-        // const oraclePrice = getOraclePrice(vault.fixedPrice.symbol);
-        // const priceUSD = new BigNumber(vault.fixedPrice.value).times(oraclePrice);
-  
-        const share = vault.multisig.voters.find(voter => voter.addr === address)?.share ?? 0;
-        // const shareUSD = priceUSD.times(share);
-        
-        return {
-            ...vault,
-            // priceUSD,
-            share,
-            // shareUSD,
+    const updateMyVaults = useCallback(async () => {
+        if (!address || address === '') {
+            console.log('Address not found.');
+            return;
         }
-    }, [address]);
 
-    const raisingVaults = !!address ? myVaults : [];
+        if (!abstraxionClient) {
+            console.log('Signing client not found.');
+            return;
+        }
 
-    return raisingVaults.map(getMyNFTVaultDetails);
+        await getVaultMultisigs(abstraxionClient, address);
+
+        // const share = vault.multisig.voters.find(voter => voter.addr === address)?.share ?? 0;
+        // // const shareUSD = priceUSD.times(share);
+        
+        // return {
+        //     ...vault,
+        //     // priceUSD,
+        //     share,
+        //     // shareUSD,
+        // }
+    }, [abstraxionClient, address]);
+
+    useEffect(() => {
+        updateMyVaults();
+    }, [updateMyVaults]);
+
+    return {
+        myVaults,
+        updateMyVaults,
+    }
 };
 
 export default useMyNFTVaults;

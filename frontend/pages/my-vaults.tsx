@@ -34,10 +34,9 @@ const MyVaults: NextPage = () => {
     const router = useRouter();
 
     const [userWallet] = useAtom(userWalletAtom);
-
     const {getOraclePrice} = useOraclePrice();
 
-    const myVaults = useMyNFTVaults(userWallet?.account.address);
+    const { myVaults } = useMyNFTVaults(userWallet?.account.address);
 
     // const [selectedVault, setSelectedVault] = useState<MyNFTVault | undefined>(() => myVaults[0]);
     const selectedVault = myVaults[0];
@@ -114,7 +113,9 @@ const MyVaults: NextPage = () => {
 
     const Content =
         userWallet === null ? (
-            <AccountButton />
+            <Card color="glass" className="p-4 text-body Font_body_md">
+                Connect Abstraxion account to see your portfolio.
+            </Card>
         ) : (
             <div className="w-full flex items-stretch gap-x-14 text-body">
                 <section className="w-1/3 flex flex-col gap-y-8">
@@ -143,7 +144,21 @@ const MyVaults: NextPage = () => {
                         </div>
                     </Card>
 
-                    <Button iconType="add" label="Create vault" onClick={createVault} />
+                    <Button 
+                        iconType="add" 
+                        label="Create vault" 
+                        status={isCreateVaultProcessing ? 'processing' : 'enabled'}
+                        onClick={createVault} 
+                    />
+
+                    <ul>
+                        {myVaults.map(myVault => (
+                            <div key={myVault.ica.icaMultisigAddress}>
+                                {myVault.ica.icaMultisigAddress}
+                            </div>
+                        ))}
+                     
+                    </ul>
                 </section>
 
                 {selectedVault && (
@@ -275,7 +290,7 @@ const MyVaults: NextPage = () => {
                                 <NFTVaultLinkCard
                                     key={nft.tokenId}
                                     href="raising-vault"
-                                    nftVault={nft}
+                                    nft={nft}
                                     amountLabel="Fixed price"
                                     formattedAmount={formatNumber(nft.fixedPrice.value, 18)}
                                     vaultAddress={selectedVault.ica.icaMultisigAddress}

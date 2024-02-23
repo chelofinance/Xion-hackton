@@ -5,7 +5,7 @@ import NFTTumbnail from '@/components/NFTThumbnail';
 import Card from '@/components/Card';
 import {formatNumber, formatUSD, simpleFormat} from '@/utils/number';
 import CoinAmount from '@/components/CoinAmount';
-import {AppChains, chainConfigMap, CHAIN_METADATA_DICT, INJECTIVE_ID, TokenSymbols, COIN_DICT} from '@/constants/app';
+import {AppChains, chainConfigMap, CHAIN_METADATA_DICT, INJECTIVE_ID, TokenSymbols, COIN_DICT, TEST_VAULT} from '@/constants/app';
 import Button, {ButtonProps} from '@/components/Button';
 import ProgressBar from '@/components/ProgressBar';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
@@ -120,20 +120,20 @@ const RaisingVault: NextPage = () => {
 
   const [userWallet] = useAtom(userWalletAtom);
 
-  const myRaisingVaults = useMyNFTVaults(userWallet?.account.address);
+  const { myVaults } = useMyNFTVaults(userWallet?.account.address);
 
   const {myNFT, myVault} = useMemo<{
     myNFT: RaisingNFT | undefined;
     myVault: MyNFTVault | undefined;
   }>(() => {
-    const myVault = myRaisingVaults.find((myVault) => myVault.nfts.find((nft) => nft.tokenId === nft?.tokenId));
+    const myVault = myVaults.find((myVault) => myVault.nfts.find((nft) => nft.tokenId === nft?.tokenId));
     const myNFT = myVault?.nfts.find((nft) => nft.tokenId === nft?.tokenId);
 
     return {
       myNFT,
       myVault,
     };
-  }, [myRaisingVaults, nft?.tokenId]);
+  }, [myVaults, nft?.tokenId]);
 
   const myNFTPriceUSD = useMemo<BigNumber>(() => {
     if (!myNFT) return new BigNumber(0);
@@ -155,7 +155,7 @@ const RaisingVault: NextPage = () => {
       await transferInjective({
         client: client,
         amount: new BigNumber(depositAmount).shiftedBy(18).toString(),
-        recipient: CONFIG.icaAccount.address,
+        recipient: TEST_VAULT.icaAccount.address,
         account: addr,
       });
 
@@ -177,7 +177,7 @@ const RaisingVault: NextPage = () => {
     try {
       const keplrSigner = await createKeplrSigner();
       const {client} = await injectiveClient(keplrSigner);
-      const balance = await client.getBalance(CONFIG.icaAccount.address, 'inj');
+      const balance = await client.getBalance(TEST_VAULT.icaAccount.address, 'inj');
 
       setCosmos({client, signer: keplrSigner});
       // setVaultBalance(balance.amount);
@@ -198,7 +198,7 @@ const RaisingVault: NextPage = () => {
 
     try {
       const proposal = createIcaBuyMsg({
-        ica: CONFIG.icaAccount.address,
+        ica: TEST_VAULT.icaAccount.address,
         buyContract: nft.buyContractAddress,
         nftContract: nft.collection.contractAddress,
         tokenId: nft.tokenId,
@@ -208,10 +208,10 @@ const RaisingVault: NextPage = () => {
         client,
         account,
         injectiveMsg: proposal,
-        icaMultisigAddress: CONFIG.cw3FixedMultisig.address,
-        icaControllerAddress: CONFIG.icaController.address,
+        icaMultisigAddress: CONFIG.proxyMultisig.address,
+        icaControllerAddress: TEST_VAULT.icaController.address,
       });
-      await executeProposal(client, account, CONFIG.cw3FixedMultisig.address, Number(proposal_id));
+      await executeProposal(client, account, CONFIG.proxyMultisig.address, Number(proposal_id));
     } catch (err) {
       console.log('ERR:', err);
     }

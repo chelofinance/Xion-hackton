@@ -4,13 +4,14 @@ import { useAbstraxionSigningClient } from "@burnt-labs/abstraxion";
 import { CreateIcaMultisigResult, createIcaMultisig } from "@/utils/multisig";
 import { AppChains, chainConfigMap } from "@/constants/app";
 import { useCallback } from "react";
+import { SendTxResult } from "@/types/tx";
 
 const useCreateVault = (userWallet: ConnectedWallet | null) => {
     const { target, startProcessing, stopProcessing } = useProcessing<boolean>();
 
     const { client: abstraxionClient } = useAbstraxionSigningClient();
 
-    const createVault = useCallback(async (options?: { memberAddresses: string[] }): Promise<CreateIcaMultisigResult | null> => {
+    const createVault = useCallback(async (options?: { memberAddresses: string[] }): Promise<SendTxResult<CreateIcaMultisigResult> | null> => {
         if (!userWallet) {
             console.log('Connected account not found.');
             return null;
@@ -36,18 +37,18 @@ const useCreateVault = (userWallet: ConnectedWallet | null) => {
           const icaFactoryAddress = chainConfigMap[AppChains.XION_TESTNET].icaFactory.address;
           const memberAddresses = options?.memberAddresses ? [userWallet.account.address, ...options.memberAddresses] : [userWallet.account.address];
           
-          const response = await createIcaMultisig(
+          const result = await createIcaMultisig(
             abstraxionClient,
             account,
             icaFactoryAddress,
             memberAddresses
           );
 
-          console.log('createIcaMultisig response: ', response);
+          console.log('createIcaMultisig response: ', result);
 
           stopProcessing();
 
-          return response;
+          return result;
         } catch (err) {
           stopProcessing();
           console.log('RALPH ERR: ', err);
