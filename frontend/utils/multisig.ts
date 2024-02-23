@@ -2,9 +2,10 @@
 
 import {v4 as uuidv4} from 'uuid';
 import {produceProposal} from './propose';
-import Contracts from 'config/contracts.config';
+import { SendTxResult } from '@/types/tx';
+import { GetProposalsResponse } from './xion';
+import { AppChains, chainConfigMap, channelOpenInitOptions } from '@/constants/app';
 
-const contracts = Contracts['xion-testnet'];
 
 export async function getIcaAccountAddress(client: any, ica_controller_address: string) {
     const contract_response = await client?.queryContractSmart(ica_controller_address, {get_contract_state: {}});
@@ -13,7 +14,7 @@ export async function getIcaAccountAddress(client: any, ica_controller_address: 
 }
 
 export async function getIcaControllerAddress(client: any, ica_multisig_address: string) {
-    const ica_controller_response = await client?.queryContractSmart(contracts.icaFactory.address, {
+    const ica_controller_response = await client?.queryContractSmart(chainConfigMap[AppChains.XION_TESTNET].icaFactory.address, {
         query_controller_by_multisig: ica_multisig_address,
     });
     console.log('ica_controller_response', ica_controller_response);
@@ -30,12 +31,9 @@ export type CreateIcaMultisigResult = {
     };
 };
 
-export async function createIcaMultisig(
-    client: any,
-    account: {bech32Address: string},
-    ica_factory: string,
-    memberAddresses: string[]
-): Promise<CreateIcaMultisigResult | null> {
+export async function createIcaMultisig(client: any, account: { bech32Address: string }, ica_factory: string, memberAddresses: string[]): Promise<
+SendTxResult<CreateIcaMultisigResult>
+> {
     const voters = memberAddresses.map((address) => ({addr: address, weight: 1}));
 
     const msg = {
@@ -50,10 +48,11 @@ export async function createIcaMultisig(
                 max_voting_period: {
                     time: 36000,
                 },
+                proxy: chainConfigMap[AppChains.XION_TESTNET].proxyMultisig.address,            
             },
             channel_open_init_options: {
-                connection_id: contracts.channelOpenInitOptions.connectionId,
-                counterparty_connection_id: contracts.channelOpenInitOptions.counterpartyConnectionId,
+                connection_id: channelOpenInitOptions[AppChains.XION_TESTNET].connectionId,
+                counterparty_connection_id: channelOpenInitOptions[AppChains.XION_TESTNET].counterpartyConnectionId,
             },
             salt: uuidv4(),
         },
@@ -66,7 +65,7 @@ export async function createIcaMultisig(
 
         const instantiate_events = instantiateResponse?.events.filter((e: any) => e.type === 'instantiate');
         const ica_multisig_address: string | undefined = instantiate_events
-            ?.find((e: any) => e.attributes.find((attr: any) => attr.key === 'code_id' && attr.value === '202'))
+            ?.find((e: any) => e.attributes.find((attr: any) => attr.key === 'code_id' && attr.value === chainConfigMap[AppChains.XION_TESTNET].cw3FixedMultisig.codeId))
             ?.attributes.find((attr: any) => attr.key === '_contract_address')?.value;
         console.log('ica_multisig_address:', ica_multisig_address);
 
@@ -83,18 +82,24 @@ export async function createIcaMultisig(
         )?.value;
 
         return {
-            instantiateResponse,
-            ica_multisig_address,
-            channel_init_info: {
-                src_channel_id,
-                src_port_id,
-                destination_port,
-            },
+            isSuccess: true,
+            response: {
+                instantiateResponse,
+                ica_multisig_address,
+                channel_init_info: {
+                    src_channel_id,
+                    src_port_id,
+                    destination_port,
+                },
+            }
         };
     } catch (error) {
         console.log('error', error);
-        alert(error);
-        return null;
+        // alert(error);
+        return {
+            isSuccess: false,
+            response: undefined,
+        };
     }
 }
 
@@ -165,20 +170,22 @@ export async function executeProposal(client: any, account: any, icaMultisigAddr
     }
 }
 
-export async function getProposalList(client: any, icaMultisigAddress: string) {
+export async function getProposalList(client: any, icaMultisigAddress: string): Promise<GetProposalsResponse> {
     const msg = {
-        list_proposals: {},
+        list_proposals: { start_after: 0 },
     };
 
     try {
-        const queryResponse = await client?.queryContractSmart(icaMultisigAddress, msg);
-        console.log('queryResponse', queryResponse);
-        return queryResponse;
+        const response: GetProposalsResponse | undefined = await client?.queryContractSmart(icaMultisigAddress, msg);
+        
+        console.log('getProposalList response:', response);
+
+        return response ?? { proposals: [] };
     } catch (error) {
-        console.log('error', error);
-        // alert(error);
+        console.log('getProposalList error:', error);
     }
-    return [];
+
+    return { proposals: [] };
 }
 
 export async function getBalance(client: any, address: string) {

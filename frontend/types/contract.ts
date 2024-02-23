@@ -3,16 +3,19 @@ export type ContractsDict = {
         collectionId: string;
     };
     cw3FixedMultisig: {
-        codeId: number;
-        address: string;
+        codeId: string;
+        // address: string;
     };
-    icaAccount: {
-        address: string;
-    };
-    icaController: {
-        address: string;
-    };
+    // icaAccount: {
+    //     address: string;
+    // };
+    // icaController: {
+    //     address: string;
+    // };
     icaFactory: {
+        address: string;
+    };
+    proxyMultisig: {
         address: string;
     };
 };

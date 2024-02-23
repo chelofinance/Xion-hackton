@@ -1,7 +1,10 @@
-import { useAbstraxionAccount, useAbstraxionSigningClient } from "@burnt-labs/abstraxion";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { getProposalList, voteProposal as voteMultisigProposal } from "@/utils/multisig";
+import { useAbstraxionSigningClient } from "@burnt-labs/abstraxion";
+import { useCallback, useEffect } from "react";
+import { voteProposal as voteMultisigProposal } from "@/utils/multisig";
 import { ProposalStatus } from "@/constants/app";
+import { ProposalResponse, getMultisigThreshold, getProposals, getVoters } from "@/utils/xion";
+import useRaisingNFTVaults from "../useRaisingNFTVaults";
+import { RaisingNFT } from "@/types/asset";
 
 type Proposal = {
     id: string;
@@ -9,63 +12,74 @@ type Proposal = {
     status: ProposalStatus;
 }
 
-const TEST_PROPOSALS: Proposal[] = [
-    {
-        id: '1',
-        description: 'buy this NFT',
-        status: ProposalStatus.Passed,
-    },
-    {
-        id: '2',
-        description: 'sell this NFT',
-        status: ProposalStatus.Pending,
-    },
-];
-
-const useProposals = (icaMultisigAddress: string): { 
-    proposals: Proposal[]; 
-    updateProposals: () => Promise<void>;
-    voteProposal:(proposalId: string, vote: boolean) => Promise<void>;
+const useProposals = (address: string | undefined): { 
+    getVaultProposals: (icaMultisigAddress: string) => Promise<readonly {
+        nft: RaisingNFT;
+        proposal: ProposalResponse;
+    }[]>;
+    voteProposal:(icaMultisigAddress: string, proposalId: string, vote: boolean) => Promise<void>;
 } => {
     const { client: abstraxionClient } = useAbstraxionSigningClient();
-  const { data: account } = useAbstraxionAccount();
 
+    const nfts = useRaisingNFTVaults();
+    
+    const getBuyNFTByProposal = useCallback((proposal: ProposalResponse): RaisingNFT | null => {
+        const nft = nfts.find((nft) => proposal.msgs.some((msg) => msg.wasm?.execute.contract_addr === nft.buyContractAddress));
+        return nft ?? null;
+    }, [nfts.length]);
 
-    const [proposals, setProposals] = useState<Proposal[]>([]);
-
-    const updateProposals = useCallback(async () => {
+    const getVaultProposals = useCallback(async (icaMultisigAddress: string): Promise<readonly {
+        nft: RaisingNFT;
+        proposal: ProposalResponse;
+    }[]> => {
         try {
-            const fetchedProposalData: { proposals: Proposal[] } | undefined = await getProposalList(
+            const proposalsData = await getProposals(
                 abstraxionClient,
                 icaMultisigAddress
             );
 
-            setProposals(fetchedProposalData?.proposals ?? []);
+            const votersData = await getVoters(abstraxionClient, icaMultisigAddress);
+            const thresholdData = await getMultisigThreshold(abstraxionClient, icaMultisigAddress);
+
+            const buyNFTsByProposal = proposalsData?.proposals.reduce<{
+                nft: RaisingNFT;
+                proposal: ProposalResponse;
+            }[]>((accm, proposal) => {
+                const nft = getBuyNFTByProposal(proposal);
+                return nft ? [...accm, { nft, proposal }] : accm;
+            }, []);
+
+            return buyNFTsByProposal;
+
         } catch(e) {
             console.log(e);
+            return [];
         }
 
-    }, [abstraxionClient, icaMultisigAddress]);
+    }, [abstraxionClient, getBuyNFTByProposal]);
 
     useEffect(() => {
-        updateProposals();
-    }, [updateProposals]);
+        //
+    }, []);
 
-    const voteProposal = useCallback(async (proposalId: string, vote: boolean) => {
+    const voteProposal = useCallback(async (icaMultisigAddress: string, proposalId: string, vote: boolean) => {
+        if (!address || address === '') {
+            console.log('Account not found.');
+            return;
+        }
+
         await voteMultisigProposal(
           abstraxionClient,
-          account,
+          { bech32Address: address },
           icaMultisigAddress,
           proposalId,
           vote,
         );
 
-        await updateProposals();
-      }, [abstraxionClient, account, icaMultisigAddress, updateProposals]);
+      }, [abstraxionClient, address]);
 
     return {
-        proposals,
-        updateProposals,
+        getVaultProposals,
         voteProposal,
     };
 };

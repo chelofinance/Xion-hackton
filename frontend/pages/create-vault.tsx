@@ -15,9 +15,6 @@ import {chainConfigMap} from '@/constants/app';
 import router from 'next/router';
 import CopyHelper from '@/components/CopyHelper';
 import { shortenAddress, shortenText } from '@/utils/text';
-import Head from 'next/head';
-import { useAtom } from 'jotai';
-import { testVaultAtom } from '@/store/states';
 
 const CreateVault: NextPage = () => {
   const [status, setStatus] = React.useState<ButtonStatus>('enabled');
@@ -25,7 +22,7 @@ const CreateVault: NextPage = () => {
   const {data: account, isConnected} = useAbstraxionAccount();
   const [vault, setVault] = useState<CreateIcaMultisigResult | null>(null);
 
-  const [testVault, setTestVault] = useAtom(testVaultAtom);
+  // const [testVault, setTestVault] = useAtom(testVaultAtom);
 
   const handleCreateVault = async () => {
     try {
@@ -34,15 +31,17 @@ const CreateVault: NextPage = () => {
       const abstractAccount = await client?.getAccount(account.bech32Address);
 
       console.log('abstractAccount', abstractAccount);
-      const ica_multisig_address_response: CreateIcaMultisigResult | null = await createIcaMultisig(
+      const result = await createIcaMultisig(
         client,
         account,
         chainConfigMap[AppChains.XION_TESTNET].icaFactory.address,
         [abstractAccount?.address || '']
       );
-      setVault(ica_multisig_address_response);
+      const response = result.response ?? null;
 
-      setTestVault(TEST_VAULT);
+      setVault(response);
+
+      // setTestVault(TEST_VAULT);
 
       setStatus('enabled');
     } catch (err) {

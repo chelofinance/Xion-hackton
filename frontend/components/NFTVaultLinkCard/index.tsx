@@ -7,27 +7,27 @@ import Tag from '../Tag';
 
 type NFTVaultLinkCardProps = {
   href: string;
-  nftVault: NFT;
+  nft: NFT;
   amountLabel: string;
   formattedAmount: string;
   vaultAddress: string;
 };
 
-const NFTVaultLinkCard = ({ href, nftVault, amountLabel, formattedAmount, vaultAddress }: NFTVaultLinkCardProps) => {
+const NFTVaultLinkCard = ({ href, nft, amountLabel, formattedAmount, vaultAddress }: NFTVaultLinkCardProps) => {
   return (
     <Link
-      href={`/${href}/${nftVault.collection.contractAddress}${nftVault.tokenId}`}
+      href={`/${href}/${nft.collection.contractAddress}${nft.tokenId}`}
       className="group/nft-vault-link overflow-hidden Transition_500 transition-colors rounded-card_md border border-solid border-transparent hover:border-body"
     >
       <div className="flex items-center justify-between gap-x-4">
         <div className="flex items-center gap-x-4">
           <NFTTumbnail
             size="md"
-            imgSrc={nftVault.imgSrc}
+            imgSrc={nft.imgSrc}
             className="Transition_500 transition-all group-hover/nft-vault-link:scale-105"
           />
-          <div className="Font_label_14px">{nftVault.nftName}</div>
-          {nftVault.ownerAddress === vaultAddress && <Tag size="sm" label="Owned" />}
+          <div className="Font_label_14px">{nft.nftName}</div>
+          {nft.ownerAddress === vaultAddress && <Tag size="sm" label="Owned" />}
         </div>
 
         <div className="flex flex-col items-end Transition_500 transition-all group-hover/nft-vault-link:pr-3">

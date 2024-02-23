@@ -3,9 +3,9 @@ import Main from '@/components/Main';
 import Heading from '@/components/Heading';
 import NFTTumbnail from '@/components/NFTThumbnail';
 import Card from '@/components/Card';
-import {formatNumber, formatUSD, simpleFormat} from '@/utils/number';
+import {formatNumber, formatUSD} from '@/utils/number';
 import CoinAmount from '@/components/CoinAmount';
-import {AppChains, chainConfigMap, CHAIN_METADATA_DICT, INJECTIVE_ID, TokenSymbols, COIN_DICT} from '@/constants/app';
+import {AppChains, chainConfigMap, CHAIN_METADATA_DICT, INJECTIVE_ID, TokenSymbols, COIN_DICT, TEST_VAULT} from '@/constants/app';
 import Button, {ButtonProps} from '@/components/Button';
 import ProgressBar from '@/components/ProgressBar';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
@@ -16,11 +16,10 @@ import useOraclePrice from '@/hooks/useOraclePrice';
 import BigNumber from 'bignumber.js';
 import useRaisingNFTVault from '@/hooks/useRaisingNFTVaults';
 import useMyNFTVaults from '@/hooks/useMyNFTVaults';
-import {MyNFTVault, NFT, RaisingNFT} from '@/types/asset';
+import {MyNFTVault, MyVault, NFT, RaisingNFT} from '@/types/asset';
 import {useAtom} from 'jotai';
-import {userWalletAtom} from '@/store/states';
+import {myVaultsAtom, userWalletAtom} from '@/store/states';
 import NumberText from '@/components/NumberText';
-import {injectiveClient, transferInjective} from '@/utils/injective';
 import {useRouter} from 'next/router';
 import PageLoader from '@/components/PageLoader';
 import Tag from '@/components/Tag';
@@ -28,25 +27,35 @@ import {createIcaBuyMsg} from '@/utils/ica';
 import {createProposal, executeProposal} from '@/utils/multisig';
 import {useAbstraxionAccount, useAbstraxionSigningClient} from '@burnt-labs/abstraxion';
 import {InjectiveSigningStargateClient} from '@injectivelabs/sdk-ts/dist/cjs/core/stargate';
+import useMyVaults from '@/hooks/useMyVaults';
+import useDepositToVaultMultisig from '@/hooks/useDepositToVaultMultisig';
+import useBalanceOnXion from '@/hooks/useBalanceOnXion';
+import FTAmount from '@/struct/FTAmount';
+import useBalanceOnInjective from '@/hooks/useBalanceOnInjective';
 
 const CONFIG = chainConfigMap[AppChains.XION_TESTNET];
 
-const createKeplrSigner = async () => {
-  (window as any).keplr.defaultOptions = {
-    sign: {preferNoSetFee: true},
-  };
-  const offlineSigner: any = await (window as any).keplr.getOfflineSignerAuto(INJECTIVE_ID);
+// const createKeplrSigner = async () => {
+//   (window as any).keplr.defaultOptions = {
+//     sign: {preferNoSetFee: true},
+//   };
+//   const offlineSigner: any = await (window as any).keplr.getOfflineSignerAuto(INJECTIVE_ID);
 
-  return offlineSigner;
-};
+//   return offlineSigner;
+// };
 
 const RaisingVault: NextPage = () => {
   const router = useRouter();
   const {address} = router.query;
 
   const nftList = useRaisingNFTVault();
-  const nft = nftList.find((nft) => nft.tokenId === address);
-  const [tmpRaisedAmount, setTmpRaisedAmount] = useState<number>(nft?.raisedAmount ?? 0);
+  const nft = nftList.find((nft) => `${nft.collection.contractAddress}${nft.tokenId}` === address);
+
+  const [userWallet] = useAtom(userWalletAtom);
+
+  const { getBalance, updateBalance } = useBalanceOnXion(userWallet?.account.address);
+
+  const [tmpRaisedAmount, setTmpRaisedAmount] = useState<FTAmount>(() => getBalance(TokenSymbols.INJ));
 
   const [isDepositFormOpen, setIsDepositFormOpen] = useState<boolean>(false);
 
@@ -61,7 +70,7 @@ const RaisingVault: NextPage = () => {
   const {getOraclePrice} = useOraclePrice();
   const oraclePrice = nft ? getOraclePrice(nft.fixedPrice.symbol) : 0;
 
-  const maxDepositAmount = nft ? Number(nft.fixedPrice.value) - tmpRaisedAmount : 0;
+  const maxDepositAmount = nft ? nft.fixedPrice.value.minus(tmpRaisedAmount.shifted).toNumber() : 0;
   const maxDepositAmountUSD = useMemo(
     () => new BigNumber(maxDepositAmount.toString()).times(oraclePrice),
     [maxDepositAmount, oraclePrice]
@@ -87,7 +96,7 @@ const RaisingVault: NextPage = () => {
   }, [isDepositAmountValid]);
 
   const priceUSD = useMemo(() => new BigNumber(nft?.fixedPrice.value.toString() ?? 0).times(oraclePrice), [oraclePrice]);
-  const raisedAmountUSD = useMemo(() => new BigNumber(tmpRaisedAmount).times(oraclePrice), [oraclePrice, tmpRaisedAmount]);
+  const raisedAmountUSD = tmpRaisedAmount.usd;
 
   const formattedCompactPriceUSD = priceUSD.gte(1000) ? ` (${formatUSD(priceUSD, {compact: true, semiequate: true})})` : '';
   const formattedPriceUSD = `${formatUSD(priceUSD)}${formattedCompactPriceUSD}`;
@@ -119,22 +128,25 @@ const RaisingVault: NextPage = () => {
     if (nft) router.push(`/nft/${nft.collection.contractAddress}${nft.tokenId}`);
   }, [nft]);
 
-  const [userWallet] = useAtom(userWalletAtom);
-
-  const myRaisingVaults = useMyNFTVaults();
+  const [myVaults] = useAtom(myVaultsAtom);
 
   const {myNFT, myVault} = useMemo<{
     myNFT: RaisingNFT | undefined;
-    myVault: MyNFTVault | undefined;
+    myVault: MyVault | undefined;
   }>(() => {
-    const myVault = myRaisingVaults.find((myVault) => myVault.nfts.find((nft) => nft.tokenId === nft?.tokenId));
-    const myNFT = myVault?.nfts.find((nft) => nft.tokenId === nft?.tokenId);
+    const myVault = myVaults.find((myVault) => myVault.proposals.find((proposal) => proposal.nft.tokenId === nft?.tokenId));
+    const myNFT = myVault?.proposals.find((proposal) => proposal.nft.tokenId === nft?.tokenId)?.nft;
 
     return {
       myNFT,
       myVault,
     };
-  }, [myRaisingVaults, nft?.tokenId]);
+  }, [myVaults, nft?.tokenId]);
+
+  const { getBalance: getBalanceOnInjective } = useBalanceOnInjective(myVault?.multisigAddress);
+
+  const myVaultBalance = getBalanceOnInjective(TokenSymbols.INJ);
+  const isRaisedAll = useMemo<boolean>(() => !!nft && myVaultBalance.shifted.eq(nft.fixedPrice.value), [nft, myVaultBalance.shifted]);
 
   const myNFTPriceUSD = useMemo<BigNumber>(() => {
     if (!myNFT) return new BigNumber(0);
@@ -143,24 +155,29 @@ const RaisingVault: NextPage = () => {
     return priceUSD;
   }, [myNFT]);
 
-  const isRaisedAll = useMemo<boolean>(() => maxDepositAmount === 0, [maxDepositAmount]);
-  const isOwningVault = useMemo<boolean>(() => nft?.ownerAddress === myVault?.ica.icaMultisigAddress, [nft, myVault]);
+  const isOwningVault = useMemo<boolean>(() => nft?.ownerAddress === myVault?.multisigAddress, [nft, myVault]);
+
+  const {depositToVaultMultisig, isProcessing: isDepositToVaultProcessing} = useDepositToVaultMultisig();
 
   const handleDeposit = async () => {
-    try {
-      const keplrSigner = await createKeplrSigner();
-      const {client} = await injectiveClient(keplrSigner);
-      const accounts = await keplrSigner.getAccounts();
-      const addr = accounts[0].address;
+    if (!userWallet) {
+      console.log('account not found.');
+      return;
+    }
 
-      await transferInjective({
-        client: client,
-        amount: new BigNumber(depositAmount).shiftedBy(18).toString(),
-        recipient: CONFIG.icaAccount.address,
-        account: addr,
+    if (!myVault) {
+      return;
+    }
+
+    try {
+
+      await depositToVaultMultisig(myVault, {
+        symbol: TokenSymbols.INJ,
+        depositAmount, 
+        senderAddress: userWallet.account.address,
       });
 
-      setTmpRaisedAmount(tmpRaisedAmount + depositAmount);
+      await updateBalance();
     } catch (err) {
       console.log('ERR TRANSFER', err);
     }
@@ -174,22 +191,22 @@ const RaisingVault: NextPage = () => {
     signer: null,
   });
 
-  const init = async () => {
-    try {
-      const keplrSigner = await createKeplrSigner();
-      const {client} = await injectiveClient(keplrSigner);
-      const balance = await client.getBalance(CONFIG.icaAccount.address, 'inj');
+  // const init = async () => {
+  //   try {
+  //     const keplrSigner = await createKeplrSigner();
+  //     const {client} = await injectiveClient(keplrSigner);
+  //     const balance = await client.getBalance(TEST_VAULT.icaAccount.address, 'inj');
 
-      setCosmos({client, signer: keplrSigner});
-      // setVaultBalance(balance.amount);
-    } catch (err) {
-      console.log('ERR SETTING UP', err);
-    }
-  };
+  //     setCosmos({client, signer: keplrSigner});
+  //     // setVaultBalance(balance.amount);
+  //   } catch (err) {
+  //     console.log('ERR SETTING UP', err);
+  //   }
+  // };
 
-  useEffect(() => {
-    init();
-  }, []);
+  // useEffect(() => {
+  //   init();
+  // }, []);
 
   const {client} = useAbstraxionSigningClient();
   const {data: account} = useAbstraxionAccount();
@@ -199,7 +216,7 @@ const RaisingVault: NextPage = () => {
 
     try {
       const proposal = createIcaBuyMsg({
-        ica: CONFIG.icaAccount.address,
+        ica: TEST_VAULT.icaAccount.address,
         buyContract: nft.buyContractAddress,
         nftContract: nft.collection.contractAddress,
         tokenId: nft.tokenId,
@@ -209,10 +226,10 @@ const RaisingVault: NextPage = () => {
         client,
         account,
         injectiveMsg: proposal,
-        icaMultisigAddress: CONFIG.cw3FixedMultisig.address,
-        icaControllerAddress: CONFIG.icaController.address,
+        icaMultisigAddress: CONFIG.proxyMultisig.address,
+        icaControllerAddress: TEST_VAULT.icaController.address,
       });
-      await executeProposal(client, account, CONFIG.cw3FixedMultisig.address, Number(proposal_id));
+      await executeProposal(client, account, CONFIG.proxyMultisig.address, Number(proposal_id));
     } catch (err) {
       console.log('ERR:', err);
     }
@@ -317,12 +334,32 @@ const RaisingVault: NextPage = () => {
               {/* </div> */}
             </Card>
 
-            {isRaisedAll && (
+            {!myVault && myVaults.length === 0 && (
+              <Card color="glass" className="flex items-stretch justify-between gap-x-4 p-4 text-body">
+                <div className="Font_body_md">You do not have any vault.</div>
+
+                <div className="flex justify-end">
+                  <Button iconType="arrow_forward" label="Create vault" onClick={() => router.push('/my-vaults')} />
+                </div>
+              </Card>
+            )}
+
+            {!myVault && myVaults.length > 0 && (
+              <Card color="glass" className="flex items-stretch justify-between gap-x-4 p-4 text-body">
+                <div className="Font_body_md">Select vault to make proposal</div>
+
+                <div className="flex justify-end">
+                  <Button iconType="arrow_forward" label="Buy vault" onClick={() => router.push('/my-vaults')} />
+                </div>
+              </Card>
+            )}
+
+            {myVault && (
               <Card color="glass" className="flex items-stretch justify-between gap-x-4 p-4 text-body">
                 <div className="h-6 flex flex-col justify-center Font_label_14px">Vault balance</div>
 
                 <div className="flex flex-col gap-y-2 items-end">
-                  <CoinAmount size="md" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(tmpRaisedAmount)} />
+                  <CoinAmount size="md" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(myVaultBalance.shifted)} />
                   <CaptionAmount size="sm" formattedAmount={formattedPriceUSD} />
                 </div>
               </Card>
@@ -403,6 +440,7 @@ const RaisingVault: NextPage = () => {
                       label="Deposit"
                       iconType="arrow_forward"
                       className="w-full md:w-fit"
+                      status={isDepositToVaultProcessing ? 'processing' : 'enabled'}
                       onClick={handleDeposit}
                       {...depositButtonProps}
                     />

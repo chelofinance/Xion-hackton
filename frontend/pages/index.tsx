@@ -73,7 +73,9 @@ const Home: NextPage = () => {
             </div>
           </section> */}
 
-          <NFTsTable tooltipLayer="base" className="mt-20 md:mx-page_x" />
+          <div id="home-nfts-table">
+            <NFTsTable tooltipLayer="base" className="mt-20 md:mx-page_x" />
+          </div>
         </Main>
       )}
     </>

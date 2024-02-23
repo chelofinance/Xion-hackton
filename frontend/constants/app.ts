@@ -2,6 +2,7 @@ import GoogleAnalytics from '@/analytics/googleAnalytics/GoogleAnalytics';
 import Mixpanel from '@/analytics/mixpanel/Mixpanel';
 import XION_CHAIN_LOGO from '@/resources/logos/chain_logo_xion.png';
 import type {NFTVault, RaisingNFT} from '@/types/asset';
+import { ChannelInitOptions } from '@/types/channel';
 import {ContractsDict} from '@/types/contract';
 import BigNumber from 'bignumber.js';
 
@@ -64,25 +65,32 @@ export const chainConfigMap: Record<AppChains, ContractsDict> = {
       collectionId: '65ca322f3e56373c6b5d1a66',
     },
     cw3FixedMultisig: {
-      codeId: 50,
-      address: 'xion105h6k7cv3kvt4vxeh5l86x9wnqudjl8wlx87ywwqzqcpa24m6fzsc4d2y0', //placeholder addr
-    },
-    icaController: {
-      address: 'xion1az60z73mezhcyxajgucvlcs3kj72fzwu2l2m5qxmsccs6vmnappqys5pjj',
-    },
-    icaAccount: {
-      address: 'inj1tfvcvjkpw02eeldx2lhtw0xysg3msehyarqe5lwygf3dk40vt9uqhuzlg3',
+      codeId: "246",
     },
     icaFactory: {
       address: 'xion12yetpccljlw9fa3emp7nn0cl4xapc99fym6pns4wjknsxupxe2aqgxlvdd',
     },
+    proxyMultisig: {
+      address: 'xion1ygmla4psmxf8ts6qzg5rm38u973qc2fvsfm28hv4macmj64jecgq4jw7dh',
+    },
   },
 };
 
-export const TEST_VAULT = chainConfigMap[AppChains.XION_TESTNET];
+export const channelOpenInitOptions: Record<AppChains, ChannelInitOptions> = {
+  [AppChains.XION_TESTNET]: {
+    connectionId: "connection-45",
+    counterpartyConnectionId: "connection-213"
+  },
+};
+
+export const XION_RPC = 'https://testnet-rpc.xion-api.com:443';
 
 export const abstraxionProviderConfig = {
-  contracts: [TEST_VAULT.icaFactory.address, TEST_VAULT.cw3FixedMultisig.address],
+  contracts: [
+    chainConfigMap[AppChains.XION_TESTNET].icaFactory.address, 
+    chainConfigMap[AppChains.XION_TESTNET].proxyMultisig.address
+  ],
+  // rpcUrl: XION_RPC,
 };
 
 export const INJECTIVE_RPC = 'https://testnet.sentry.tm.injective.network:443';
@@ -218,6 +226,24 @@ export const RAISING_NFTS_DICT: Record<string, RaisingNFT> = {
   inj1m6spa200qevzfnrt9ca2ez5dgmd7725l0ruc743: {
     ...RAISING_NFTS[2],
   },
+};
+
+    //   codeId: 50,
+    //   address: 'xion105h6k7cv3kvt4vxeh5l86x9wnqudjl8wlx87ywwqzqcpa24m6fzsc4d2y0', //placeholder addr
+    // },
+    // icaController: {
+    //   address: 'xion1az60z73mezhcyxajgucvlcs3kj72fzwu2l2m5qxmsccs6vmnappqys5pjj',
+    // },
+    // icaAccount: {
+    //   address: 'inj1tfvcvjkpw02eeldx2lhtw0xysg3msehyarqe5lwygf3dk40vt9uqhuzlg3',
+
+export const TEST_VAULT = {
+  icaController: {
+    address: 'xion1az60z73mezhcyxajgucvlcs3kj72fzwu2l2m5qxmsccs6vmnappqys5pjj'
+  },
+  icaAccount: {
+    address: 'inj1tfvcvjkpw02eeldx2lhtw0xysg3msehyarqe5lwygf3dk40vt9uqhuzlg3'
+  }
 };
 
 export const EMPTY_NFT_VAULT: NFTVault = {
