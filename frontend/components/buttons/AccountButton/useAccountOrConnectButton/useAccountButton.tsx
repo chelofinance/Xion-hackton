@@ -33,7 +33,7 @@ const useAccountButton = (): {
   const accountButtonProps = useMemo(() => {
     if (userWallet === null) return null;
 
-    const label = shortenAddress(userWallet.account.address);
+    const label = shortenAddress(userWallet.account.bech32Address);
     const onClick = openAccountModal;
     const color: ButtonColor = 'primary';
     const type: ButtonType = 'outline';

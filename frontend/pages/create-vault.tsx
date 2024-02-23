@@ -6,7 +6,7 @@ import NFTTumbnail from '@/components/NFTThumbnail';
 import Card from '@/components/Card';
 import {formatNumber, formatUSD} from '@/utils/number';
 import CoinAmount from '@/components/CoinAmount';
-import {AppChains, TEST_VAULT, TokenSymbols} from '@/constants/app';
+import {AppChains, TokenSymbols} from '@/constants/app';
 import Button from '@/components/Button';
 import {ButtonStatus} from '@/components/Button/types';
 import {useAbstraxionAccount, useAbstraxionSigningClient} from '@burnt-labs/abstraxion';
@@ -61,13 +61,13 @@ const CreateVault: NextPage = () => {
               </Heading>
 
               <div className="space-y-4">
-                <div className="flex justify-between">
+                {vault.ica_multisig_address && <div className="flex justify-between">
                   <div className="Font_label_14px">Address</div>
 
-                  <CopyHelper toCopy={TEST_VAULT.icaAccount.address} className="text-ground">
-                    <span className="w-fit truncate Font_button_md">{shortenAddress(TEST_VAULT.icaAccount.address, 4, 4)}</span>
+                  <CopyHelper toCopy={vault.ica_multisig_address} className="text-ground">
+                    <span className="w-fit truncate Font_button_md">{shortenAddress(vault.ica_multisig_address, 4, 4)}</span>
                   </CopyHelper>
-                </div>
+                </div>}
 
                 {vault.channel_init_info.src_channel_id && (
                   <div className="flex justify-between">

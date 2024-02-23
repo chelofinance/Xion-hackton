@@ -248,3 +248,4 @@ export const PROPOSAL_STATUS_LABEL_DICT: Record<ProposalStatus, string> = {
 // Due to unstable relayers, ICA Account address could be empty when creating a proposal.
 // So, to avoid errors in demo, we use a placeholder address.
 export const INJ_ICA_ACCOUNT_PLACEHOLDER = 'inj1r8x942pe0sf7dd9cpr36szzaflpleav5qx59ke';
+export const ICA_CONTROLLER_FALLBACK = 'xion1az60z73mezhcyxajgucvlcs3kj72fzwu2l2m5qxmsccs6vmnappqys5pjj';

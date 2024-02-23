@@ -1,5 +1,4 @@
 import {ButtonProps} from '@/components/Button';
-import useConnectButton from './useConnectButton';
 import {useModal as useXionModal, useAbstraxionAccount} from '@burnt-labs/abstraxion';
 import useModal from '@/hooks/useModal';
 import useAccountButton from './useAccountButton';
@@ -21,7 +20,6 @@ const useAccountOrConnectButton = (): {
   setXionModal: ReturnType<typeof useXionModal>[1];
 } => {
   const { accountModal } = useAccountButton();
-  const { connectModal } = useConnectButton();
 
   //TODO i need this since xion connects differently from other cosmos chains.
   //To use account abstraction we must login with account abstraction, not with keplr wallet
@@ -51,7 +49,7 @@ const useAccountOrConnectButton = (): {
       ? accountButtonProps
       : { label: 'Connect', iconType: 'arrow_forward', onClick: () => setXionModal(true)}
   );
-  const modal = accountModal ?? connectModal;
+  const modal = accountModal ?? null;
   // END xion login
 
   const [userWallet, setUserWallet] = useAtom(userWalletAtom);
@@ -64,7 +62,7 @@ const useAccountOrConnectButton = (): {
 
     const userWallet = {
       ...abstraxion,
-      account: { address: account.bech32Address }
+      account,
     };
     
     setUserWallet(userWallet);
@@ -74,14 +72,14 @@ const useAccountOrConnectButton = (): {
     if (isConnected && account.bech32Address !== '') {
       const userWallet = {
         ...abstraxion,
-        account: { address: account.bech32Address }
+        account,
       };
       
       setUserWallet(userWallet);
     }
   }, []);
 
-  const { updateMyVaults } = useMyVaults(userWallet?.account.address);
+  const { updateMyVaults } = useMyVaults(userWallet?.account.bech32Address);
 
   useEffect(() => {
     updateMyVaults();

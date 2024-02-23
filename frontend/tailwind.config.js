@@ -98,7 +98,7 @@ module.exports = {
         disabled: 'var(--color-gray300)',
         semantic_bull: 'var(--color-green400)',
         semantic_bear: 'var(--color-red400)',
-        semantic_danger: 'var(--color-red400)',
+        semantic_danger: 'var(--color-red700)',
       },
       backgroundImage: {
         // app_gradient:

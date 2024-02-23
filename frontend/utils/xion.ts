@@ -2,13 +2,17 @@ import {
   AllChains,
   AppChains,
   COIN_DICT,
+  ICA_CONTROLLER_FALLBACK,
+  INJ_ICA_ACCOUNT_PLACEHOLDER,
   ProposalStatus,
   TokenSymbols,
   chainConfigMap,
   channelOpenInitOptions,
 } from '@/constants/app';
+import { MultisigICAVault } from '@/types/asset';
 import type {SendTxResult} from '@/types/tx';
-import {useAbstraxionSigningClient} from '@burnt-labs/abstraxion';
+import { AbstraxionAccount } from '@/types/wallet';
+import {useAbstraxionAccount, useAbstraxionSigningClient} from '@burnt-labs/abstraxion';
 import {DeliverTxResponse} from '@cosmjs/cosmwasm-stargate';
 import type {Coin} from '@cosmjs/stargate';
 import BigNumber from 'bignumber.js';
@@ -108,6 +112,13 @@ export const getBalanceOnXion = async (
   }
 };
 
+export const getIcaAccountAddress = async (signingClient: XionSigningClient, icaControllerAddress: string): Promise<string | undefined> => {
+  const msg = {get_contract_state: {}};
+  const response = await signingClient?.queryContractSmart(icaControllerAddress, msg);
+  const icaAccountAddress: string | undefined = response?.contract_state?.address;
+  return icaAccountAddress;
+}
+
 export type GetVaultMultisigsResponse = {
   controllers: readonly string[];
   multisigs: readonly string[];
@@ -116,7 +127,7 @@ export type GetVaultMultisigsResponse = {
 export const getVaultMultisigs = async (
   signingClient: XionSigningClient,
   bech32Address: string
-): Promise<GetVaultMultisigsResponse> => {
+): Promise<readonly MultisigICAVault[]> => {
   const icaFactoryAddress = chainConfigMap[AppChains.XION_TESTNET].icaFactory.address;
   const msg = {
     query_multisig_by_member: bech32Address,
@@ -125,13 +136,24 @@ export const getVaultMultisigs = async (
   try {
     const response: GetVaultMultisigsResponse | undefined = await signingClient?.queryContractSmart(icaFactoryAddress, msg);
 
-    console.log('getVaultMultisigs response:', response);
+    const vaultMutisigs = response?.multisigs.reduce<Promise<readonly MultisigICAVault[]>>(async (accmPromise, multisig, index) => {
+      const icaControllerAddress = response.controllers[index];
+      const icaAccountAddress = await getIcaAccountAddress(signingClient, icaControllerAddress);
+      
+      const accm = await accmPromise;
 
-    return response ?? {controllers: [], multisigs: []};
+      return icaControllerAddress ? [...accm, {
+        multisigAddress: multisig,
+        icaControllerAddress: icaAccountAddress ? icaControllerAddress : ICA_CONTROLLER_FALLBACK,
+        icaAccountAddress: icaAccountAddress ?? INJ_ICA_ACCOUNT_PLACEHOLDER,
+      }] : accm;
+    }, Promise.resolve([])) ?? [];
+
+    return vaultMutisigs;
   } catch (error) {
     console.log(`Failed to get vault multisigs: ${error}`);
 
-    return {controllers: [], multisigs: []};
+    return [];
   }
 };
 
@@ -222,7 +244,7 @@ const CHANNEL_OPTIONS = channelOpenInitOptions[AppChains.XION_TESTNET];
 
 export async function createICAMultisigVault(
   client: XionSigningClient,
-  account: any,
+  account: AbstraxionAccount,
   ica_factory: string,
   memberAddresses: string[]
 ) {
