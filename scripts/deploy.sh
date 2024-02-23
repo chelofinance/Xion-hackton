@@ -1,5 +1,7 @@
 set -e
 
+yarn
+
 cd ../contracts/proxy
 RUSTFLAGS='-C link-arg=-s' cargo wasm
 cd -
@@ -29,14 +31,24 @@ echo "Multisig ICA Factory Contract: $MULTISIG_ICA_FACTORY_CONTRACT"
 # Testing factory
 yarn start --action execute --contract $MULTISIG_ICA_FACTORY_CONTRACT --network xion-testnet --message '{"deploy_multisig_ica": {"channel_open_init_options":{"connection_id":"connection-45","counterparty_connection_id":"connection-213"},"multisig_instantiate_msg":{"max_voting_period":{"time":36000},"proxy":"'"$PROXY_CONTRACT"'","threshold":{"absolute_count":{"weight":1}},"voters":[{"addr":"xion1wz2k7rrvm472h37swxp90689jzsvyzch3y4cyz","weight":1}]},"salt":"'$(date +%s)'"}}'
 
+EXAMPLE_MULTISIG=$(yarn start --action query --contract $MULTISIG_ICA_FACTORY_CONTRACT --network xion-testnet --message '{"query_multisig_by_creator": "xion1wz2k7rrvm472h37swxp90689jzsvyzch3y4cyz"}' | grep '"multisigs":' | awk -F '[][]' '{split($2,a,","); print a[length(a)]}' | awk '{gsub(/"/,"")}1')
+if [ -z "$EXAMPLE_MULTISIG" ]; then echo "Failed to get EXAMPLE_MULTISIG"; exit 1; fi
+echo "Example Multisig: $EXAMPLE_MULTISIG"
+
+yarn start --action execute --contract $EXAMPLE_MULTISIG --network xion-testnet --message '{"add_member":{"address":"xion1flkj5f92jq46l3cwhnkd7eyyg035r7fqxypw66", "fee": {"amount": "1000000000000000", "denom": "inj"}, "sender":"xion1wz2k7rrvm472h37swxp90689jzsvyzch3y4cyz"}}'
+
+yarn start --action query --contract $MULTISIG_ICA_FACTORY_CONTRACT --network xion-testnet --message '{"query_multisig_by_member": "xion1flkj5f92jq46l3cwhnkd7eyyg035r7fqxypw66"}'
+echo "Above output should contain the example multisig: $EXAMPLE_MULTISIG"
+
+echo "-----------------------------------------------"
 echo "cw3FixedMultisig.codeId: $MULTISIG_CODEID"
 echo "icaFactory.address: $MULTISIG_ICA_FACTORY_CONTRACT"
 echo "proxyMultisig.address: $PROXY_CONTRACT"
-
+echo "-----------------------------------------------"
 echo " - ica_controller: 59"
 echo " - proxy: $PROXY_CODEID"
 echo " - multisig: $MULTISIG_CODEID"
 echo " - factory: $MULTISIG_ICA_FACTORY_CODEID"
-
+echo "-----------------------------------------------"
 echo " - factory: $MULTISIG_ICA_FACTORY_CONTRACT"
 echo " - proxy: $PROXY_CONTRACT"

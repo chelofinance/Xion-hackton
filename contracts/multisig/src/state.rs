@@ -11,6 +11,7 @@ pub struct Config {
     pub total_weight: u64,
     pub max_voting_period: Duration,
     pub proxy: Option<Addr>,
+    pub ica_factory: Option<Addr>,
 }
 
 // unique items

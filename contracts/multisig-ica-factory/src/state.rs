@@ -7,12 +7,19 @@ pub use contract::State as ContractState;
 
 /// The item used to store the state of the application.
 pub const STATE: Item<ContractState> = Item::new("state");
+
 /// The mapping of the multisig contract addresses to the `cw-ica-controller`
 /// contract addresses that they own.
 pub const MULTISIG_ICA: Map<&Addr, Addr> = Map::new("multisig_ica");
-/// The mapping of the multisig contract addresses to the `creator`/`member(ToDo)`
-/// multisig addresses that they own/member.
+
+/// The mapping of the multisig contract addresses to the `creator`
+/// multisig addresses that they own.
 pub const CREATOR_MULTISIG: Map<&Addr, Vec<Addr>> = Map::new("creator_multisig");
+
+/// The mapping of the multisig contract addresses to the `member`
+/// multisig addresses that they are members.
+pub const MEMBER_MULTISIG: Map<&Addr, Vec<Addr>> = Map::new("member_multisig");
+
 /// The mapping of the `cw-ica-controller` contract addresses to the multisig
 /// contract addresses that own them. This is the reverse of [`MULTISIG_ICA`].
 pub const ICA_MULTISIG: Map<&Addr, Addr> = Map::new("ica_multisig");

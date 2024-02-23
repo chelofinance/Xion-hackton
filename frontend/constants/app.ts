@@ -1,9 +1,9 @@
 import GoogleAnalytics from '@/analytics/googleAnalytics/GoogleAnalytics';
 import Mixpanel from '@/analytics/mixpanel/Mixpanel';
 import XION_CHAIN_LOGO from '@/resources/logos/chain_logo_xion.png';
-import type {NFTVault, RaisingNFT} from '@/types/asset';
+import type { NFTVault, RaisingNFT } from '@/types/asset';
 import { ChannelInitOptions } from '@/types/channel';
-import {ContractsDict} from '@/types/contract';
+import { ContractsDict } from '@/types/contract';
 import BigNumber from 'bignumber.js';
 
 export const googleAnalytics = new GoogleAnalytics('google analytics');
@@ -37,7 +37,7 @@ export enum AppChains {
   XION_TESTNET = 'xion-testnet',
 }
 
-export const SUPPORTED_CHAINS_DICT: Record<AppChains, {logoURL: string}> = {
+export const SUPPORTED_CHAINS_DICT: Record<AppChains, { logoURL: string }> = {
   [AppChains.XION_TESTNET]: {
     logoURL: XION_CHAIN_LOGO.src,
   },
@@ -50,7 +50,7 @@ export enum AllChains {
   INJECTIVE_TESTNET = 'Injective Testnet',
 }
 
-export const CHAIN_METADATA_DICT: Record<AllChains, {explorerAddressURL: string}> = {
+export const CHAIN_METADATA_DICT: Record<AllChains, { explorerAddressURL: string }> = {
   [AllChains.XION_TESTNET]: {
     explorerAddressURL: '',
   },
@@ -65,13 +65,13 @@ export const chainConfigMap: Record<AppChains, ContractsDict> = {
       collectionId: '65ca322f3e56373c6b5d1a66',
     },
     cw3FixedMultisig: {
-      codeId: "246",
+      codeId: "256",
     },
     icaFactory: {
-      address: 'xion12yetpccljlw9fa3emp7nn0cl4xapc99fym6pns4wjknsxupxe2aqgxlvdd',
+      address: 'xion1m7a6vv87lr3cueq5xr6p8gk296784eg264p7vhp34g2whm708v5qdxzcwp',
     },
     proxyMultisig: {
-      address: 'xion1ygmla4psmxf8ts6qzg5rm38u973qc2fvsfm28hv4macmj64jecgq4jw7dh',
+      address: 'xion15akp3vrj5zn2u9ktejwjz2s2uf2usk9rdtfkz4klh66w9n5t4xts83n0vl',
     },
   },
 };
@@ -87,7 +87,7 @@ export const XION_RPC = 'https://testnet-rpc.xion-api.com:443';
 
 export const abstraxionProviderConfig = {
   contracts: [
-    chainConfigMap[AppChains.XION_TESTNET].icaFactory.address, 
+    chainConfigMap[AppChains.XION_TESTNET].icaFactory.address,
     chainConfigMap[AppChains.XION_TESTNET].proxyMultisig.address
   ],
   // rpcUrl: XION_RPC,
@@ -105,7 +105,7 @@ export enum TokenSymbols {
   XION = 'XION',
 }
 
-export type CoinData = {denomOn: Record<AllChains, string>; decimals: number};
+export type CoinData = { denomOn: Record<AllChains, string>; decimals: number };
 
 export const COIN_DICT: Record<TokenSymbols, CoinData> = {
   [TokenSymbols.INJ]: {

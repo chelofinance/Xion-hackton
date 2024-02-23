@@ -119,7 +119,7 @@ export const getVaultMultisigs = async (
 ): Promise<GetVaultMultisigsResponse> => {
   const icaFactoryAddress = chainConfigMap[AppChains.XION_TESTNET].icaFactory.address;
   const msg = {
-    query_multisig_by_creator: bech32Address,
+    query_multisig_by_member: bech32Address,
   };
 
   try {

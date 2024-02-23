@@ -9,12 +9,22 @@ pub struct InstantiateMsg {
     pub threshold: Threshold,
     pub max_voting_period: Duration,
     pub proxy: Option<Addr>,
+    pub ica_factory: Option<Addr>,
 }
 
 #[cw_serde]
 pub struct Voter {
     pub addr: String,
     pub weight: u64,
+}
+
+// To update the members list so that we can query later
+#[cw_serde]
+pub enum AddMembershipMsg {
+    AddMembership {
+        multisig_addr: Addr,
+        member_addr: Addr,
+    },
 }
 
 // TODO: add some T variants? Maybe good enough as fixed Empty for now

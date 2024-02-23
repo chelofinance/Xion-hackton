@@ -78,14 +78,14 @@ const useMyNFTVaults = (): readonly MyNFTVault[] => {
     const loadVaults = useCallback(async () => {
         const factory = chainConfigMap[AppChains.XION_TESTNET].icaFactory.address;
         const response: {multisigs: string[]; controllers: string[]} = await client?.queryContractSmart(factory, {
-            query_multisig_by_creator: account.bech32Address,
+            query_multisig_by_member: account.bech32Address,
         });
         console.log(
             'RESPONSE',
             response,
             factory,
             {
-                query_multisig_by_creator: account.bech32Address,
+                query_multisig_by_member: account.bech32Address,
             },
             client
         );
