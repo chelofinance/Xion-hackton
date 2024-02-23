@@ -26,7 +26,7 @@ const useProposals = (address: string | undefined): {
     const getBuyNFTByProposal = useCallback((proposal: ProposalResponse): RaisingNFT | null => {
         const nft = nfts.find((nft) => proposal.msgs.some((msg) => msg.wasm?.execute.contract_addr === nft.buyContractAddress));
         return nft ?? null;
-    }, [nfts]);
+    }, [nfts.length]);
 
     const getVaultProposals = useCallback(async (icaMultisigAddress: string): Promise<readonly {
         nft: RaisingNFT;

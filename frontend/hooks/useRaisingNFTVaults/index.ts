@@ -30,7 +30,7 @@ const useRaisingNFTVaults = (collectionId: string = chainConfigMap[AppChains.XIO
     const {loading, error, data} = useQuery<QueryTalisTokenResponse>(QUERY_TALIS_TOKENS, {
         variables: queryVariable(collectionId),
     });
-    
+
     const info = useMemo(() => loading
     ? {tokens: {tokens: []}}
     : Boolean(error)
@@ -39,7 +39,7 @@ const useRaisingNFTVaults = (collectionId: string = chainConfigMap[AppChains.XIO
 
     const nfts: RaisingNFT[] = useMemo(() => info.tokens.tokens.map(
         (tkn): RaisingNFT => ({
-            chain: AllChains.XION_TESTNET,
+            chain: AllChains.INJECTIVE_TESTNET,
             participants: 0,
             raisedAmount: 0,
             collection: {

@@ -10,6 +10,7 @@ import { IconType } from '@/components/Icon';
 import { useAtom } from 'jotai';
 import { userWalletAtom } from '@/store/states';
 import { abstraxion } from '@/constants/wallet';
+import useMyVaults from '@/hooks/useMyVaults';
 
 type AccountButtonProps = Pick<ButtonProps, 'status' | 'color' | 'iconType' | 'label' | 'onClick'>;
 
@@ -53,7 +54,7 @@ const useAccountOrConnectButton = (): {
   const modal = accountModal ?? connectModal;
   // END xion login
 
-  const [, setUserWallet] = useAtom(userWalletAtom);
+  const [userWallet, setUserWallet] = useAtom(userWalletAtom);
 
   useEffect(() => {
     if (!isConnected || account.bech32Address === '') {
@@ -79,6 +80,12 @@ const useAccountOrConnectButton = (): {
       setUserWallet(userWallet);
     }
   }, []);
+
+  const { updateMyVaults } = useMyVaults(userWallet?.account.address);
+
+  useEffect(() => {
+    updateMyVaults();
+  }, [updateMyVaults]);
 
   return {
     buttonProps,

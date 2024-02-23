@@ -3,14 +3,14 @@ import { GetMultisigThresholdResponse, GetVotersResponse, ProposalResponse, Vote
 import { useAbstraxionSigningClient } from "@burnt-labs/abstraxion";
 import { useCallback, useEffect, useState } from "react";
 import useProposals from "../useProposals";
-
-
+import { useAtom } from "jotai";
+import { myVaultsAtom } from "@/store/states";
 
 const useMyVaults = (address: string | undefined): {
     myVaults: readonly MyVault[];
     updateMyVaults: () => Promise<void>;
 } => {
-    const [myVaults, setMyVaults] = useState<readonly MyVault[]>([]);
+    const [myVaults, setMyVaults] = useAtom(myVaultsAtom);
 
     const { client: abstraxionClient } = useAbstraxionSigningClient();
 
@@ -49,20 +49,7 @@ const useMyVaults = (address: string | undefined): {
         }));
 
         setMyVaults(vaults);
-        // const share = vault.multisig.voters.find(voter => voter.addr === address)?.share ?? 0;
-        // // const shareUSD = priceUSD.times(share);
-        
-        // return {
-        //     ...vault,
-        //     // priceUSD,
-        //     share,
-        //     // shareUSD,
-        // }
     }, [abstraxionClient, address, getVaultProposals]);
-
-    useEffect(() => {
-        updateMyVaults();
-    }, [updateMyVaults]);
 
     return {
         myVaults,

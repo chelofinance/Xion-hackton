@@ -27,6 +27,7 @@ import useBalanceOnXion from '@/hooks/useBalanceOnXion';
 import useCreateVault from '@/hooks/useCreateVault';
 import useMyVaults from '@/hooks/useMyVaults';
 import { MyVault } from '@/types/asset';
+import AmountInput from '@/components/form-presets/AmountInput';
 
 const MyVaults: NextPage = () => {
     const router = useRouter();
@@ -34,7 +35,7 @@ const MyVaults: NextPage = () => {
     const [userWallet] = useAtom(userWalletAtom);
     const {getOraclePrice} = useOraclePrice();
 
-    const { myVaults } = useMyVaults(userWallet?.account.address);
+    const { myVaults, updateMyVaults } = useMyVaults(userWallet?.account.address);
 
     const [selectedVault, setSelectedVault] = useState<MyVault | undefined>();
 
@@ -44,7 +45,7 @@ const MyVaults: NextPage = () => {
     const myINJBalance = getMyBalanceOnXion(TokenSymbols.INJ);
     const myXIONBalance = getMyBalanceOnXion(TokenSymbols.XION);
 
-    const {getBalance: getBalanceOnXion} = useBalanceOnXion(fallbackVault?.multisigAddress);
+    const {getBalance: getBalanceOnXion, updateBalance: updateBalanceOnXion} = useBalanceOnXion(fallbackVault?.multisigAddress);
     const multisigBalance = getBalanceOnXion(TokenSymbols.INJ);
 
     const {depositToVaultMultisig, isProcessing: isDepositToVaultProcessing} = useDepositToVaultMultisig();
@@ -79,37 +80,65 @@ const MyVaults: NextPage = () => {
 
     const {addMember} = useAddMember(fallbackVault?.icaControllerAddress ?? '');
 
-    const form = useRef<HTMLFormElement>(null);
+    const addMemberForm = useRef<HTMLFormElement>(null);
+    const depositForm = useRef<HTMLFormElement>(null);
+
 
     const [newMemberAddress, setNewMemberAddress] = useState<string>('');
     const onChangeNewMemberAddress = (debouncedValue: string) => {
         setNewMemberAddress(debouncedValue);
     };
 
-    /**
-     *
-     * @todo need additional floww to input deposit amount using form
-     */
+    const [isDepositFormOpen, setIsDepositFormOpen] = useState<boolean>(false);
+
+    const [depositAmount, setDepositAmount] = useState<number>(0);
+    const [isDepositAmountValid, setIsDepositAmountValid] = useState<boolean>(true);
+  
+    const onChangeDepositAmount = useCallback((debouncedValue: string, isValid: boolean) => {
+      setIsDepositAmountValid(isValid);
+  
+      const amount = parseFloat(debouncedValue);
+      if (!isNaN(amount)) {
+        setDepositAmount(amount);
+        setIsDepositAmountValid(true);
+      }
+    }, []);
+
     const handleDepositToVault = useCallback(async () => {
-        console.log('HERE', fallbackVault, userWallet);
         if (!fallbackVault || !userWallet) return;
 
         const result = await depositToVaultMultisig(fallbackVault, {
             symbol: TokenSymbols.INJ,
-            depositAmount: 1,
+            depositAmount,
             senderAddress: userWallet.account.address,
         });
 
         if (result?.isSuccess) {
-            // refetch balance
+            await updateBalanceOnXion();
         }
     }, [depositToVaultMultisig, fallbackVault, userWallet]);
+
+    const getDepositAmountErrorMsg = useCallback(
+        (value: string) => {
+          if (value === '' || value === '0') return 'Enter amount';
+    
+          const inputAmount = parseFloat(value);
+          if (isNaN(inputAmount)) return 'Invalid number';
+          return null;
+        },
+        []
+      );
 
     const handleMergeBalance = useCallback(async () => {
         //
     }, []);
 
     const {createVault, isProcessing: isCreateVaultProcessing} = useCreateVault(userWallet);
+
+    const handleCreateVault = useCallback(async () => {
+        await createVault();
+        await updateMyVaults();
+    }, [createVault, updateMyVaults]);
 
     const Content =
         userWallet === null ? (
@@ -148,17 +177,36 @@ const MyVaults: NextPage = () => {
                         iconType="add" 
                         label="Create vault" 
                         status={isCreateVaultProcessing ? 'processing' : 'enabled'}
-                        onClick={createVault} 
+                        onClick={handleCreateVault} 
                     />
 
-                    <ul>
+                    {myVaults.length > 0 && <Heading tagName="h3">My vaults</Heading>}
+
+                    <ul className="w-full flex flex-col gap-y-4">
                         {myVaults.map(myVault => (
                             <li key={myVault.multisigAddress}>
-                                <button type="button" onClick={() => setSelectedVault(myVault)}>
-                                    <Card color={fallbackVault?.multisigAddress === myVault.multisigAddress ? 'primary' : 'glass'} className="p-4">
-                                        {myVault.multisigAddress}
-                                    </Card>
-                                </button>
+                                <Card size="sm" color={fallbackVault?.multisigAddress === myVault.multisigAddress ? 'primary' : 'glass'} className="flex flex-col items-stretch p-4">
+                                    <div className="Font_caption_sm">{shortenAddress(myVault.multisigAddress)}</div>
+
+                                    {myVault.proposals[0]?.nft && (
+                                        <NFTVaultLinkCard
+                                            href="raising-vault"
+                                            nft={myVault.proposals[0].nft}
+                                            amountLabel="Fixed price"
+                                            formattedAmount={formatNumber(myVault.proposals[0].nft.fixedPrice.value, 18)}
+                                            vaultAddress={myVault.multisigAddress}
+                                        />
+                                    )}
+
+                                    <div className="flex justify-end">
+                                        <Button 
+                                            size="sm"
+                                            color={fallbackVault?.multisigAddress === myVault.multisigAddress ? 'on_primary' : 'primary'} 
+                                            label="Manage" 
+                                            onClick={() => setSelectedVault(myVault)}
+                                        />
+                                    </div>
+                                </Card>
                             </li>
                         ))}
                      
@@ -167,7 +215,7 @@ const MyVaults: NextPage = () => {
 
                 {fallbackVault && (
                     <section className="grow shrink flex flex-col gap-y-8">
-                        <Heading tagName="h3">Vault summary</Heading>
+                        <Heading tagName="h3">Vault {shortenAddress(fallbackVault.multisigAddress)}</Heading>
 
                         <Card color="glass" className="flex flex-col justify-between items-stretch gap-y-4 p-4">
                             <div className="Font_label_14px">Balance</div>
@@ -218,12 +266,52 @@ const MyVaults: NextPage = () => {
                                 <Button
                                     // size="sm"
                                     label="Deposit"
-                                    iconType="arrow_forward"
+                                    iconType={isDepositFormOpen ? 'expand_less' : 'expand_more'}
                                     status={isDepositToVaultProcessing ? 'processing' : 'enabled'}
                                     onClick={handleDepositToVault}
                                 />
                             </div>
                         </Card>
+
+                        {isDepositFormOpen && (
+                            <Card color="secondary" className="flex flex-col justify-between items-stretch gap-y-4 p-4">
+                                <div className="Font_label_14px text-white">Deposit</div>
+
+                                <form ref={depositForm} className="flex flex-col items-stretch gap-y-8">
+                                    <div className="flex items-stretch justify-between gap-x-4">
+                                        <div className="w-1/3 h-[3.125rem] flex items-center Font_label_14px whitespace-nowrap">Deposit amount</div>
+
+                                        <AmountInput
+                                            required
+                                            form={depositForm.current}
+                                            label="Deposit amount"
+                                            placeholder="0.0"
+                                            initialValue={depositAmount}
+                                            getErrorMsg={getDepositAmountErrorMsg}
+                                            onChange={onChangeDepositAmount}
+                                        />
+                                    </div>
+
+                                    <div className="flex items-center justify-end gap-x-2">
+                                        <Button
+                                            color="on_secondary"
+                                            type="text"
+                                            label="Cancel"
+                                            className="w-full md:w-fit"
+                                            onClick={() => setIsDepositFormOpen(false)}
+                                        />
+                                        <Button
+                                            color="on_secondary"
+                                            label="Deposit"
+                                            iconType="arrow_forward"
+                                            className="w-full md:w-fit"
+                                            status={isDepositToVaultProcessing ? 'processing' : isDepositAmountValid ? 'enabled' : 'disabled'}
+                                            onClick={handleDepositToVault}
+                                        />
+                                    </div>
+                                </form>
+                            </Card>
+                        )}
 
                         {/* <div className="flex flex-col gap-y-2">
                             <CopyHelper toCopy={fallbackVault.ica.icaMultisigAddress} className="text-body">
@@ -254,13 +342,23 @@ const MyVaults: NextPage = () => {
                         </div> */}
 
                         <section className="space-y-4 mt-4">
-                            <Heading tagName="h4">Proposals</Heading>
+                            <Heading tagName="h4">Buy Proposals</Heading>
 
                             {fallbackVault.proposals.map((proposal) => (
                                 <Card key={proposal.proposal.id} color="primary" className="space-y-4 p-4">
                                     <div>
                                         #{proposal.proposal.id} {proposal.proposal.description}
                                     </div>
+
+                                    <NFTVaultLinkCard
+                                        key={proposal.nft.tokenId}
+                                        href="raising-vault"
+                                        nft={proposal.nft}
+                                        amountLabel="Fixed price"
+                                        formattedAmount={formatNumber(proposal.nft.fixedPrice.value, 18)}
+                                        vaultAddress={fallbackVault.multisigAddress}
+                                    />
+
                                     {proposal.proposal.status === ProposalStatus.Pending && (
                                         <div className="flex justify-end gap-x-2">
                                             <Button
@@ -275,6 +373,7 @@ const MyVaults: NextPage = () => {
                                             />
                                         </div>
                                     )}
+
                                     {proposal.proposal.status !== ProposalStatus.Pending && (
                                         <div className="flex justify-end gap-x-2">
                                             <Tag size="sm" label={PROPOSAL_STATUS_LABEL_DICT[proposal.proposal.status]} />
@@ -288,28 +387,17 @@ const MyVaults: NextPage = () => {
                                     No proposal found
                                 </Card>
                             )}
+
+                            <div className="flex justify-end">
+                                <Button iconType="arrow_forward" label="Propose" onClick={() => router.push('/#home-nfts-table')} />
+                            </div>
                         </section>
-
-                        <div className="flex flex-col gap-4 items-stretch mt-4">
-                            <Heading tagName="h4">NFTs</Heading>
-
-                            {fallbackVault.proposals.map((proposal) => (
-                                <NFTVaultLinkCard
-                                    key={proposal.nft.tokenId}
-                                    href="raising-vault"
-                                    nft={proposal.nft}
-                                    amountLabel="Fixed price"
-                                    formattedAmount={formatNumber(proposal.nft.fixedPrice.value, 18)}
-                                    vaultAddress={fallbackVault.multisigAddress}
-                                />
-                            ))}
-                        </div>
 
                         <section className="space-y-4 mt-4">
                             <Heading tagName="h4">Add member</Heading>
 
                             <TextInput
-                                form={form.current}
+                                form={addMemberForm.current}
                                 initialValue={newMemberAddress}
                                 onChange={onChangeNewMemberAddress}
                                 type="text"
@@ -333,15 +421,6 @@ const MyVaults: NextPage = () => {
                         <Card color="glass" className="p-4 text-body">
                             No vault found.
                         </Card>
-
-                        <div className="flex justify-end">
-                            <Button
-                                size="lg"
-                                label="Create vault"
-                                iconType="arrow_forward"
-                                onClick={() => router.push('/create-vault')}
-                            />
-                        </div>
                     </div>
                 )}
             </div>

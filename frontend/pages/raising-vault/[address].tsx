@@ -18,7 +18,7 @@ import useRaisingNFTVault from '@/hooks/useRaisingNFTVaults';
 import useMyNFTVaults from '@/hooks/useMyNFTVaults';
 import {MyNFTVault, MyVault, NFT, RaisingNFT} from '@/types/asset';
 import {useAtom} from 'jotai';
-import {userWalletAtom} from '@/store/states';
+import {myVaultsAtom, userWalletAtom} from '@/store/states';
 import NumberText from '@/components/NumberText';
 import {useRouter} from 'next/router';
 import PageLoader from '@/components/PageLoader';
@@ -31,6 +31,7 @@ import useMyVaults from '@/hooks/useMyVaults';
 import useDepositToVaultMultisig from '@/hooks/useDepositToVaultMultisig';
 import useBalanceOnXion from '@/hooks/useBalanceOnXion';
 import FTAmount from '@/struct/FTAmount';
+import useBalanceOnInjective from '@/hooks/useBalanceOnInjective';
 
 const CONFIG = chainConfigMap[AppChains.XION_TESTNET];
 
@@ -48,7 +49,7 @@ const RaisingVault: NextPage = () => {
   const {address} = router.query;
 
   const nftList = useRaisingNFTVault();
-  const nft = nftList.find((nft) => nft.tokenId === address);
+  const nft = nftList.find((nft) => `${nft.collection.contractAddress}${nft.tokenId}` === address);
 
   const [userWallet] = useAtom(userWalletAtom);
 
@@ -127,7 +128,7 @@ const RaisingVault: NextPage = () => {
     if (nft) router.push(`/nft/${nft.collection.contractAddress}${nft.tokenId}`);
   }, [nft]);
 
-  const { myVaults } = useMyVaults(userWallet?.account.address);
+  const [myVaults] = useAtom(myVaultsAtom);
 
   const {myNFT, myVault} = useMemo<{
     myNFT: RaisingNFT | undefined;
@@ -142,6 +143,11 @@ const RaisingVault: NextPage = () => {
     };
   }, [myVaults, nft?.tokenId]);
 
+  const { getBalance: getBalanceOnInjective } = useBalanceOnInjective(myVault?.multisigAddress);
+
+  const myVaultBalance = getBalanceOnInjective(TokenSymbols.INJ);
+  const isRaisedAll = useMemo<boolean>(() => !!nft && myVaultBalance.shifted.eq(nft.fixedPrice.value), [nft, myVaultBalance.shifted]);
+
   const myNFTPriceUSD = useMemo<BigNumber>(() => {
     if (!myNFT) return new BigNumber(0);
     const oraclePrice = getOraclePrice(myNFT.fixedPrice.symbol);
@@ -149,7 +155,6 @@ const RaisingVault: NextPage = () => {
     return priceUSD;
   }, [myNFT]);
 
-  const isRaisedAll = useMemo<boolean>(() => maxDepositAmount === 0, [maxDepositAmount]);
   const isOwningVault = useMemo<boolean>(() => nft?.ownerAddress === myVault?.multisigAddress, [nft, myVault]);
 
   const {depositToVaultMultisig, isProcessing: isDepositToVaultProcessing} = useDepositToVaultMultisig();
@@ -329,12 +334,32 @@ const RaisingVault: NextPage = () => {
               {/* </div> */}
             </Card>
 
-            {isRaisedAll && (
+            {!myVault && myVaults.length === 0 && (
+              <Card color="glass" className="flex items-stretch justify-between gap-x-4 p-4 text-body">
+                <div className="Font_body_md">You do not have any vault.</div>
+
+                <div className="flex justify-end">
+                  <Button iconType="arrow_forward" label="Create vault" onClick={() => router.push('/my-vaults')} />
+                </div>
+              </Card>
+            )}
+
+            {!myVault && myVaults.length > 0 && (
+              <Card color="glass" className="flex items-stretch justify-between gap-x-4 p-4 text-body">
+                <div className="Font_body_md">Select vault to make proposal</div>
+
+                <div className="flex justify-end">
+                  <Button iconType="arrow_forward" label="Buy vault" onClick={() => router.push('/my-vaults')} />
+                </div>
+              </Card>
+            )}
+
+            {myVault && (
               <Card color="glass" className="flex items-stretch justify-between gap-x-4 p-4 text-body">
                 <div className="h-6 flex flex-col justify-center Font_label_14px">Vault balance</div>
 
                 <div className="flex flex-col gap-y-2 items-end">
-                  <CoinAmount size="md" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(tmpRaisedAmount.shifted)} />
+                  <CoinAmount size="md" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(myVaultBalance.shifted)} />
                   <CaptionAmount size="sm" formattedAmount={formattedPriceUSD} />
                 </div>
               </Card>
@@ -415,6 +440,7 @@ const RaisingVault: NextPage = () => {
                       label="Deposit"
                       iconType="arrow_forward"
                       className="w-full md:w-fit"
+                      status={isDepositToVaultProcessing ? 'processing' : 'enabled'}
                       onClick={handleDeposit}
                       {...depositButtonProps}
                     />

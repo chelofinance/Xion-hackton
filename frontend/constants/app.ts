@@ -65,7 +65,7 @@ export const chainConfigMap: Record<AppChains, ContractsDict> = {
       collectionId: '65ca322f3e56373c6b5d1a66',
     },
     cw3FixedMultisig: {
-      codeId: "232",
+      codeId: "246",
     },
     icaFactory: {
       address: 'xion12yetpccljlw9fa3emp7nn0cl4xapc99fym6pns4wjknsxupxe2aqgxlvdd',
