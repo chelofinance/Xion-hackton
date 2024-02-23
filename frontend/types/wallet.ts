@@ -1,3 +1,5 @@
+import { useAbstraxionAccount } from "@burnt-labs/abstraxion";
+
 export type WalletType = 'abstraxion';
 
 export type Wallet = Readonly<{
@@ -9,9 +11,11 @@ export type Wallet = Readonly<{
   isComing?: boolean;
 }>;
 
+export type AbstraxionAccount = ReturnType<typeof useAbstraxionAccount>['data'];
+
 export type ConnectedWallet = Readonly<
   Omit<Wallet, 'onNoConnector'> 
   & {
-    account: { address: string };
+    account: AbstraxionAccount;
   }
 >;

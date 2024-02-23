@@ -8,7 +8,8 @@ import {
   channelOpenInitOptions,
 } from '@/constants/app';
 import type {SendTxResult} from '@/types/tx';
-import {useAbstraxionSigningClient} from '@burnt-labs/abstraxion';
+import { AbstraxionAccount } from '@/types/wallet';
+import {useAbstraxionAccount, useAbstraxionSigningClient} from '@burnt-labs/abstraxion';
 import {DeliverTxResponse} from '@cosmjs/cosmwasm-stargate';
 import type {Coin} from '@cosmjs/stargate';
 import BigNumber from 'bignumber.js';
@@ -222,7 +223,7 @@ const CHANNEL_OPTIONS = channelOpenInitOptions[AppChains.XION_TESTNET];
 
 export async function createICAMultisigVault(
   client: XionSigningClient,
-  account: any,
+  account: AbstraxionAccount,
   ica_factory: string,
   memberAddresses: string[]
 ) {

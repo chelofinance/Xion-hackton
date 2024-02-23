@@ -3,8 +3,9 @@
 import {v4 as uuidv4} from 'uuid';
 import {produceProposal} from './propose';
 import {SendTxResult} from '@/types/tx';
-import {GetProposalsResponse} from './xion';
+import {GetProposalsResponse, XionSigningClient} from './xion';
 import {AppChains, chainConfigMap, channelOpenInitOptions} from '@/constants/app';
+import { AbstraxionAccount } from '@/types/wallet';
 
 export async function getIcaAccountAddress(client: any, ica_controller_address: string) {
     const contract_response = await client?.queryContractSmart(ica_controller_address, {get_contract_state: {}});
@@ -117,8 +118,8 @@ export async function createIcaProposal({
     multisig,
     icaController,
 }: {
-    client: any;
-    account: any;
+    client: XionSigningClient;
+    account: AbstraxionAccount;
     injectiveMsg: any;
     multisig: string;
     icaController: string;
@@ -136,19 +137,27 @@ export async function createIcaProposal({
     };
 
     try {
-        console.log(multisigProposal, proxyMessage, proxy, account.bech32Address);
+        console.log({
+            multisigProposal, 
+            proxyMessage,
+            proxy, 
+            address: account.bech32Address,
+        });
+
         const executionResponse = await client?.execute(account.bech32Address, proxy, proxyMessage, 'auto');
         console.log('executionResponse', executionResponse);
 
-        const proposal_id = executionResponse?.events
+        const proposal_id: string | undefined = executionResponse?.events
             .find((e: any) => e.type === 'wasm')
             ?.attributes.find((a: any) => a.key === 'proposal_id')?.value;
+
         console.log('proposal_id', proposal_id);
+
         return {proposal_id};
     } catch (error) {
         console.log('error', error);
         alert(error);
-        return {proposal_id: 'null'};
+        return {proposal_id: undefined};
     }
 }
 

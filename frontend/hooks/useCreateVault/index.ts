@@ -31,7 +31,7 @@ const useCreateVault = (userWallet: ConnectedWallet | null) => {
         startProcessing(true);
 
         try {
-          const abstractAccount = await abstraxionClient.getAccount(userWallet.account.address);
+          const abstractAccount = await abstraxionClient.getAccount(userWallet.account.bech32Address);
     
           if (!abstractAccount) {
             stopProcessing();
@@ -44,11 +44,11 @@ const useCreateVault = (userWallet: ConnectedWallet | null) => {
           console.log('account', account);
 
           const icaFactoryAddress = chainConfigMap[AppChains.XION_TESTNET].icaFactory.address;
-          const memberAddresses = options?.memberAddresses ? [userWallet.account.address, ...options.memberAddresses] : [userWallet.account.address];
+          const memberAddresses = options?.memberAddresses ? [userWallet.account.bech32Address, ...options.memberAddresses] : [userWallet.account.bech32Address];
 
           const result = await createIcaMultisig(
             abstraxionClient,
-            { bech32Address: userWallet.account.address },
+            { bech32Address: userWallet.account.bech32Address },
             icaFactoryAddress,
             memberAddresses
           );

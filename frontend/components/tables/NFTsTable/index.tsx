@@ -40,7 +40,7 @@ const coin = COIN_DICT[TokenSymbols.INJ];
 const NFTsTable = ({className = '', tooltipLayer}: NFTsTableProps) => {
   const {getOraclePrice} = useOraclePrice();
   const [userWallet] = useAtom(userWalletAtom);
-  const {myVaults, updateMyVaults} = useMyVaults(userWallet?.account.address);
+  const {myVaults, updateMyVaults} = useMyVaults(userWallet?.account.bech32Address);
   const nfts = useRaisingNFTVaults();
 
   const rows = useMemo<readonly NFTsTableRow[]>(() => {

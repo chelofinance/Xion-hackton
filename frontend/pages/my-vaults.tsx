@@ -35,13 +35,13 @@ const MyVaults: NextPage = () => {
     const [userWallet] = useAtom(userWalletAtom);
     const {getOraclePrice} = useOraclePrice();
 
-    const {myVaults, updateMyVaults} = useMyVaults(userWallet?.account.address);
+    const {myVaults, updateMyVaults} = useMyVaults(userWallet?.account.bech32Address);
 
     const [selectedVault, setSelectedVault] = useState<MyVault>();
 
     const fallbackVault = selectedVault ?? myVaults[0];
 
-    const {getBalance: getMyBalanceOnXion} = useBalanceOnXion(userWallet?.account.address);
+    const {getBalance: getMyBalanceOnXion} = useBalanceOnXion(userWallet?.account.bech32Address);
     const myINJBalance = getMyBalanceOnXion(TokenSymbols.INJ);
     const myXIONBalance = getMyBalanceOnXion(TokenSymbols.XION);
 
@@ -69,7 +69,7 @@ const MyVaults: NextPage = () => {
 
             return accm.plus(shareUSD);
         }, new BigNumber(0));
-    }, [getOraclePrice, myVaults, userWallet?.account.address]);
+    }, [getOraclePrice, myVaults, userWallet?.account.bech32Address]);
 
     const formattedTotalUSD = useMemo(
         () => formatUSD(vaultBalance.usd.plus(myNFTVaultsValueUSD)),
@@ -108,7 +108,7 @@ const MyVaults: NextPage = () => {
         const result = await depositToVaultMultisig(fallbackVault, {
             symbol: TokenSymbols.INJ,
             depositAmount,
-            senderAddress: userWallet.account.address,
+            senderAddress: userWallet.account.bech32Address,
         });
 
         if (result?.isSuccess) {

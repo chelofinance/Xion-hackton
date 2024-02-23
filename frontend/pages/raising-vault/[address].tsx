@@ -63,7 +63,7 @@ const RaisingVault: NextPage = () => {
 
   const [userWallet] = useAtom(userWalletAtom);
 
-  const {getBalance, updateBalance} = useBalanceOnXion(userWallet?.account.address);
+  const {getBalance, updateBalance} = useBalanceOnXion(userWallet?.account.bech32Address);
 
   const [tmpRaisedAmount, setTmpRaisedAmount] = useState<FTAmount>(() => getBalance(TokenSymbols.INJ));
 
@@ -187,7 +187,7 @@ const RaisingVault: NextPage = () => {
       await depositToVaultMultisig(myVault, {
         symbol: TokenSymbols.INJ,
         depositAmount,
-        senderAddress: userWallet.account.address,
+        senderAddress: userWallet.account.bech32Address,
       });
 
       await updateBalance();
@@ -206,33 +206,48 @@ const RaisingVault: NextPage = () => {
   });
 
   const {client} = useAbstraxionSigningClient();
-  const {data: account} = useAbstraxionAccount();
+  const {data: abstraxionAccount} = useAbstraxionAccount();
 
-  const handleICABuyNft = async () => {
+  const [isSelectVaultOpen, setIsSelectVaultOpen] = useState<boolean>(false);
+  const [selectedVault, setSelectedVault] = useState<MyVault>();
+
+  const fallbackSelectedVault = useMemo(() => selectedVault ?? myVaults[0], [selectedVault, myVaults]);
+
+  const handleICABuyNft = useCallback(async () => {
     if (!nft) return;
-    if (!router.query.vault || myVaults.length <= 0) router.push('/my-vaults'); //go use vault
 
-    const vaultUsed = myVaults.find((vault) => vault.multisigAddress === router.query.vault) || (myVaults[0] as MyVault);
+    const proposingVault = myVault ?? fallbackSelectedVault;
+
+    if (!proposingVault) {
+      alert('Create a vault to buy NFTs.')
+      return;
+    }
+
+    // const vaultUsed = myVaults.find((vault) => vault.multisigAddress === router.query.vault) || (myVaults[0] as MyVault);
 
     try {
-      const proposal = createIcaBuyMsg({
-        ica: vaultUsed?.icaControllerAddress || 'relaying',
+      const proposalMsg = createIcaBuyMsg({
+        ica: proposingVault.icaControllerAddress || 'relaying',
         buyContract: nft.buyContractAddress,
         nftContract: nft.collection.contractAddress,
         tokenId: nft.tokenId,
-        cost: new BigNumber(nft.fixedPrice.value.toString()).shiftedBy(18).toString(),
+        cost: nft.fixedPrice.value.shiftedBy(COIN_DICT[nft.fixedPrice.symbol].decimals).dp(0).toString(),
       });
-      const {proposal_id} = await createIcaProposal({
+
+      const { proposal_id } = await createIcaProposal({
         client,
-        account,
-        injectiveMsg: proposal,
-        multisig: vaultUsed?.multisigAddress,
-        icaController: vaultUsed?.icaControllerAddress,
+        account: abstraxionAccount,
+        injectiveMsg: proposalMsg,
+        multisig: proposingVault.multisigAddress,
+        icaController: proposingVault.icaControllerAddress,
       });
-    } catch (err) {
-      console.log('ERR:', err);
+
+      console.log('createIcaProposal response:', { proposal_id })
+
+    } catch (error) {
+      console.log('createIcaProposal faile:', error);
     }
-  };
+  }, [nft, myVault, fallbackSelectedVault]);
 
   const handleICASellNft = async () => {
     if (!nft) return;
@@ -243,11 +258,6 @@ const RaisingVault: NextPage = () => {
       console.log('ERR:', err);
     }
   };
-
-  const [isSelectVaultOpen, setIsSelectVaultOpen] = useState<boolean>(false);
-  const [selectedVault, setSelectedVault] = useState<MyVault>();
-
-  const fallbackSelectedVault = selectedVault ?? myVaults[0];
 
   if (nft === undefined) return <PageLoader />;
 
@@ -373,7 +383,7 @@ const RaisingVault: NextPage = () => {
                     </ul>
 
                     <div className="flex justify-end">
-                      <Button iconType="arrow_forward" color="on_primary" label="OK" />
+                      <Button iconType="arrow_forward" color="on_primary" label="OK" onClick={handleICABuyNft} />
                     </div>
                   </Card>
                 )}

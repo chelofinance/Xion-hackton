@@ -64,7 +64,7 @@ const useAccountOrConnectButton = (): {
 
     const userWallet = {
       ...abstraxion,
-      account: { address: account.bech32Address }
+      account,
     };
     
     setUserWallet(userWallet);
@@ -74,14 +74,14 @@ const useAccountOrConnectButton = (): {
     if (isConnected && account.bech32Address !== '') {
       const userWallet = {
         ...abstraxion,
-        account: { address: account.bech32Address }
+        account,
       };
       
       setUserWallet(userWallet);
     }
   }, []);
 
-  const { updateMyVaults } = useMyVaults(userWallet?.account.address);
+  const { updateMyVaults } = useMyVaults(userWallet?.account.bech32Address);
 
   useEffect(() => {
     updateMyVaults();
