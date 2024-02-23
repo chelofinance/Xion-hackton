@@ -101,7 +101,10 @@
     --color-sky400-o10: rgba(224, 249, 255, 0.1);
     --color-sky500: #E1FBFF;
     /* red */
+    --color-red100: #FF8080;
+    --color-red200: #FF6868;
     --color-red400: rgb(250, 43, 57);
+    --color-red700: #7D0A0A;
     /* gree */
     --color-green400: #01BF08;
      /* rgb(0, 255, 0); */

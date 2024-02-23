@@ -32,6 +32,8 @@ import useDepositToVaultMultisig from '@/hooks/useDepositToVaultMultisig';
 import useBalanceOnXion from '@/hooks/useBalanceOnXion';
 import FTAmount from '@/struct/FTAmount';
 import useBalanceOnInjective from '@/hooks/useBalanceOnInjective';
+import CheckItem from '@/components/CheckItem';
+import { shortenAddress } from '@/utils/text';
 
 const CONFIG = chainConfigMap[AppChains.XION_TESTNET];
 
@@ -245,6 +247,11 @@ const RaisingVault: NextPage = () => {
     }
   };
 
+  const [isSelectVaultOpen, setIsSelectVaultOpen] = useState<boolean>(false);
+  const [selectedVault, setSelectedVault] = useState<MyVault>();
+
+  const fallbackSelectedVault = selectedVault ?? myVaults[0];
+
   if (nft === undefined) return <PageLoader />;
 
   return (
@@ -320,7 +327,6 @@ const RaisingVault: NextPage = () => {
             </Card>
 
             <Card color="glass" className="flex items-stretch justify-between gap-x-4 p-4 text-body">
-              {/* <div className="flex items-stretch justify-between gap-x-4 text-body"> */}
               <div className="h-6 flex flex-col justify-center Font_label_14px">Fixed price</div>
 
               <div className="flex flex-col gap-y-2 items-end">
@@ -331,12 +337,11 @@ const RaisingVault: NextPage = () => {
                 />
                 <CaptionAmount size="sm" formattedAmount={formattedPriceUSD} />
               </div>
-              {/* </div> */}
             </Card>
 
             {!myVault && myVaults.length === 0 && (
               <Card color="glass" className="flex items-stretch justify-between gap-x-4 p-4 text-body">
-                <div className="Font_body_md">You do not have any vault.</div>
+                <div className="Font_body_md">Get a vault to buy NFTs.</div>
 
                 <div className="flex justify-end">
                   <Button iconType="arrow_forward" label="Create vault" onClick={() => router.push('/my-vaults')} />
@@ -345,13 +350,37 @@ const RaisingVault: NextPage = () => {
             )}
 
             {!myVault && myVaults.length > 0 && (
-              <Card color="glass" className="flex items-stretch justify-between gap-x-4 p-4 text-body">
-                <div className="Font_body_md">Select vault to make proposal</div>
-
+              <div className="space-y-4">
                 <div className="flex justify-end">
-                  <Button iconType="arrow_forward" label="Buy vault" onClick={() => router.push('/my-vaults')} />
+                  <Button iconType="expand_more" label="Buy NFT" onClick={() => setIsSelectVaultOpen(!isSelectVaultOpen)} />
                 </div>
-              </Card>
+
+                {isSelectVaultOpen && (
+                  <Card color="primary" className="flex flex-col gap-y-4 p-4">
+                    <div className="h-6 Font_label_14px">Select vault to make buy proposal.</div>
+
+                    <ul className="flex flex-wrap gap-x-2">
+                      {myVaults.map(myVault => (
+                        <li key={myVault.multisigAddress}>
+                          <CheckItem 
+                            label={shortenAddress(myVault.multisigAddress)}
+                            checked={fallbackSelectedVault?.multisigAddress === myVault.multisigAddress}
+                            onChange={(isChecked) => {
+                              if (isChecked) {
+                                setSelectedVault(myVault);
+                              }
+                            }}
+                          />
+                        </li>
+                      ))}
+                    </ul>
+
+                    <div className="flex justify-end">
+                      <Button iconType="arrow_forward" color="on_primary" label="OK" />
+                    </div>
+                  </Card>
+                )}
+              </div>
             )}
 
             {myVault && (
