@@ -9,7 +9,7 @@ const executeType = InjectiveWasmxV1Beta1Tx.MsgExecuteContractCompat as Generate
 
 const allTypes: Array<[string, GeneratedType]> = [[INJECTIVE_CONTRACT_MSG_URI, executeType], ...stargateTypes, ...wasmTypes];
 
-const registry = new Registry(allTypes);
+export const registry = new Registry(allTypes);
 
 const buildInjectiveContractMsg = ({value}: EncodeObject) => {
   const message = value.msg;
