@@ -1,9 +1,10 @@
-import { AllChains, AppChains, COIN_DICT, ProposalStatus, TokenSymbols, chainConfigMap } from "@/constants/app";
+import { AllChains, AppChains, COIN_DICT, ProposalStatus, TokenSymbols, chainConfigMap, channelOpenInitOptions } from "@/constants/app";
 import type { SendTxResult } from "@/types/tx";
 import { useAbstraxionSigningClient } from "@burnt-labs/abstraxion";
 import { DeliverTxResponse } from "@cosmjs/cosmwasm-stargate";
 import type { Coin } from "@cosmjs/stargate";
 import BigNumber from "bignumber.js";
+import {v4 as uuidv4} from 'uuid';
 
 export type HandleDepositArgs = {
   symbol: TokenSymbols;
@@ -195,4 +196,91 @@ export async function getMultisigThreshold(client: XionSigningClient, icaMultisi
   }
 
   return undefined;
+}
+
+const CONFIG = chainConfigMap[AppChains.XION_TESTNET];
+const CHANNEL_OPTIONS = channelOpenInitOptions[AppChains.XION_TESTNET];
+
+export async function createICAMultisigVault(
+  client: XionSigningClient,
+  account: any,
+  ica_factory: string,
+  memberAddresses: string[]
+) {
+  const voters = memberAddresses.map((address) => ({
+    addr: address,
+    weight: 1,
+  }));
+
+  const msg = {
+    deploy_multisig_ica: {
+      multisig_instantiate_msg: {
+        voters,
+        threshold: {
+          absolute_count: {
+            weight: 1,
+          },
+        },
+        max_voting_period: {
+          time: 36000,
+        },
+        proxy: CONFIG.proxyMultisig.address,
+      },
+      channel_open_init_options: {
+        connection_id: CHANNEL_OPTIONS.connectionId,
+        counterparty_connection_id:
+          CHANNEL_OPTIONS.counterpartyConnectionId,
+      },
+      salt: uuidv4(),
+    },
+  };
+  console.log("msg", msg);
+
+  try {
+    const instantiateResponse = await client?.execute(
+      account.bech32Address,
+      ica_factory,
+      msg,
+      "auto"
+    );
+    console.log("instantiateResponse", instantiateResponse);
+
+    const instantiate_events = instantiateResponse?.events.filter(
+      (e: any) => e.type === "instantiate"
+    );
+    const ica_multisig_address = instantiate_events
+      ?.find((e: any) =>
+        e.attributes.find(
+          (attr: any) => attr.key === "code_id" && attr.value === CONFIG.cw3FixedMultisig.codeId
+        )
+      )
+      ?.attributes.find((attr: any) => attr.key === "_contract_address")?.value;
+    console.log("ica_multisig_address:", ica_multisig_address);
+
+    const channel_open_init_events = instantiateResponse?.events.filter(
+      (e: any) => e.type === "channel_open_init"
+    );
+    console.log("channel_open_init_events", channel_open_init_events);
+    const src_channel_id = channel_open_init_events?.[0]?.attributes?.find(
+      (attr: any) => attr.key === "channel_id"
+    )?.value;
+    const src_port_id = channel_open_init_events?.[0]?.attributes?.find(
+      (attr: any) => attr.key === "port_id"
+    )?.value;
+    const destination_port = channel_open_init_events?.[0]?.attributes?.find(
+      (attr: any) => attr.key === "counterparty_port_id"
+    )?.value;
+
+    return {
+      ica_multisig_address,
+      channel_init_info: {
+        src_channel_id,
+        src_port_id,
+        destination_port,
+      },
+    };
+  } catch (error) {
+    console.log("error", error);
+    alert(error);
+  }
 }

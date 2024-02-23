@@ -5,13 +5,14 @@ import { CreateIcaMultisigResult, createIcaMultisig } from "@/utils/multisig";
 import { AppChains, chainConfigMap } from "@/constants/app";
 import { useCallback } from "react";
 import { SendTxResult } from "@/types/tx";
+import { createICAMultisigVault } from "@/utils/xion";
 
 const useCreateVault = (userWallet: ConnectedWallet | null) => {
     const { target, startProcessing, stopProcessing } = useProcessing<boolean>();
 
     const { client: abstraxionClient } = useAbstraxionSigningClient();
 
-    const createVault = useCallback(async (options?: { memberAddresses: string[] }): Promise<SendTxResult<CreateIcaMultisigResult> | null> => {
+    const createVault = useCallback(async (options?: { memberAddresses: string[] }): Promise<SendTxResult<any> | null> => {
         if (!userWallet) {
             console.log('Connected account not found.');
             return null;
@@ -44,11 +45,11 @@ const useCreateVault = (userWallet: ConnectedWallet | null) => {
             memberAddresses
           );
 
-          console.log('createIcaMultisig response: ', result);
+          console.log('createICAMultisigVault response: ', result);
 
           stopProcessing();
 
-          return result;
+          return result ? { isSuccess: true, response: result } : null;
         } catch (err) {
           stopProcessing();
           console.log('RALPH ERR: ', err);

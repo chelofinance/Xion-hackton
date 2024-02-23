@@ -3,6 +3,7 @@ import QUERY_TALIS_TOKENS, {QueryTalisTokenResponse} from '@/data/graphql/querie
 import {RaisingNFT} from '@/types/asset';
 import {useQuery} from '@apollo/client';
 import BigNumber from 'bignumber.js';
+import { useMemo } from 'react';
 
 const queryVariable = (collectionId: string, options?: {limit: number}) => ({
     input: {
@@ -29,13 +30,14 @@ const useRaisingNFTVaults = (collectionId: string = chainConfigMap[AppChains.XIO
     const {loading, error, data} = useQuery<QueryTalisTokenResponse>(QUERY_TALIS_TOKENS, {
         variables: queryVariable(collectionId),
     });
-    const info = loading
+    
+    const info = useMemo(() => loading
+    ? {tokens: {tokens: []}}
+    : Boolean(error)
         ? {tokens: {tokens: []}}
-        : Boolean(error)
-            ? {tokens: {tokens: []}}
-            : (data as QueryTalisTokenResponse);
+        : (data as QueryTalisTokenResponse), [loading, error, data]);
 
-    const nfts: RaisingNFT[] = info.tokens.tokens.map(
+    const nfts: RaisingNFT[] = useMemo(() => info.tokens.tokens.map(
         (tkn): RaisingNFT => ({
             chain: AllChains.XION_TESTNET,
             participants: 0,
@@ -62,7 +64,7 @@ const useRaisingNFTVaults = (collectionId: string = chainConfigMap[AppChains.XIO
             buyContractAddress: tkn.onChainInfo.sellOrderInfo?.order.contract_address || '',
             onSale: tkn.onSale,
         })
-    );
+    ), [info]);
 
     return nfts;
 };

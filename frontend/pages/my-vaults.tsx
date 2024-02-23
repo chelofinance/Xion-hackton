@@ -26,6 +26,7 @@ import useBalanceOnInjective from '@/hooks/useBalanceOnInjective';
 import useBalanceOnXion from '@/hooks/useBalanceOnXion';
 import useCreateVault from '@/hooks/useCreateVault';
 import useMyVaults from '@/hooks/useMyVaults';
+import { MyVault } from '@/types/asset';
 
 const MyVaults: NextPage = () => {
     const router = useRouter();
@@ -35,19 +36,20 @@ const MyVaults: NextPage = () => {
 
     const { myVaults } = useMyVaults(userWallet?.account.address);
 
-    // const [selectedVault, setSelectedVault] = useState<MyNFTVault | undefined>(() => myVaults[0]);
-    const selectedVault = myVaults[0];
+    const [selectedVault, setSelectedVault] = useState<MyVault | undefined>();
+
+    const fallbackVault = selectedVault ?? myVaults[0];
 
     const {getBalance: getMyBalanceOnXion} = useBalanceOnXion(userWallet?.account.address);
     const myINJBalance = getMyBalanceOnXion(TokenSymbols.INJ);
     const myXIONBalance = getMyBalanceOnXion(TokenSymbols.XION);
 
-    const {getBalance: getBalanceOnXion} = useBalanceOnXion(selectedVault?.multisigAddress);
+    const {getBalance: getBalanceOnXion} = useBalanceOnXion(fallbackVault?.multisigAddress);
     const multisigBalance = getBalanceOnXion(TokenSymbols.INJ);
 
     const {depositToVaultMultisig, isProcessing: isDepositToVaultProcessing} = useDepositToVaultMultisig();
 
-    const {getBalance: getBalanceOnInjective} = useBalanceOnInjective(selectedVault?.multisigAddress);
+    const {getBalance: getBalanceOnInjective} = useBalanceOnInjective(fallbackVault?.multisigAddress);
     const vaultBalance = getBalanceOnInjective(TokenSymbols.INJ);
 
     const myNFTVaultsValueUSD = useMemo(() => {
@@ -73,9 +75,9 @@ const MyVaults: NextPage = () => {
         [vaultBalance.usd, myNFTVaultsValueUSD]
     );
 
-    const { voteProposal} = useProposals(selectedVault?.icaControllerAddress ?? '');
+    const { voteProposal} = useProposals(fallbackVault?.icaControllerAddress ?? '');
 
-    const {addMember} = useAddMember(selectedVault?.icaControllerAddress ?? '');
+    const {addMember} = useAddMember(fallbackVault?.icaControllerAddress ?? '');
 
     const form = useRef<HTMLFormElement>(null);
 
@@ -89,10 +91,10 @@ const MyVaults: NextPage = () => {
      * @todo need additional floww to input deposit amount using form
      */
     const handleDepositToVault = useCallback(async () => {
-        console.log('HERE', selectedVault, userWallet);
-        if (!selectedVault || !userWallet) return;
+        console.log('HERE', fallbackVault, userWallet);
+        if (!fallbackVault || !userWallet) return;
 
-        const result = await depositToVaultMultisig(selectedVault, {
+        const result = await depositToVaultMultisig(fallbackVault, {
             symbol: TokenSymbols.INJ,
             depositAmount: 1,
             senderAddress: userWallet.account.address,
@@ -101,9 +103,9 @@ const MyVaults: NextPage = () => {
         if (result?.isSuccess) {
             // refetch balance
         }
-    }, [depositToVaultMultisig, selectedVault, userWallet]);
+    }, [depositToVaultMultisig, fallbackVault, userWallet]);
 
-    const handleTransferToVault = useCallback(async () => {
+    const handleMergeBalance = useCallback(async () => {
         //
     }, []);
 
@@ -151,15 +153,19 @@ const MyVaults: NextPage = () => {
 
                     <ul>
                         {myVaults.map(myVault => (
-                            <div key={myVault.multisigAddress}>
-                                {myVault.multisigAddress}
-                            </div>
+                            <li key={myVault.multisigAddress}>
+                                <button type="button" onClick={() => setSelectedVault(myVault)}>
+                                    <Card color={fallbackVault?.multisigAddress === myVault.multisigAddress ? 'primary' : 'glass'} className="p-4">
+                                        {myVault.multisigAddress}
+                                    </Card>
+                                </button>
+                            </li>
                         ))}
                      
                     </ul>
                 </section>
 
-                {selectedVault && (
+                {fallbackVault && (
                     <section className="grow shrink flex flex-col gap-y-8">
                         <Heading tagName="h3">Vault summary</Heading>
 
@@ -179,9 +185,9 @@ const MyVaults: NextPage = () => {
                                         chain={AllChains.INJECTIVE_TESTNET}
                                         formattedAmount={formatNumber(vaultBalance.shifted, vaultBalance.decimals)}
                                     />
-                                    <CopyHelper toCopy={selectedVault.multisigAddress} className="text-caption">
+                                    <CopyHelper toCopy={fallbackVault.multisigAddress} className="text-caption">
                                         <span className="w-fit truncate Font_caption_xs">
-                                            {shortenAddress(selectedVault.multisigAddress, 4, 4)}
+                                            {shortenAddress(fallbackVault.multisigAddress, 4, 4)}
                                         </span>
                                     </CopyHelper>
                                 </div>
@@ -193,9 +199,9 @@ const MyVaults: NextPage = () => {
                                         chain={AllChains.XION_TESTNET}
                                         formattedAmount={formatNumber(multisigBalance.shifted, multisigBalance.decimals)}
                                     />
-                                    <CopyHelper toCopy={selectedVault.icaControllerAddress} className="text-caption">
+                                    <CopyHelper toCopy={fallbackVault.icaControllerAddress} className="text-caption">
                                         <span className="w-fit truncate Font_caption_xs">
-                                            {shortenAddress(selectedVault.icaControllerAddress, 4, 4)}
+                                            {shortenAddress(fallbackVault.icaControllerAddress, 4, 4)}
                                         </span>
                                     </CopyHelper>
                                 </div>
@@ -207,7 +213,7 @@ const MyVaults: NextPage = () => {
                                     iconType="arrow_forward"
                                     label="Merge balance"
                                     status={multisigBalance.shifted.gt(0) ? 'enabled' : 'disabled'}
-                                    onClick={handleTransferToVault}
+                                    onClick={handleMergeBalance}
                                 />
                                 <Button
                                     // size="sm"
@@ -220,7 +226,7 @@ const MyVaults: NextPage = () => {
                         </Card>
 
                         {/* <div className="flex flex-col gap-y-2">
-                            <CopyHelper toCopy={selectedVault.ica.icaMultisigAddress} className="text-body">
+                            <CopyHelper toCopy={fallbackVault.ica.icaMultisigAddress} className="text-body">
                                 <div className="flex items-center gap-x-4">
                                     <div className="flex items-center">
                                         <div className="w-[132px] Font_caption_xs mr-4 text-left">Vault address (ICA)</div>
@@ -228,12 +234,12 @@ const MyVaults: NextPage = () => {
                                     </div>
 
                                     <span className="w-fit truncate Font_button_md">
-                                        {shortenAddress(selectedVault.ica.icaMultisigAddress, 4, 4)}
+                                        {shortenAddress(fallbackVault.ica.icaMultisigAddress, 4, 4)}
                                     </span>
                                 </div>
                             </CopyHelper>
 
-                            <CopyHelper toCopy={selectedVault.ica.icaControllerAddress} className="text-body">
+                            <CopyHelper toCopy={fallbackVault.ica.icaControllerAddress} className="text-body">
                                 <div className="flex items-center gap-x-4">
                                     <div className="flex items-center">
                                         <div className="w-[132px] Font_caption_xs mr-4 text-left">Multisig address</div>
@@ -241,7 +247,7 @@ const MyVaults: NextPage = () => {
                                     </div>
 
                                     <span className="w-fit truncate Font_button_md">
-                                        {shortenAddress(selectedVault.ica.icaControllerAddress, 4, 4)}
+                                        {shortenAddress(fallbackVault.ica.icaControllerAddress, 4, 4)}
                                     </span>
                                 </div>
                             </CopyHelper>
@@ -250,7 +256,7 @@ const MyVaults: NextPage = () => {
                         <section className="space-y-4 mt-4">
                             <Heading tagName="h4">Proposals</Heading>
 
-                            {selectedVault.proposals.map((proposal) => (
+                            {fallbackVault.proposals.map((proposal) => (
                                 <Card key={proposal.proposal.id} color="primary" className="space-y-4 p-4">
                                     <div>
                                         #{proposal.proposal.id} {proposal.proposal.description}
@@ -260,12 +266,12 @@ const MyVaults: NextPage = () => {
                                             <Button
                                                 color="on_primary"
                                                 label="No"
-                                                onClick={() => voteProposal(selectedVault.multisigAddress, proposal.proposal.id, true)}
+                                                onClick={() => voteProposal(fallbackVault.multisigAddress, proposal.proposal.id, true)}
                                             />
                                             <Button
                                                 color="on_primary"
                                                 label="Yes"
-                                                onClick={() => voteProposal(selectedVault.multisigAddress, proposal.proposal.id, true)}
+                                                onClick={() => voteProposal(fallbackVault.multisigAddress, proposal.proposal.id, true)}
                                             />
                                         </div>
                                     )}
@@ -277,7 +283,7 @@ const MyVaults: NextPage = () => {
                                 </Card>
                             ))}
 
-                            {selectedVault.proposals.length === 0 && (
+                            {fallbackVault.proposals.length === 0 && (
                                 <Card color="glass" className="p-4 text-body">
                                     No proposal found
                                 </Card>
@@ -287,14 +293,14 @@ const MyVaults: NextPage = () => {
                         <div className="flex flex-col gap-4 items-stretch mt-4">
                             <Heading tagName="h4">NFTs</Heading>
 
-                            {selectedVault.proposals.map((proposal) => (
+                            {fallbackVault.proposals.map((proposal) => (
                                 <NFTVaultLinkCard
                                     key={proposal.nft.tokenId}
                                     href="raising-vault"
                                     nft={proposal.nft}
                                     amountLabel="Fixed price"
                                     formattedAmount={formatNumber(proposal.nft.fixedPrice.value, 18)}
-                                    vaultAddress={selectedVault.multisigAddress}
+                                    vaultAddress={fallbackVault.multisigAddress}
                                 />
                             ))}
                         </div>
@@ -322,7 +328,7 @@ const MyVaults: NextPage = () => {
                     </section>
                 )}
 
-                {!selectedVault && (
+                {!fallbackVault && (
                     <div className="grow shrink flex flex-col gap-y-4">
                         <Card color="glass" className="p-4 text-body">
                             No vault found.

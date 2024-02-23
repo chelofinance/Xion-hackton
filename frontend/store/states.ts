@@ -38,9 +38,3 @@ export const userWalletAtom = atom(
 export const userAgentAtom = atom<
   { isMobile: boolean; isMobileOrTablet: boolean; isIOS: boolean; isNonIOSMobile: boolean } | undefined
 >(undefined);
-
-/**
- * 
- * @description tmp states for demo
- */
-export const testVaultAtom = atom<ContractsDict | null>(TEST_VAULT);

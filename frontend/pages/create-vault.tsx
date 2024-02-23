@@ -15,9 +15,6 @@ import {chainConfigMap} from '@/constants/app';
 import router from 'next/router';
 import CopyHelper from '@/components/CopyHelper';
 import { shortenAddress, shortenText } from '@/utils/text';
-import Head from 'next/head';
-import { useAtom } from 'jotai';
-import { testVaultAtom } from '@/store/states';
 
 const CreateVault: NextPage = () => {
   const [status, setStatus] = React.useState<ButtonStatus>('enabled');
@@ -25,7 +22,7 @@ const CreateVault: NextPage = () => {
   const {data: account, isConnected} = useAbstraxionAccount();
   const [vault, setVault] = useState<CreateIcaMultisigResult | null>(null);
 
-  const [testVault, setTestVault] = useAtom(testVaultAtom);
+  // const [testVault, setTestVault] = useAtom(testVaultAtom);
 
   const handleCreateVault = async () => {
     try {
@@ -44,7 +41,7 @@ const CreateVault: NextPage = () => {
 
       setVault(response);
 
-      setTestVault(TEST_VAULT);
+      // setTestVault(TEST_VAULT);
 
       setStatus('enabled');
     } catch (err) {
