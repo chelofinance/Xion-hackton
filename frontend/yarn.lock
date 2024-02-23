@@ -1073,10 +1073,10 @@
     graz "^0.0.51"
     jose "^5.1.3"
 
-"@burnt-labs/abstraxion@^1.0.0-alpha.33":
-  version "1.0.0-alpha.33"
-  resolved "https://registry.yarnpkg.com/@burnt-labs/abstraxion/-/abstraxion-1.0.0-alpha.33.tgz#f2a9d9b126a90fec34e9842f72a12cc9bb51a391"
-  integrity sha512-xaH++sL1tWgfZ+MLuQk9TpwrJa7fPJN/Qnj34LSkHEJ4HBjHuQoEEuos6zKDbXw44DEP7yktC5CxovQI+90vMw==
+"@burnt-labs/abstraxion@^1.0.0-alpha.34":
+  version "1.0.0-alpha.34"
+  resolved "https://registry.yarnpkg.com/@burnt-labs/abstraxion/-/abstraxion-1.0.0-alpha.34.tgz#9688f6240b7cd166179fb2431f6ec2a3babe62ed"
+  integrity sha512-XHM//J0vYqhkJwumA8uVahOhJdtFVl8vwPToibd2SSweJRGv/jEmiLATvkeAYtMoXUbGz+NkLlh4T1/auqoLTg==
   dependencies:
     "@burnt-labs/abstraxion-core" "1.0.0-alpha.32"
     "@burnt-labs/constants" "0.1.0-alpha.6"

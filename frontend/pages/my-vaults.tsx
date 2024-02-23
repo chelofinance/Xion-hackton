@@ -173,16 +173,24 @@ const MyVaults: NextPage = () => {
                         </div>
                     </Card>
 
-                    <Button 
-                        iconType="add" 
-                        label="Create vault" 
-                        status={isCreateVaultProcessing ? 'processing' : 'enabled'}
-                        onClick={handleCreateVault} 
-                    />
+                    {/* <div className="flex justify-end">
+                        <Button 
+                            iconType="add" 
+                            label="Create vault" 
+                            status={isCreateVaultProcessing ? 'processing' : 'enabled'}
+                            onClick={handleCreateVault} 
+                        />
+                    </div> */}
 
-                    {myVaults.length > 0 && <Heading tagName="h3">My vaults</Heading>}
+                    <Heading tagName="h3">My vaults</Heading>
 
                     <ul className="w-full flex flex-col gap-y-4">
+                        {myVaults.length === 0 && (
+                            <Card color="glass" className="p-4 text-body">
+                                No vault found.
+                            </Card>
+                        )}
+
                         {myVaults.map(myVault => (
                             <li key={myVault.multisigAddress}>
                                 <Card size="sm" color={fallbackVault?.multisigAddress === myVault.multisigAddress ? 'primary' : 'glass'} className="flex flex-col items-stretch p-4">
@@ -198,19 +206,31 @@ const MyVaults: NextPage = () => {
                                         />
                                     )}
 
-                                    <div className="flex justify-end">
+                                    {fallbackVault?.multisigAddress !== myVault.multisigAddress && <div className="flex justify-end">
                                         <Button 
                                             size="sm"
-                                            color={fallbackVault?.multisigAddress === myVault.multisigAddress ? 'on_primary' : 'primary'} 
-                                            label="Manage" 
+                                            iconType="chevron_right"
+                                            // color="secondary" 
+                                            label="Manage"
+                                            // labelHidden
                                             onClick={() => setSelectedVault(myVault)}
                                         />
-                                    </div>
+                                    </div>}
                                 </Card>
                             </li>
                         ))}
                      
                     </ul>
+
+                    <div className="flex justify-end items-center">
+                        <Button 
+                            // size="sm"
+                            iconType="add"
+                            label="Create vault" 
+                            status={isCreateVaultProcessing ? 'processing' : 'enabled'}
+                            onClick={handleCreateVault} 
+                        />
+                    </div>
                 </section>
 
                 {fallbackVault && (
@@ -266,16 +286,17 @@ const MyVaults: NextPage = () => {
                                 <Button
                                     // size="sm"
                                     label="Deposit"
+                                    color="secondary"
                                     iconType={isDepositFormOpen ? 'expand_less' : 'expand_more'}
                                     status={isDepositToVaultProcessing ? 'processing' : 'enabled'}
-                                    onClick={handleDepositToVault}
+                                    onClick={() => setIsDepositFormOpen(!isDepositFormOpen)}
                                 />
                             </div>
                         </Card>
 
                         {isDepositFormOpen && (
                             <Card color="secondary" className="flex flex-col justify-between items-stretch gap-y-4 p-4">
-                                <div className="Font_label_14px text-white">Deposit</div>
+                                {/* <div className="Font_label_14px text-white">Deposit</div> */}
 
                                 <form ref={depositForm} className="flex flex-col items-stretch gap-y-8">
                                     <div className="flex items-stretch justify-between gap-x-4">
