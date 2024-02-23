@@ -257,9 +257,9 @@ const MyVaults: NextPage = () => {
                                         chain={AllChains.INJECTIVE_TESTNET}
                                         formattedAmount={formatNumber(vaultBalance.shifted, vaultBalance.decimals)}
                                     />
-                                    <CopyHelper toCopy={fallbackVault.multisigAddress} className="text-caption">
+                                    <CopyHelper toCopy={fallbackVault.icaAccountAddress} className="text-caption">
                                         <span className="w-fit truncate Font_caption_xs">
-                                            {shortenAddress(fallbackVault.multisigAddress, 4, 4)}
+                                            {shortenAddress(fallbackVault.icaAccountAddress, 4, 4)}
                                         </span>
                                     </CopyHelper>
                                 </div>
@@ -271,9 +271,9 @@ const MyVaults: NextPage = () => {
                                         chain={AllChains.XION_TESTNET}
                                         formattedAmount={formatNumber(multisigBalance.shifted, multisigBalance.decimals)}
                                     />
-                                    <CopyHelper toCopy={fallbackVault.icaControllerAddress} className="text-caption">
+                                    <CopyHelper toCopy={fallbackVault.multisigAddress} className="text-caption">
                                         <span className="w-fit truncate Font_caption_xs">
-                                            {shortenAddress(fallbackVault.icaControllerAddress, 4, 4)}
+                                            {shortenAddress(fallbackVault.multisigAddress, 4, 4)}
                                         </span>
                                     </CopyHelper>
                                 </div>
