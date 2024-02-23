@@ -4,6 +4,7 @@ import {v4 as uuidv4} from 'uuid';
 import {produceProposal} from './propose';
 import Contracts from 'config/contracts.config';
 import { SendTxResult } from '@/types/tx';
+import { GetProposalsResponse } from './xion';
 
 const contracts = Contracts['xion-testnet'];
 
@@ -169,20 +170,22 @@ export async function executeProposal(client: any, account: any, icaMultisigAddr
     }
 }
 
-export async function getProposalList(client: any, icaMultisigAddress: string) {
+export async function getProposalList(client: any, icaMultisigAddress: string): Promise<GetProposalsResponse> {
     const msg = {
-        list_proposals: {},
+        list_proposals: { start_after: 0 },
     };
 
     try {
-        const queryResponse = await client?.queryContractSmart(icaMultisigAddress, msg);
-        console.log('queryResponse', queryResponse);
-        return queryResponse;
+        const response: GetProposalsResponse | undefined = await client?.queryContractSmart(icaMultisigAddress, msg);
+        
+        console.log('getProposalList response:', response);
+
+        return response ?? { proposals: [] };
     } catch (error) {
-        console.log('error', error);
-        // alert(error);
+        console.log('getProposalList error:', error);
     }
-    return [];
+
+    return { proposals: [] };
 }
 
 export async function getBalance(client: any, address: string) {

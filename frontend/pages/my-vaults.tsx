@@ -42,26 +42,26 @@ const MyVaults: NextPage = () => {
     const myINJBalance = getMyBalanceOnXion(TokenSymbols.INJ);
     const myXIONBalance = getMyBalanceOnXion(TokenSymbols.XION);
 
-    const {getBalance: getBalanceOnXion} = useBalanceOnXion(selectedVault?.ica.icaControllerAddress);
+    const {getBalance: getBalanceOnXion} = useBalanceOnXion(selectedVault?.multisigAddress);
     const multisigBalance = getBalanceOnXion(TokenSymbols.INJ);
 
     const {depositToVaultMultisig, isProcessing: isDepositToVaultProcessing} = useDepositToVaultMultisig();
 
-    const {getBalance: getBalanceOnInjective} = useBalanceOnInjective(selectedVault?.ica.icaMultisigAddress);
+    const {getBalance: getBalanceOnInjective} = useBalanceOnInjective(selectedVault?.multisigAddress);
     const vaultBalance = getBalanceOnInjective(TokenSymbols.INJ);
 
     const myNFTVaultsValueUSD = useMemo(() => {
         return myVaults.reduce((accm, vault) => {
-            const nftsValuesUSD = vault.nfts.reduce((accm, nft) => {
-                const isOwned = nft.ownerAddress === vault.ica.icaMultisigAddress;
+            const nftsValuesUSD = vault.proposals.reduce((accm, proposal) => {
+                const isOwned = proposal.nft.ownerAddress === vault.multisigAddress;
                 if (!isOwned) return accm;
 
-                const oraclePrice = getOraclePrice(nft.fixedPrice.symbol);
-                const priceUSD = new BigNumber(nft.fixedPrice.value.toString()).times(oraclePrice);
+                const oraclePrice = getOraclePrice(proposal.nft.fixedPrice.symbol);
+                const priceUSD = new BigNumber(proposal.nft.fixedPrice.value.toString()).times(oraclePrice);
                 return accm.plus(priceUSD);
             }, new BigNumber(0));
 
-            const share = vault.multisig.voters.find((voter) => voter.addr === userWallet?.account.address)?.share ?? 0;
+            const share = vault.share;
             const shareUSD = nftsValuesUSD.times(share);
 
             return accm.plus(shareUSD);
@@ -73,9 +73,9 @@ const MyVaults: NextPage = () => {
         [vaultBalance.usd, myNFTVaultsValueUSD]
     );
 
-    const {proposals, voteProposal} = useProposals(selectedVault?.ica.icaControllerAddress ?? '');
+    const { voteProposal} = useProposals(selectedVault?.icaControllerAddress ?? '');
 
-    const {addMember} = useAddMember(selectedVault?.ica.icaControllerAddress ?? '');
+    const {addMember} = useAddMember(selectedVault?.icaControllerAddress ?? '');
 
     const form = useRef<HTMLFormElement>(null);
 
@@ -151,8 +151,8 @@ const MyVaults: NextPage = () => {
 
                     <ul>
                         {myVaults.map(myVault => (
-                            <div key={myVault.ica.icaMultisigAddress}>
-                                {myVault.ica.icaMultisigAddress}
+                            <div key={myVault.multisigAddress}>
+                                {myVault.multisigAddress}
                             </div>
                         ))}
                      
@@ -179,9 +179,9 @@ const MyVaults: NextPage = () => {
                                         chain={AllChains.INJECTIVE_TESTNET}
                                         formattedAmount={formatNumber(vaultBalance.shifted, vaultBalance.decimals)}
                                     />
-                                    <CopyHelper toCopy={selectedVault.ica.icaMultisigAddress} className="text-caption">
+                                    <CopyHelper toCopy={selectedVault.multisigAddress} className="text-caption">
                                         <span className="w-fit truncate Font_caption_xs">
-                                            {shortenAddress(selectedVault.ica.icaMultisigAddress, 4, 4)}
+                                            {shortenAddress(selectedVault.multisigAddress, 4, 4)}
                                         </span>
                                     </CopyHelper>
                                 </div>
@@ -193,9 +193,9 @@ const MyVaults: NextPage = () => {
                                         chain={AllChains.XION_TESTNET}
                                         formattedAmount={formatNumber(multisigBalance.shifted, multisigBalance.decimals)}
                                     />
-                                    <CopyHelper toCopy={selectedVault.ica.icaControllerAddress} className="text-caption">
+                                    <CopyHelper toCopy={selectedVault.icaControllerAddress} className="text-caption">
                                         <span className="w-fit truncate Font_caption_xs">
-                                            {shortenAddress(selectedVault.ica.icaControllerAddress, 4, 4)}
+                                            {shortenAddress(selectedVault.icaControllerAddress, 4, 4)}
                                         </span>
                                     </CopyHelper>
                                 </div>
@@ -250,34 +250,34 @@ const MyVaults: NextPage = () => {
                         <section className="space-y-4 mt-4">
                             <Heading tagName="h4">Proposals</Heading>
 
-                            {proposals.map((proposal) => (
-                                <Card key={proposal.id} color="primary" className="space-y-4 p-4">
+                            {selectedVault.proposals.map((proposal) => (
+                                <Card key={proposal.proposal.id} color="primary" className="space-y-4 p-4">
                                     <div>
-                                        #{proposal.id} {proposal.description}
+                                        #{proposal.proposal.id} {proposal.proposal.description}
                                     </div>
-                                    {proposal.status === ProposalStatus.Pending && (
+                                    {proposal.proposal.status === ProposalStatus.Pending && (
                                         <div className="flex justify-end gap-x-2">
                                             <Button
                                                 color="on_primary"
                                                 label="No"
-                                                onClick={() => voteProposal(proposal.id, true)}
+                                                onClick={() => voteProposal(selectedVault.multisigAddress, proposal.proposal.id, true)}
                                             />
                                             <Button
                                                 color="on_primary"
                                                 label="Yes"
-                                                onClick={() => voteProposal(proposal.id, true)}
+                                                onClick={() => voteProposal(selectedVault.multisigAddress, proposal.proposal.id, true)}
                                             />
                                         </div>
                                     )}
-                                    {proposal.status !== ProposalStatus.Pending && (
+                                    {proposal.proposal.status !== ProposalStatus.Pending && (
                                         <div className="flex justify-end gap-x-2">
-                                            <Tag size="sm" label={PROPOSAL_STATUS_LABEL_DICT[proposal.status]} />
+                                            <Tag size="sm" label={PROPOSAL_STATUS_LABEL_DICT[proposal.proposal.status]} />
                                         </div>
                                     )}
                                 </Card>
                             ))}
 
-                            {proposals.length === 0 && (
+                            {selectedVault.proposals.length === 0 && (
                                 <Card color="glass" className="p-4 text-body">
                                     No proposal found
                                 </Card>
@@ -287,14 +287,14 @@ const MyVaults: NextPage = () => {
                         <div className="flex flex-col gap-4 items-stretch mt-4">
                             <Heading tagName="h4">NFTs</Heading>
 
-                            {selectedVault.nfts.map((nft) => (
+                            {selectedVault.proposals.map((proposal) => (
                                 <NFTVaultLinkCard
-                                    key={nft.tokenId}
+                                    key={proposal.nft.tokenId}
                                     href="raising-vault"
-                                    nft={nft}
+                                    nft={proposal.nft}
                                     amountLabel="Fixed price"
-                                    formattedAmount={formatNumber(nft.fixedPrice.value, 18)}
-                                    vaultAddress={selectedVault.ica.icaMultisigAddress}
+                                    formattedAmount={formatNumber(proposal.nft.fixedPrice.value, 18)}
+                                    vaultAddress={selectedVault.multisigAddress}
                                 />
                             ))}
                         </div>

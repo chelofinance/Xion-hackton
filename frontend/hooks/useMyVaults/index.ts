@@ -1,15 +1,20 @@
-import type { MyNFTVault, NFTVault } from "@/types/asset";
-import { getVaultMultisigs } from "@/utils/xion";
+import type { MyNFTVault, MyVault, NFTVault, RaisingNFT } from "@/types/asset";
+import { GetMultisigThresholdResponse, GetVotersResponse, ProposalResponse, VoterResponse, getMultisigThreshold, getVaultMultisigs, getVoters } from "@/utils/xion";
 import { useAbstraxionSigningClient } from "@burnt-labs/abstraxion";
 import { useCallback, useEffect, useState } from "react";
+import useProposals from "../useProposals";
+
+
 
 const useMyVaults = (address: string | undefined): {
-    myVaults: readonly MyNFTVault[];
+    myVaults: readonly MyVault[];
     updateMyVaults: () => Promise<void>;
 } => {
-    const [myVaults, setMyVaults] = useState<readonly MyNFTVault[]>([]);
+    const [myVaults, setMyVaults] = useState<readonly MyVault[]>([]);
 
     const { client: abstraxionClient } = useAbstraxionSigningClient();
+
+    const { getVaultProposals } = useProposals(address);
 
     const updateMyVaults = useCallback(async () => {
         if (!address || address === '') {
@@ -22,8 +27,28 @@ const useMyVaults = (address: string | undefined): {
             return;
         }
 
-        await getVaultMultisigs(abstraxionClient, address);
+        const { multisigs, controllers } = await getVaultMultisigs(abstraxionClient, address);
 
+        const vaults = await Promise.all(multisigs.map(async (multisig, index) => {
+            const icaControllerAddress = controllers[index];
+            const voters = (await getVoters(abstraxionClient, multisig))?.voters;
+            const threshold = (await getMultisigThreshold(abstraxionClient, multisig))?.absolute_count;
+            const proposals = await getVaultProposals(multisig);
+
+            const myWeight = voters?.find(voter => voter.addr === address)?.weight ?? '1';
+            const share = parseFloat(myWeight) / parseFloat(threshold?.total_weight ?? '1');
+
+            return {
+                multisigAddress: multisig,
+                icaControllerAddress,
+                voters,
+                threshold,
+                proposals,
+                share,
+            };
+        }));
+
+        setMyVaults(vaults);
         // const share = vault.multisig.voters.find(voter => voter.addr === address)?.share ?? 0;
         // // const shareUSD = priceUSD.times(share);
         
@@ -33,7 +58,7 @@ const useMyVaults = (address: string | undefined): {
         //     share,
         //     // shareUSD,
         // }
-    }, [abstraxionClient, address]);
+    }, [abstraxionClient, address, getVaultProposals]);
 
     useEffect(() => {
         updateMyVaults();

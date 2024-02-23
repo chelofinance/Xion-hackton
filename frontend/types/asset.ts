@@ -1,4 +1,5 @@
 import type {AllChains, TokenSymbols} from '@/constants/app';
+import { ProposalResponse, VoterResponse } from '@/utils/xion';
 import BigNumber from 'bignumber.js';
 
 export type NFTCollection = Readonly<{
@@ -68,3 +69,19 @@ export type MyNFTVault = NFTVault &
     share: number;
     // shareUSD: BigNumber;
   }>;
+
+
+  export type MyVault = {
+    multisigAddress: string;
+    icaControllerAddress: string;
+    share: number;
+    voters: readonly VoterResponse[];
+    threshold: {
+        weight: string;
+        total_weight: string;
+    } | undefined;
+    proposals: readonly {
+        nft: RaisingNFT;
+        proposal: ProposalResponse;
+    }[];
+}

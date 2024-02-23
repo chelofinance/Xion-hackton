@@ -16,7 +16,7 @@ import useOraclePrice from '@/hooks/useOraclePrice';
 import BigNumber from 'bignumber.js';
 import useRaisingNFTVault from '@/hooks/useRaisingNFTVaults';
 import useMyNFTVaults from '@/hooks/useMyNFTVaults';
-import {MyNFTVault, NFT, RaisingNFT} from '@/types/asset';
+import {MyNFTVault, MyVault, NFT, RaisingNFT} from '@/types/asset';
 import {useAtom} from 'jotai';
 import {userWalletAtom} from '@/store/states';
 import NumberText from '@/components/NumberText';
@@ -126,10 +126,10 @@ const RaisingVault: NextPage = () => {
 
   const {myNFT, myVault} = useMemo<{
     myNFT: RaisingNFT | undefined;
-    myVault: MyNFTVault | undefined;
+    myVault: MyVault | undefined;
   }>(() => {
-    const myVault = myVaults.find((myVault) => myVault.nfts.find((nft) => nft.tokenId === nft?.tokenId));
-    const myNFT = myVault?.nfts.find((nft) => nft.tokenId === nft?.tokenId);
+    const myVault = myVaults.find((myVault) => myVault.proposals.find((proposal) => proposal.nft.tokenId === nft?.tokenId));
+    const myNFT = myVault?.proposals.find((proposal) => proposal.nft.tokenId === nft?.tokenId)?.nft;
 
     return {
       myNFT,
@@ -145,7 +145,7 @@ const RaisingVault: NextPage = () => {
   }, [myNFT]);
 
   const isRaisedAll = useMemo<boolean>(() => maxDepositAmount === 0, [maxDepositAmount]);
-  const isOwningVault = useMemo<boolean>(() => nft?.ownerAddress === myVault?.ica.icaMultisigAddress, [nft, myVault]);
+  const isOwningVault = useMemo<boolean>(() => nft?.ownerAddress === myVault?.multisigAddress, [nft, myVault]);
 
   const handleDeposit = async () => {
     try {
