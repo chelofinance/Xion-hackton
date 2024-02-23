@@ -9,7 +9,7 @@ use cosmwasm_std::{
 use crate::error::ContractError;
 use crate::msg::{
     CallbacksResponses, ExecuteMsg, ICAControllerResponse, InstantiateMsg, MultisigByCreator,
-    MultisigsResponses, QueryMsg,
+        MultisigByMember ,   MultisigsResponses, QueryMsg,
 };
 use crate::state;
 
@@ -77,6 +77,11 @@ pub fn execute(
             cw_ica_controller_code_id,
             proxy,
         ),
+        ExecuteMsg::AddMembership { multisig_addr, member_addr } => execute::add_membership(
+            deps,
+            multisig_addr,
+            member_addr,
+        ),
         ExecuteMsg::UpdateOwnership(action) => {
             cw_ownable::update_ownership(deps, &env.block, &info.sender, action)?;
             Ok(Response::default())
@@ -95,6 +100,9 @@ pub fn query(_deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
         }
         QueryMsg::QueryMultisigByCreator(creator) => {
             to_json_binary(&query_multisig_by_creator(_deps, creator)?)
+        }
+        QueryMsg::QueryMultisigByMember(member) => {
+            to_json_binary(&query_multisig_by_member(_deps, member)?)
         }
         QueryMsg::Ownership {} => to_json_binary(&cw_ownable::get_ownership(_deps.storage)?),
     }
@@ -138,6 +146,20 @@ fn query_multisig_by_creator(deps: Deps, creator: Addr) -> StdResult<MultisigByC
     })
 }
 
+fn query_multisig_by_member(deps: Deps, member: Addr) -> StdResult<MultisigByMember> {
+    let multisigs = state::MEMBER_MULTISIG.load(deps.storage, &member).unwrap_or_default();
+    let res_controllers: Result<Vec<Addr>, _> = multisigs
+        .iter()
+        .map(|sig| state::MULTISIG_ICA.load(deps.storage, sig))
+        .collect();
+    let controllers = res_controllers.unwrap();
+
+    Ok(MultisigByMember {
+        controllers,
+        multisigs,
+    })
+}
+
 mod execute {
     use crate::utils;
     use cosmwasm_std::to_json_binary;
@@ -159,6 +181,7 @@ mod execute {
     ) -> Result<Response, ContractError> {
         let state = state::STATE.load(deps.storage)?;
         multisig_instantiate_msg.proxy = Some(state.proxy);
+        multisig_instantiate_msg.ica_factory = Some(env.contract.address.clone());
 
         let (multisig_init_cosmos_msg, multisig_addr) = utils::instantiate2::contract(
             deps.api,
@@ -167,7 +190,7 @@ mod execute {
             state.cw3_multisig_code_id,
             salt.clone(),
             format!("multisig-ica-{salt}"),
-            Some(env.contract.address.to_string()),
+            Some(env.contract.address.clone().to_string()),
             to_json_binary(&multisig_instantiate_msg)?,
         )?;
 
@@ -200,6 +223,11 @@ mod execute {
 
         state::MULTISIG_ICA.save(deps.storage, &multisig_addr, &cw_ica_controller_address)?;
         state::CREATOR_MULTISIG.save(deps.storage, &info.sender, &created_by)?;
+
+        let mut member_of = state::MEMBER_MULTISIG.load(deps.storage, &info.sender).unwrap_or_default();
+        member_of.push(multisig_addr.clone());
+        state::MEMBER_MULTISIG.save(deps.storage, &info.sender, &member_of)?;
+
         state::ICA_MULTISIG.save(deps.storage, &cw_ica_controller_address, &multisig_addr)?;
         state::STATE.save(deps.storage, &state)?;
 
@@ -260,6 +288,19 @@ mod execute {
         }
 
         state::STATE.save(deps.storage, &state)?;
+        Ok(Response::default())
+    }
+
+    pub fn add_membership(
+        deps: DepsMut,
+        multisig_addr: Addr,
+        member_addr: Addr,
+    ) -> Result<Response, ContractError> {
+
+        let mut member_of = state::MEMBER_MULTISIG.load(deps.storage, &member_addr).unwrap_or_default();
+        member_of.push(multisig_addr.clone());
+        state::MEMBER_MULTISIG.save(deps.storage, &member_addr, &member_of)?;
+
         Ok(Response::default())
     }
 }

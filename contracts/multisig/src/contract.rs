@@ -4,7 +4,7 @@ use std::cmp::Ordering;
 use cosmwasm_std::entry_point;
 use cosmwasm_std::{
     to_json_binary, Addr, Binary, BlockInfo, Coin, CosmosMsg, Deps, DepsMut, Empty, Env,
-    MessageInfo, Order, Response, StdResult,
+    MessageInfo, Order, Response, StdResult, WasmMsg,
 };
 
 use cw2::set_contract_version;
@@ -16,7 +16,7 @@ use cw_storage_plus::Bound;
 use cw_utils::{Expiration, ThresholdResponse};
 
 use crate::error::ContractError;
-use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
+use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg, AddMembership};
 use crate::state::{next_id, Config, BALLOTS, CONFIG, PROPOSALS, VOTERS};
 
 // version info for migration info
@@ -27,7 +27,7 @@ const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
 pub fn instantiate(
     deps: DepsMut,
     _env: Env,
-    _info: MessageInfo,
+    info: MessageInfo,
     msg: InstantiateMsg,
 ) -> Result<Response, ContractError> {
     if msg.voters.is_empty() {
@@ -44,6 +44,7 @@ pub fn instantiate(
         total_weight,
         max_voting_period: msg.max_voting_period,
         proxy: msg.proxy,
+        ica_factory: Some(info.sender.clone()),
     };
     CONFIG.save(deps.storage, &cfg)?;
 
@@ -83,7 +84,7 @@ pub fn execute(
             address,
             fee,
             sender,
-        } => add_member(deps, validate_sender(&info, &cfg, sender), address, fee),
+        } => add_member(deps, env, validate_sender(&info, &cfg, sender), address, fee),
         ExecuteMsg::Propose {
             title,
             description,
@@ -123,6 +124,7 @@ pub fn execute(
 
 fn add_member(
     deps: DepsMut,
+    env: Env,
     info: MessageInfo,
     address: Addr,
     fee: Coin,
@@ -137,7 +139,18 @@ fn add_member(
     let key = deps.api.addr_validate(&address.to_string())?;
     VOTERS.save(deps.storage, &key, &weight)?;
 
+    //execute add_membership function in cfg.ica_factory
+    let ica_factory = CONFIG.load(deps.storage)?.ica_factory;
+    let add_member_msg = AddMembership {
+        multisig_addr: env.contract.address,
+        member_addr: address.clone(),
+    };
     Ok(Response::new()
+        .add_message(CosmosMsg::Wasm(WasmMsg::Execute {
+            contract_addr: ica_factory.unwrap().to_string(),
+            msg: to_json_binary(&add_member_msg)?,
+            funds: vec![],
+        }))
         .add_attribute("action", "add_member")
         .add_attribute("sender", info.sender)
         .add_attribute("member", address.to_string()))
@@ -548,6 +561,7 @@ mod tests {
             threshold,
             max_voting_period,
             proxy: None,
+            ica_factory: None,
         };
         instantiate(deps, mock_env(), info, instantiate_msg)
     }
@@ -585,6 +599,7 @@ mod tests {
             },
             max_voting_period,
             proxy: None,
+            ica_factory: None,
         };
         let err = instantiate(
             deps.as_mut(),

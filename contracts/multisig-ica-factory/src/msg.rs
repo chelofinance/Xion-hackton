@@ -43,6 +43,10 @@ pub enum ExecuteMsg {
         cw_ica_controller_code_id: Option<u64>,
         proxy: Option<Addr>,
     },
+    AddMembership {
+        multisig_addr: Addr,
+        member_addr: Addr,
+    },
 }
 
 /// The messages to query this contract.
@@ -65,6 +69,10 @@ pub enum QueryMsg {
     /// get multisig and controller by creator
     #[returns(ICAControllerResponse)]
     QueryMultisigByCreator(Addr),
+    
+    /// get multisig and controller by member
+    #[returns(ICAControllerResponse)]
+    QueryMultisigByMember(Addr),
 }
 
 /// response to multisigs created
@@ -91,6 +99,15 @@ pub struct ICAControllerResponse {
 ///
 #[cw_serde]
 pub struct MultisigByCreator {
+    ///
+    pub multisigs: Vec<Addr>,
+    ///
+    pub controllers: Vec<Addr>,
+}
+
+///
+#[cw_serde]
+pub struct MultisigByMember {
     ///
     pub multisigs: Vec<Addr>,
     ///

@@ -57,6 +57,7 @@ fn cw3_controls_cw20() {
         threshold: Threshold::AbsoluteCount { weight: 2 },
         max_voting_period: Duration::Height(3),
         proxy: None,
+        ica_factory: None,
     };
 
     let multisig_addr = router
