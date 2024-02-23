@@ -37,7 +37,8 @@ const MyVaults: NextPage = () => {
 
     const {getOraclePrice} = useOraclePrice();
 
-    const myVaults = useMyNFTVaults(userWallet?.account.address);
+    const myVaults = useMyNFTVaults();
+    console.log({myVaults});
 
     // const [selectedVault, setSelectedVault] = useState<MyNFTVault | undefined>(() => myVaults[0]);
     const selectedVault = myVaults[0];
@@ -93,6 +94,7 @@ const MyVaults: NextPage = () => {
      * @todo need additional floww to input deposit amount using form
      */
     const handleDepositToVault = useCallback(async () => {
+        console.log('HERE', selectedVault, userWallet);
         if (!selectedVault || !userWallet) return;
 
         const result = await depositToVaultMultisig(selectedVault, {
@@ -104,13 +106,13 @@ const MyVaults: NextPage = () => {
         if (result?.isSuccess) {
             // refetch balance
         }
-    }, [depositToVaultMultisig]);
+    }, [depositToVaultMultisig, selectedVault, userWallet]);
 
     const handleTransferToVault = useCallback(async () => {
         //
     }, []);
 
-    const { createVault, isProcessing: isCreateVaultProcessing } = useCreateVault(userWallet);
+    const {createVault, isProcessing: isCreateVaultProcessing} = useCreateVault(userWallet);
 
     const Content =
         userWallet === null ? (
@@ -154,8 +156,11 @@ const MyVaults: NextPage = () => {
                             <div className="Font_label_14px">Balance</div>
 
                             <div className="space-y-1">
-                                <BalanceTotal formattedNumber={formatUSD(vaultBalance.usd.plus(multisigBalance.usd))} isLoading={false} />
-                                
+                                <BalanceTotal
+                                    formattedNumber={formatUSD(vaultBalance.usd.plus(multisigBalance.usd))}
+                                    isLoading={false}
+                                />
+
                                 <div className="flex items-center gap-x-2">
                                     <CoinAmount
                                         size="sm"

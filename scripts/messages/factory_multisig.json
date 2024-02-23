@@ -17,9 +17,9 @@
       }
     },
     "channel_open_init_options": {
-      "connection_id": "connection-42",
-      "counterparty_connection_id": "connection-210"
+      "connection_id": "connection-49",
+      "counterparty_connection_id": "connection-214"
     },
-    "salt": "pingasdfasdf"
+    "salt": "co;odfaeasmadare"
   }
 }
