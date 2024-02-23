@@ -231,14 +231,23 @@ export async function addMember(
     };
 
     const msg = {
-        add_member: {
-            address: memberAddress,
-            fee,
-        },
+      add_member: {
+        address: memberAddress,
+        fee,
+        sender: account.bech32Address,
+      }
     };
 
     try {
-        const executionResponse = await client?.execute(account.bech32Address, icaMultisigAddress, msg, 'auto');
+      const executionResponse = await client?.execute(
+        account.bech32Address,
+        chainConfigMap[AppChains.XION_TESTNET].proxyMultisig.address,
+        {
+          contract_addr: icaMultisigAddress,
+          payload: msg,
+        },
+        'auto',
+      );
         console.log('executionResponse', executionResponse);
         return executionResponse;
     } catch (error) {
