@@ -180,6 +180,7 @@ const RaisingVault: NextPage = () => {
       await updateBalance();
     } catch (err) {
       console.log('ERR TRANSFER', err);
+      alert("An error occured. Check console for details.")
     }
   };
 
