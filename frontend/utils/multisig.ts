@@ -48,8 +48,8 @@ SendTxResult<CreateIcaMultisigResult>
                 max_voting_period: {
                     time: 36000,
                 },
+                proxy: chainConfigMap[AppChains.XION_TESTNET].proxyMultisig.address,            
             },
-            proxy: chainConfigMap[AppChains.XION_TESTNET].proxyMultisig.address,
             channel_open_init_options: {
                 connection_id: channelOpenInitOptions[AppChains.XION_TESTNET].connectionId,
                 counterparty_connection_id: channelOpenInitOptions[AppChains.XION_TESTNET].counterpartyConnectionId,
