@@ -3,7 +3,7 @@ import Main from '@/components/Main';
 import Heading from '@/components/Heading';
 import NFTTumbnail from '@/components/NFTThumbnail';
 import Card from '@/components/Card';
-import {formatNumber, formatUSD, simpleFormat} from '@/utils/number';
+import {formatNumber, formatUSD} from '@/utils/number';
 import CoinAmount from '@/components/CoinAmount';
 import {AppChains, chainConfigMap, CHAIN_METADATA_DICT, INJECTIVE_ID, TokenSymbols, COIN_DICT, TEST_VAULT} from '@/constants/app';
 import Button, {ButtonProps} from '@/components/Button';
@@ -14,7 +14,7 @@ import ChainLabel from '@/components/ChainLabel';
 import AmountInput from '@/components/form-presets/AmountInput';
 import useOraclePrice from '@/hooks/useOraclePrice';
 import BigNumber from 'bignumber.js';
-import useRaisingNFTVault from '@/hooks/useRaisingNFTVault';
+import useRaisingNFTVault from '@/hooks/useRaisingNFTVaults';
 import useMyNFTVaults from '@/hooks/useMyNFTVaults';
 import {MyNFTVault, NFT, RaisingNFT} from '@/types/asset';
 import {useAtom} from 'jotai';
@@ -28,6 +28,7 @@ import {createIcaBuyMsg} from '@/utils/ica';
 import {createProposal, executeProposal} from '@/utils/multisig';
 import {useAbstraxionAccount, useAbstraxionSigningClient} from '@burnt-labs/abstraxion';
 import {InjectiveSigningStargateClient} from '@injectivelabs/sdk-ts/dist/cjs/core/stargate';
+import useMyVaults from '@/hooks/useMyVaults';
 
 const CONFIG = chainConfigMap[AppChains.XION_TESTNET];
 
@@ -44,7 +45,8 @@ const RaisingVault: NextPage = () => {
   const router = useRouter();
   const {address} = router.query;
 
-  const nft = useRaisingNFTVault(address as string | undefined);
+  const nftList = useRaisingNFTVault();
+  const nft = nftList.find((nft) => nft.tokenId === address);
   const [tmpRaisedAmount, setTmpRaisedAmount] = useState<number>(nft?.raisedAmount ?? 0);
 
   const [isDepositFormOpen, setIsDepositFormOpen] = useState<boolean>(false);
@@ -120,7 +122,7 @@ const RaisingVault: NextPage = () => {
 
   const [userWallet] = useAtom(userWalletAtom);
 
-  const { myVaults } = useMyNFTVaults(userWallet?.account.address);
+  const { myVaults } = useMyVaults(userWallet?.account.address);
 
   const {myNFT, myVault} = useMemo<{
     myNFT: RaisingNFT | undefined;
@@ -306,7 +308,11 @@ const RaisingVault: NextPage = () => {
               <div className="h-6 flex flex-col justify-center Font_label_14px">Fixed price</div>
 
               <div className="flex flex-col gap-y-2 items-end">
-                <CoinAmount size="md" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(nft.fixedPrice.value, COIN_DICT[nft.fixedPrice.symbol].decimals)} />
+                <CoinAmount
+                  size="md"
+                  symbol={TokenSymbols.INJ}
+                  formattedAmount={formatNumber(nft.fixedPrice.value, COIN_DICT[nft.fixedPrice.symbol].decimals)}
+                />
                 <CaptionAmount size="sm" formattedAmount={formattedPriceUSD} />
               </div>
               {/* </div> */}

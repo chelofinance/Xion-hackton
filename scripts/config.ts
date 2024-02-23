@@ -13,8 +13,8 @@ const config: Config = {
     "injective-testnet": {
       chainId: "injective-888",
       node: "https://testnet.sentry.tm.injective.network:443",
-      gasPrice: "0.001inj",
-      gasAdjustment: 1.3,
+      gasPrice: "700000000inj",
+      gasAdjustment: 2,
       prefix: "inj",
       denom: "inj",
     },

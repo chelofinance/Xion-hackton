@@ -6,29 +6,26 @@ import {formatNumber, formatUSD} from '@/utils/number';
 import {useCallback, useMemo, useRef, useState} from 'react';
 import useOraclePrice from '@/hooks/useOraclePrice';
 import BigNumber from 'bignumber.js';
-import useMyNFTVaults from '@/hooks/useMyNFTVaults';
 import {useAtom} from 'jotai';
 import {userWalletAtom} from '@/store/states';
 import NFTVaultLinkCard from '@/components/NFTVaultLinkCard';
 import AccountAddress from '@/components/AccountAddress';
 import BalanceTotal from '@/components/overlays/AccountOverlay/BalanceTotal';
-import AccountButton from '@/components/buttons/AccountButton';
 import CopyHelper from '@/components/CopyHelper';
 import {shortenAddress} from '@/utils/text';
 import Button from '@/components/Button';
 import {useRouter} from 'next/router';
-import ChainLabel from '@/components/ChainLabel';
 import {AllChains, PROPOSAL_STATUS_LABEL_DICT, ProposalStatus, TEST_VAULT, TokenSymbols} from '@/constants/app';
 import Tag from '@/components/Tag';
 import useProposals from '@/hooks/useProposals';
 import useAddMember from '@/hooks/useAddMember';
 import TextInput from '@/components/TextInput';
-import {MyNFTVault} from '@/types/asset';
 import CoinAmount from '@/components/CoinAmount';
 import useDepositToVaultMultisig from '@/hooks/useDepositToVaultMultisig';
 import useBalanceOnInjective from '@/hooks/useBalanceOnInjective';
 import useBalanceOnXion from '@/hooks/useBalanceOnXion';
 import useCreateVault from '@/hooks/useCreateVault';
+import useMyVaults from '@/hooks/useMyVaults';
 
 const MyVaults: NextPage = () => {
     const router = useRouter();
@@ -36,7 +33,7 @@ const MyVaults: NextPage = () => {
     const [userWallet] = useAtom(userWalletAtom);
     const {getOraclePrice} = useOraclePrice();
 
-    const { myVaults } = useMyNFTVaults(userWallet?.account.address);
+    const { myVaults } = useMyVaults(userWallet?.account.address);
 
     // const [selectedVault, setSelectedVault] = useState<MyNFTVault | undefined>(() => myVaults[0]);
     const selectedVault = myVaults[0];
@@ -92,6 +89,7 @@ const MyVaults: NextPage = () => {
      * @todo need additional floww to input deposit amount using form
      */
     const handleDepositToVault = useCallback(async () => {
+        console.log('HERE', selectedVault, userWallet);
         if (!selectedVault || !userWallet) return;
 
         const result = await depositToVaultMultisig(selectedVault, {
@@ -103,13 +101,13 @@ const MyVaults: NextPage = () => {
         if (result?.isSuccess) {
             // refetch balance
         }
-    }, [depositToVaultMultisig]);
+    }, [depositToVaultMultisig, selectedVault, userWallet]);
 
     const handleTransferToVault = useCallback(async () => {
         //
     }, []);
 
-    const { createVault, isProcessing: isCreateVaultProcessing } = useCreateVault(userWallet);
+    const {createVault, isProcessing: isCreateVaultProcessing} = useCreateVault(userWallet);
 
     const Content =
         userWallet === null ? (
@@ -169,8 +167,11 @@ const MyVaults: NextPage = () => {
                             <div className="Font_label_14px">Balance</div>
 
                             <div className="space-y-1">
-                                <BalanceTotal formattedNumber={formatUSD(vaultBalance.usd.plus(multisigBalance.usd))} isLoading={false} />
-                                
+                                <BalanceTotal
+                                    formattedNumber={formatUSD(vaultBalance.usd.plus(multisigBalance.usd))}
+                                    isLoading={false}
+                                />
+
                                 <div className="flex items-center gap-x-2">
                                     <CoinAmount
                                         size="sm"

@@ -63,7 +63,6 @@ const useRaisingNFTVaults = (collectionId: string = chainConfigMap[AppChains.XIO
             onSale: tkn.onSale,
         })
     );
-    console.log({nfts});
 
     return nfts;
 };

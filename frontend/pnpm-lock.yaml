@@ -9,8 +9,8 @@ dependencies:
     specifier: ^3.9.2
     version: 3.9.2(@types/react@18.0.20)(graphql-ws@5.14.3)(graphql@16.8.1)(react-dom@18.2.0)(react@18.2.0)
   '@burnt-labs/abstraxion':
-    specifier: ^1.0.0-alpha.28
-    version: 1.0.0-alpha.30(@types/react@18.0.20)(graphql-ws@5.14.3)(react-dom@18.2.0)(react@18.2.0)
+    specifier: ^1.0.0-alpha.33
+    version: 1.0.0-alpha.33(@types/react@18.0.20)(graphql-ws@5.14.3)(react-dom@18.2.0)(react@18.2.0)
   '@cosmjs/cosmwasm-stargate':
     specifier: ^0.32.2
     version: 0.32.2
@@ -1313,16 +1313,16 @@ packages:
       '@babel/helper-validator-identifier': 7.22.20
       to-fast-properties: 2.0.0
 
-  /@burnt-labs/abstraxion-core@1.0.0-alpha.30(@types/react@18.0.20)(graphql-ws@5.14.3)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-ug9ZmB2BKAoS2CFGppsjQvlovGMXlsUvZ6FU3dOtXoXUv+BbATv9pzkp7VfdaXhztqhWon7xosxy8UOegsjPLA==}
+  /@burnt-labs/abstraxion-core@1.0.0-alpha.32(@types/react@18.0.20)(graphql-ws@5.14.3)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-PVkKZTMaO3j1HSGpwvu9Ivb3bOyhBpVd7cwUurDYmJi3zt2xNh9nqDpH41F9EY+tCBDQHLR+Bx82whVl3mcDKw==}
     dependencies:
-      '@burnt-labs/constants': 0.1.0-alpha.5
-      '@burnt-labs/signers': 0.1.0-alpha.5(@types/react@18.0.20)(graphql-ws@5.14.3)
-      '@cosmjs/cosmwasm-stargate': 0.31.3
-      '@cosmjs/proto-signing': 0.31.3
-      '@cosmjs/stargate': 0.31.3
-      '@cosmjs/tendermint-rpc': 0.31.3
-      cosmjs-types: 0.8.0
+      '@burnt-labs/constants': 0.1.0-alpha.6
+      '@burnt-labs/signers': 0.1.0-alpha.6(@types/react@18.0.20)(graphql-ws@5.14.3)
+      '@cosmjs/cosmwasm-stargate': 0.32.2
+      '@cosmjs/proto-signing': 0.32.2
+      '@cosmjs/stargate': 0.32.2
+      '@cosmjs/tendermint-rpc': 0.32.2
+      cosmjs-types: 0.9.0
       graz: 0.0.51(@types/react@18.0.20)(react-dom@18.2.0)(react@18.2.0)
       jose: 5.2.1
     transitivePeerDependencies:
@@ -1352,22 +1352,28 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@burnt-labs/abstraxion@1.0.0-alpha.30(@types/react@18.0.20)(graphql-ws@5.14.3)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-PQH1UcBSxiFjj5JDumXZnCy7DFuRcQwcNVpyTt67DcrdbFfL32VPc33Uhz9ACYF3iz7hgIapiJfcRjPPwPld+g==}
+  /@burnt-labs/abstraxion@1.0.0-alpha.33(@types/react@18.0.20)(graphql-ws@5.14.3)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-xaH++sL1tWgfZ+MLuQk9TpwrJa7fPJN/Qnj34LSkHEJ4HBjHuQoEEuos6zKDbXw44DEP7yktC5CxovQI+90vMw==}
     peerDependencies:
       react: ^18.2.0
       react-dom: 18.2.0
     dependencies:
-      '@burnt-labs/abstraxion-core': 1.0.0-alpha.30(@types/react@18.0.20)(graphql-ws@5.14.3)(react-dom@18.2.0)(react@18.2.0)
-      '@burnt-labs/constants': 0.1.0-alpha.5
-      '@burnt-labs/signers': 0.1.0-alpha.5(@types/react@18.0.20)(graphql-ws@5.14.3)
+      '@burnt-labs/abstraxion-core': 1.0.0-alpha.32(@types/react@18.0.20)(graphql-ws@5.14.3)(react-dom@18.2.0)(react@18.2.0)
+      '@burnt-labs/constants': 0.1.0-alpha.6
+      '@burnt-labs/signers': 0.1.0-alpha.6(@types/react@18.0.20)(graphql-ws@5.14.3)
       '@burnt-labs/ui': 0.1.0-alpha.5(@types/react@18.0.20)(react-dom@18.2.0)(react@18.2.0)
-      '@cosmjs/cosmwasm-stargate': 0.31.3
-      '@cosmjs/proto-signing': 0.31.3
-      '@cosmjs/stargate': 0.31.3
-      '@cosmjs/tendermint-rpc': 0.31.3
+      '@cosmjs/amino': 0.32.2
+      '@cosmjs/cosmwasm-stargate': 0.32.2
+      '@cosmjs/crypto': 0.32.2
+      '@cosmjs/encoding': 0.32.2
+      '@cosmjs/proto-signing': 0.32.2
+      '@cosmjs/stargate': 0.32.2
+      '@cosmjs/tendermint-rpc': 0.32.2
+      '@cosmjs/utils': 0.32.2
+      '@keplr-wallet/cosmos': 0.12.70
+      '@keplr-wallet/crypto': 0.12.70
       '@types/react-dom': 18.2.18
-      cosmjs-types: 0.8.0
+      cosmjs-types: 0.9.0
       graz: 0.0.51(@types/react@18.0.20)(react-dom@18.2.0)(react@18.2.0)
       jose: 5.2.1
       react: 18.2.0
@@ -1397,24 +1403,25 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@burnt-labs/constants@0.1.0-alpha.5:
-    resolution: {integrity: sha512-UWS8ny025hsb7mKAA6spnYpGYRNdsue68TCJ+hST8Mo93+CGt4IjFmEsyFs7UzrYxvkcvE19T4o+wf2g5kJyCA==}
+  /@burnt-labs/constants@0.1.0-alpha.6:
+    resolution: {integrity: sha512-k6DfdDFxxY4N72d6NoAPF7CXI4BNRnKvbsz+FdXQ+ws+4CzvrVuGBXhgpa1zs+PllXrouUnq+Dmds7Gz79vJOw==}
     dev: false
 
-  /@burnt-labs/signers@0.1.0-alpha.5(@types/react@18.0.20)(graphql-ws@5.14.3):
-    resolution: {integrity: sha512-WMgVfnPznsNOwOGzrnfhpqfZLNg85or75hKFQFYYc9wNdUBCbSQ9RqiYkpfEYwuP/z7M8u/BjyWujUBSXurEoA==}
+  /@burnt-labs/signers@0.1.0-alpha.6(@types/react@18.0.20)(graphql-ws@5.14.3):
+    resolution: {integrity: sha512-g7mByKD0037EXa/Se9Q6WDm2YDrt4GbFcfLugIdEh1oT0XWu4gL8oTK3jR43Wfk6s6WAoqHfcxE0BuNehnwwqw==}
     dependencies:
       '@apollo/client': 3.9.2(@types/react@18.0.20)(graphql-ws@5.14.3)(graphql@16.8.1)(react-dom@18.2.0)(react@18.2.0)
-      '@cosmjs/amino': 0.31.3
-      '@cosmjs/cosmwasm-stargate': 0.31.3
-      '@cosmjs/crypto': 0.31.3
+      '@cosmjs/amino': 0.32.2
+      '@cosmjs/cosmwasm-stargate': 0.32.2
+      '@cosmjs/crypto': 0.32.2
       '@cosmjs/math': 0.31.3
-      '@cosmjs/proto-signing': 0.31.3
-      '@cosmjs/stargate': 0.31.3
-      '@cosmjs/tendermint-rpc': 0.31.3
-      '@cosmjs/utils': 0.31.3
+      '@cosmjs/proto-signing': 0.32.2
+      '@cosmjs/stargate': 0.32.2
+      '@cosmjs/tendermint-rpc': 0.32.2
+      '@cosmjs/utils': 0.32.2
+      '@protobuf-ts/runtime': 2.9.3
       bech32: 2.0.0
-      cosmjs-types: 0.8.0
+      cosmjs-types: 0.9.0
       graphql: 16.8.1
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
@@ -2556,34 +2563,34 @@ packages:
       '@jridgewell/resolve-uri': 3.1.1
       '@jridgewell/sourcemap-codec': 1.4.15
 
-  /@keplr-wallet/common@0.12.66:
-    resolution: {integrity: sha512-j+XyjVwuH5j9t3T6aOQKRCUVfXNk2LMTHsM+o+sWTHGS9mRSC/TE2ZMGH2CWulajs2mG4hOZWgH5k42+DoPIUQ==}
+  /@keplr-wallet/common@0.12.70:
+    resolution: {integrity: sha512-XtVdlYEF5dMjwBugMsuRtq9DnoK9W+VoSYPdWoNcS3lG37m8/rB0Fs+hBW46hJ00Vx/4WqGMepARsvxIubit7w==}
     dependencies:
-      '@keplr-wallet/crypto': 0.12.66
-      '@keplr-wallet/types': 0.12.66
+      '@keplr-wallet/crypto': 0.12.70
+      '@keplr-wallet/types': 0.12.70
       buffer: 6.0.3
       delay: 4.4.1
       mobx: 6.12.0
     dev: false
 
-  /@keplr-wallet/cosmos@0.12.66:
-    resolution: {integrity: sha512-O03TERoe/1TcXeUtKfXoq9nKzV8spLIGniSuZnGSF7zNizgfgD95YuDMSikXr6foZOY+7NWFuxF8WUKcWOs1Ig==}
+  /@keplr-wallet/cosmos@0.12.70:
+    resolution: {integrity: sha512-8UZSP/q8wvUs8sc9ap7JMNKEDMRvtKLJ7De7bp/VCSMlJoYiv94/eF2U7Z+cdw2b/r34qyZ+VHlrzPQf9fSM9A==}
     dependencies:
       '@ethersproject/address': 5.7.0
-      '@keplr-wallet/common': 0.12.66
-      '@keplr-wallet/crypto': 0.12.66
-      '@keplr-wallet/proto-types': 0.12.66
-      '@keplr-wallet/simple-fetch': 0.12.66
-      '@keplr-wallet/types': 0.12.66
-      '@keplr-wallet/unit': 0.12.66
+      '@keplr-wallet/common': 0.12.70
+      '@keplr-wallet/crypto': 0.12.70
+      '@keplr-wallet/proto-types': 0.12.70
+      '@keplr-wallet/simple-fetch': 0.12.70
+      '@keplr-wallet/types': 0.12.70
+      '@keplr-wallet/unit': 0.12.70
       bech32: 1.1.4
       buffer: 6.0.3
       long: 4.0.0
       protobufjs: 6.11.4
     dev: false
 
-  /@keplr-wallet/crypto@0.12.66:
-    resolution: {integrity: sha512-d77BCz06K9Qxi9ErW4t90hatr2ocq6nToB6h+i3QWEsYM9gfOd2QzF/E2NCWrrb0/w0s0z6iqgA/UnRs9GiqnA==}
+  /@keplr-wallet/crypto@0.12.70:
+    resolution: {integrity: sha512-jw8/jqG8rgkDPWdjnrBOmL1+u+Gjy+gs3hFsODZDQAzV2LNskgH0ySbBo0okVEjl735bUCl7ljfuqlmNIfdGwg==}
     dependencies:
       '@ethersproject/keccak256': 5.7.0
       bip32: 2.0.6
@@ -2595,27 +2602,27 @@ packages:
       sha.js: 2.4.11
     dev: false
 
-  /@keplr-wallet/proto-types@0.12.66:
-    resolution: {integrity: sha512-Mht5R9pgruJiaG0WFmL8ynA7pt1adQRsjMwlle1/WJ8HJoNeO70DNOpCTCN0FDwWunLWDPzP6/7x1hIHz0mv6A==}
+  /@keplr-wallet/proto-types@0.12.70:
+    resolution: {integrity: sha512-RubyJhQ4eB90c4DjFQbEyY6uiWAKofi1rMcCTm2JXwKrIPjozzb2b4AeqkeRl4MxlN27DfQ1X69RugBalgev5A==}
     dependencies:
       long: 4.0.0
       protobufjs: 6.11.4
     dev: false
 
-  /@keplr-wallet/simple-fetch@0.12.66:
-    resolution: {integrity: sha512-Jbp5VS+ucSVq+2ktZkpXJbsy1gWpOMDENnX0yupHUF79CE+cHtYehG6HoZBEMR2lradKQS5eBh76QfjBngTh1g==}
+  /@keplr-wallet/simple-fetch@0.12.70:
+    resolution: {integrity: sha512-WYBIWGQgYpJe2sUnXcq2lWpMOS5+e5Q2abMpvaIVgQlwKJC3UVh9srXFYRVKOKfxPc1sc2WZhWztAsEsz33IKg==}
     dev: false
 
-  /@keplr-wallet/types@0.12.66:
-    resolution: {integrity: sha512-OTTMdx6yf6pLUy9hmgZV8jc/qnZJAqppmodeaonjCkJaJHHn82jIo1KZwRxvvNjE0IDm0ke0Dek56fLd+L5FKg==}
+  /@keplr-wallet/types@0.12.70:
+    resolution: {integrity: sha512-oOZEkWVOj/GCrKpcJR8EQKp6SvWHHzuZAwVkRnxJc9UKaaOE6kiOJnu02dl9jLhTziK2/JqUbXOsF/Hopw7xOQ==}
     dependencies:
       long: 4.0.0
     dev: false
 
-  /@keplr-wallet/unit@0.12.66:
-    resolution: {integrity: sha512-BdcGoyEMM1iYqTwItNwK5l7nc1WFi2LTL/3aC6uV69mn8z8yEV+R9CWO8/W8qcc2oZdHETlqTAXlFS1Ve9iL4A==}
+  /@keplr-wallet/unit@0.12.70:
+    resolution: {integrity: sha512-yIfwa7R+z9hJdggGF0lcJN2JEfEP75XI1m3UCzL92P09r8QR5x0ZBxf3nsyt0BQIHlGEqhYaI5orWsJ1srNEQg==}
     dependencies:
-      '@keplr-wallet/types': 0.12.66
+      '@keplr-wallet/types': 0.12.70
       big-integer: 1.6.52
       utility-types: 3.11.0
     dev: false
@@ -3042,6 +3049,10 @@ packages:
 
   /@polka/url@1.0.0-next.24:
     resolution: {integrity: sha512-2LuNTFBIO0m7kKIQvvPHN6UE63VjpmL9rnEEaOOaiSPbZK+zUOYIzBAWcED+3XYzhYsd/0mD57VdxAEqqV52CQ==}
+    dev: false
+
+  /@protobuf-ts/runtime@2.9.3:
+    resolution: {integrity: sha512-nivzCpg/qYD0RX2OmHOahJALb8ndjGmUhNBcTJ0BbXoqKwCSM6vYA+vegzS3rhuaPgbyC7Ec8idlnizzUfIRuw==}
     dev: false
 
   /@protobufjs/aspromise@1.1.2:
@@ -6666,6 +6677,7 @@ packages:
       is-hex-prefixed: 1.0.0
       strip-hex-prefix: 1.0.0
     dev: false
+    bundledDependencies: false
 
   /eventemitter3@4.0.7:
     resolution: {integrity: sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw==}
@@ -7074,7 +7086,7 @@ packages:
       '@cosmjs/proto-signing': 0.31.3
       '@cosmjs/stargate': 0.31.3
       '@cosmjs/tendermint-rpc': 0.31.3
-      '@keplr-wallet/cosmos': 0.12.66
+      '@keplr-wallet/cosmos': 0.12.70
       '@metamask/providers': 11.1.2
       '@tanstack/react-query': 4.36.1(react-dom@18.2.0)(react@18.2.0)
       '@tanstack/react-query-devtools': 4.36.1(@tanstack/react-query@4.36.1)(react-dom@18.2.0)(react@18.2.0)

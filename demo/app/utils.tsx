@@ -58,6 +58,7 @@ export async function createIcaMultisig(
         max_voting_period: {
           time: 36000,
         },
+        proxy: contracts.proxyMultisig.address,
       },
       channel_open_init_options: {
         connection_id: contracts.channelOpenInitOptions.connectionId,
@@ -304,6 +305,24 @@ export async function getBalance(client: any, address: string) {
       `Account Balance: ${accountBalance?.amount} ${accountBalance?.denom}`
     );
     return accountBalance;
+  } catch (error) {
+    console.log("error", error);
+    alert(error);
+  }
+}
+
+export async function getMultisigs(client: any, account: any) {
+  try {
+    console.log("msg", {
+      factory: contracts.icaFactory.address,
+      msg: { query_multisig_by_creator: account.bech32Address }
+    })
+    const multisig_list = await client?.queryContractSmart(
+      contracts.icaFactory.address,
+      { query_multisig_by_creator: account.bech32Address }
+    );
+    console.log("multisig_list", multisig_list)
+    return multisig_list;
   } catch (error) {
     console.log("error", error);
     alert(error);

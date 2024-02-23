@@ -29,7 +29,7 @@ export type CreateIcaMultisigResult = {
         src_port_id: string | undefined;
         destination_port: string | undefined;
     };
-}
+};
 
 export async function createIcaMultisig(client: any, account: { bech32Address: string }, ica_factory: string, memberAddresses: string[]): Promise<
 SendTxResult<CreateIcaMultisigResult>
@@ -56,7 +56,7 @@ SendTxResult<CreateIcaMultisigResult>
             salt: uuidv4(),
         },
     };
-    console.log('msg', msg);
+    console.log('msg', msg, ica_factory, client);
 
     try {
         const instantiateResponse = await client?.execute(account.bech32Address, ica_factory, msg, 'auto');
@@ -70,8 +70,12 @@ SendTxResult<CreateIcaMultisigResult>
 
         const channel_open_init_events = instantiateResponse?.events.filter((e: any) => e.type === 'channel_open_init');
         console.log('channel_open_init_events', channel_open_init_events);
-        const src_channel_id: string | undefined = channel_open_init_events[0]?.attributes?.find((attr: any) => attr.key === 'channel_id')?.value;
-        const src_port_id: string | undefined = channel_open_init_events[0]?.attributes?.find((attr: any) => attr.key === 'port_id')?.value;
+        const src_channel_id: string | undefined = channel_open_init_events[0]?.attributes?.find(
+            (attr: any) => attr.key === 'channel_id'
+        )?.value;
+        const src_port_id: string | undefined = channel_open_init_events[0]?.attributes?.find(
+            (attr: any) => attr.key === 'port_id'
+        )?.value;
         const destination_port: string | undefined = channel_open_init_events[0]?.attributes?.find(
             (attr: any) => attr.key === 'counterparty_port_id'
         )?.value;

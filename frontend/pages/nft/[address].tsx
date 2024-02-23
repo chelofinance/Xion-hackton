@@ -16,7 +16,7 @@ import {injectiveClient} from '@/utils/injective';
 import {InjectiveSigningStargateClient} from '@injectivelabs/sdk-ts/dist/cjs/core/stargate';
 import {createIcaBuyMsg} from '@/utils/ica';
 import {useRouter} from 'next/router';
-import useRaisingNFTVault from '@/hooks/useRaisingNFTVault';
+import useRaisingNFTVault from '@/hooks/useRaisingNFTVaults';
 import PageLoader from '@/components/PageLoader';
 import BigNumber from 'bignumber.js';
 
@@ -50,7 +50,8 @@ const CreateVault: NextPage = () => {
     client: null,
     signer: null,
   });
-  const nft = useRaisingNFTVault(address as string | undefined);
+  const nftList = useRaisingNFTVault();
+  const nft = nftList.find((nft) => nft.tokenId === address);
 
   const init = async () => {
     try {
@@ -139,7 +140,11 @@ const CreateVault: NextPage = () => {
                 <div className="h-6 flex flex-col justify-center Font_label_14px">Fixed price</div>
 
                 <div className="flex flex-col gap-y-2 items-end">
-                  <CoinAmount size="xl" symbol={TokenSymbols.INJ} formattedAmount={formatNumber(nft.fixedPrice.value, COIN_DICT[nft.fixedPrice.symbol].decimals)} />
+                  <CoinAmount
+                    size="xl"
+                    symbol={TokenSymbols.INJ}
+                    formattedAmount={formatNumber(nft.fixedPrice.value, COIN_DICT[nft.fixedPrice.symbol].decimals)}
+                  />
                 </div>
               </div>
 
