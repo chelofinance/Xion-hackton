@@ -34,7 +34,6 @@ type ControllerResponse = {
  * @todo query the NFT vaults which includes me as a member
  */
 const useMyNFTVaults = (): readonly MyNFTVault[] => {
-    // const [testVault] = useAtom(testVaultAtom);
     const [myVaults, setMyVaults] = useState<MyNFTVault[]>([]);
     const {client} = useAbstraxionSigningClient();
     const {data: account, isConnected} = useAbstraxionAccount();

@@ -1,9 +1,17 @@
-import { AllChains, AppChains, COIN_DICT, ProposalStatus, TokenSymbols, chainConfigMap, channelOpenInitOptions } from "@/constants/app";
-import type { SendTxResult } from "@/types/tx";
-import { useAbstraxionSigningClient } from "@burnt-labs/abstraxion";
-import { DeliverTxResponse } from "@cosmjs/cosmwasm-stargate";
-import type { Coin } from "@cosmjs/stargate";
-import BigNumber from "bignumber.js";
+import {
+  AllChains,
+  AppChains,
+  COIN_DICT,
+  ProposalStatus,
+  TokenSymbols,
+  chainConfigMap,
+  channelOpenInitOptions,
+} from '@/constants/app';
+import type {SendTxResult} from '@/types/tx';
+import {useAbstraxionSigningClient} from '@burnt-labs/abstraxion';
+import {DeliverTxResponse} from '@cosmjs/cosmwasm-stargate';
+import type {Coin} from '@cosmjs/stargate';
+import BigNumber from 'bignumber.js';
 import {v4 as uuidv4} from 'uuid';
 
 export type HandleDepositArgs = {
@@ -15,8 +23,11 @@ export type HandleDepositArgs = {
 
 export type XionSigningClient = ReturnType<typeof useAbstraxionSigningClient>['client'];
 
-export const transferOnXion = async (signingClient: XionSigningClient, args: HandleDepositArgs): Promise<SendTxResult<DeliverTxResponse>> => {
-  const { symbol, depositAmount, senderAddress, recipientAddress } = args;
+export const transferOnXion = async (
+  signingClient: XionSigningClient,
+  args: HandleDepositArgs
+): Promise<SendTxResult<DeliverTxResponse>> => {
+  const {symbol, depositAmount, senderAddress, recipientAddress} = args;
 
   const coin = COIN_DICT[symbol];
   const denom = coin.denomOn[AllChains.XION_TESTNET];
@@ -72,7 +83,10 @@ export const transferOnXion = async (signingClient: XionSigningClient, args: Han
   }
 };
 
-export const getBalanceOnXion = async (signingClient: XionSigningClient, args: {address: string; denom: string}): Promise<Coin> => {
+export const getBalanceOnXion = async (
+  signingClient: XionSigningClient,
+  args: {address: string; denom: string}
+): Promise<Coin> => {
   const {address, denom} = args;
 
   try {
@@ -97,9 +111,12 @@ export const getBalanceOnXion = async (signingClient: XionSigningClient, args: {
 export type GetVaultMultisigsResponse = {
   controllers: readonly string[];
   multisigs: readonly string[];
-}
+};
 
-export const getVaultMultisigs = async (signingClient: XionSigningClient, bech32Address: string): Promise<GetVaultMultisigsResponse> => {
+export const getVaultMultisigs = async (
+  signingClient: XionSigningClient,
+  bech32Address: string
+): Promise<GetVaultMultisigsResponse> => {
   const icaFactoryAddress = chainConfigMap[AppChains.XION_TESTNET].icaFactory.address;
   const msg = {
     query_multisig_by_creator: bech32Address,
@@ -110,14 +127,13 @@ export const getVaultMultisigs = async (signingClient: XionSigningClient, bech32
 
     console.log('getVaultMultisigs response:', response);
 
-    return response ?? { controllers: [], multisigs: [] };
-
-  } catch(error) {
+    return response ?? {controllers: [], multisigs: []};
+  } catch (error) {
     console.log(`Failed to get vault multisigs: ${error}`);
 
-    return { controllers: [], multisigs: [] };
+    return {controllers: [], multisigs: []};
   }
-}
+};
 
 export type ProposalResponse = {
   id: string;
@@ -136,23 +152,23 @@ export type GetProposalsResponse = {
 
 export async function getProposals(client: XionSigningClient, icaMultisigAddress: string): Promise<GetProposalsResponse> {
   const msg = {
-      list_proposals: { start_after: 0 },
+    list_proposals: {},
   };
 
   try {
-      const response: GetProposalsResponse | undefined = await client?.queryContractSmart(icaMultisigAddress, msg);
-      
-      console.log('getProposals response:', response);
+    const response: GetProposalsResponse | undefined = await client?.queryContractSmart(icaMultisigAddress, msg);
 
-      return response ?? { proposals: [] };
+    console.log('getProposals response:', response);
+
+    return response ?? {proposals: []};
   } catch (error) {
-      console.log('getProposals error:', error);
+    console.log('getProposals error:', error);
   }
 
-  return { proposals: [] };
+  return {proposals: []};
 }
 
-export type VoterResponse = { addr: string; weight: string; };
+export type VoterResponse = {addr: string; weight: string};
 
 export type GetVotersResponse = {
   voters: readonly VoterResponse[];
@@ -164,35 +180,38 @@ export async function getVoters(client: XionSigningClient, icaMultisigAddress: s
   };
 
   try {
-      const response: GetVotersResponse | undefined = await client?.queryContractSmart(icaMultisigAddress, msg);
-      
-      console.log('getVoters response:', response);
+    const response: GetVotersResponse | undefined = await client?.queryContractSmart(icaMultisigAddress, msg);
 
-      return response ?? { voters: [] };
+    console.log('getVoters response:', response);
+
+    return response ?? {voters: []};
   } catch (error) {
-      console.log('getVoters error:', error);
+    console.log('getVoters error:', error);
   }
 
-  return { voters: [] };
+  return {voters: []};
 }
 
 export type GetMultisigThresholdResponse = {
-  absolute_count: { weight: string; total_weight: string; };
+  absolute_count: {weight: string; total_weight: string};
 };
 
-export async function getMultisigThreshold(client: XionSigningClient, icaMultisigAddress: string): Promise<GetMultisigThresholdResponse | undefined> {
+export async function getMultisigThreshold(
+  client: XionSigningClient,
+  icaMultisigAddress: string
+): Promise<GetMultisigThresholdResponse | undefined> {
   const msg = {
     threshold: {},
   };
 
   try {
-      const response: GetMultisigThresholdResponse | undefined = await client?.queryContractSmart(icaMultisigAddress, msg);
-      
-      console.log('getMultisigThreshold response:', response);
+    const response: GetMultisigThresholdResponse | undefined = await client?.queryContractSmart(icaMultisigAddress, msg);
 
-      return response;
+    console.log('getMultisigThreshold response:', response);
+
+    return response;
   } catch (error) {
-      console.log('getMultisigThreshold error:', error);
+    console.log('getMultisigThreshold error:', error);
   }
 
   return undefined;
@@ -228,47 +247,31 @@ export async function createICAMultisigVault(
       },
       channel_open_init_options: {
         connection_id: CHANNEL_OPTIONS.connectionId,
-        counterparty_connection_id:
-          CHANNEL_OPTIONS.counterpartyConnectionId,
+        counterparty_connection_id: CHANNEL_OPTIONS.counterpartyConnectionId,
       },
       salt: uuidv4(),
     },
   };
-  console.log("msg", msg);
+  console.log('msg', msg);
 
   try {
-    const instantiateResponse = await client?.execute(
-      account.bech32Address,
-      ica_factory,
-      msg,
-      "auto"
-    );
-    console.log("instantiateResponse", instantiateResponse);
+    const instantiateResponse = await client?.execute(account.bech32Address, ica_factory, msg, 'auto');
+    console.log('instantiateResponse', instantiateResponse);
 
-    const instantiate_events = instantiateResponse?.events.filter(
-      (e: any) => e.type === "instantiate"
-    );
+    const instantiate_events = instantiateResponse?.events.filter((e: any) => e.type === 'instantiate');
     const ica_multisig_address = instantiate_events
       ?.find((e: any) =>
-        e.attributes.find(
-          (attr: any) => attr.key === "code_id" && attr.value === CONFIG.cw3FixedMultisig.codeId
-        )
+        e.attributes.find((attr: any) => attr.key === 'code_id' && attr.value === CONFIG.cw3FixedMultisig.codeId)
       )
-      ?.attributes.find((attr: any) => attr.key === "_contract_address")?.value;
-    console.log("ica_multisig_address:", ica_multisig_address);
+      ?.attributes.find((attr: any) => attr.key === '_contract_address')?.value;
+    console.log('ica_multisig_address:', ica_multisig_address);
 
-    const channel_open_init_events = instantiateResponse?.events.filter(
-      (e: any) => e.type === "channel_open_init"
-    );
-    console.log("channel_open_init_events", channel_open_init_events);
-    const src_channel_id = channel_open_init_events?.[0]?.attributes?.find(
-      (attr: any) => attr.key === "channel_id"
-    )?.value;
-    const src_port_id = channel_open_init_events?.[0]?.attributes?.find(
-      (attr: any) => attr.key === "port_id"
-    )?.value;
+    const channel_open_init_events = instantiateResponse?.events.filter((e: any) => e.type === 'channel_open_init');
+    console.log('channel_open_init_events', channel_open_init_events);
+    const src_channel_id = channel_open_init_events?.[0]?.attributes?.find((attr: any) => attr.key === 'channel_id')?.value;
+    const src_port_id = channel_open_init_events?.[0]?.attributes?.find((attr: any) => attr.key === 'port_id')?.value;
     const destination_port = channel_open_init_events?.[0]?.attributes?.find(
-      (attr: any) => attr.key === "counterparty_port_id"
+      (attr: any) => attr.key === 'counterparty_port_id'
     )?.value;
 
     return {
@@ -280,7 +283,7 @@ export async function createICAMultisigVault(
       },
     };
   } catch (error) {
-    console.log("error", error);
+    console.log('error', error);
     alert(error);
   }
 }

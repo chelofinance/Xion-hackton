@@ -243,3 +243,8 @@ export const PROPOSAL_STATUS_LABEL_DICT: Record<ProposalStatus, string> = {
   [ProposalStatus.Passed]: 'Passed',
   [ProposalStatus.Executed]: 'Executed',
 };
+
+
+// Due to unstable relayers, ICA Account address could be empty when creating a proposal.
+// So, to avoid errors in demo, we use a placeholder address.
+export const INJ_ICA_ACCOUNT_PLACEHOLDER = 'inj1r8x942pe0sf7dd9cpr36szzaflpleav5qx59ke';
