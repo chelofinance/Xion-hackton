@@ -2,9 +2,9 @@
 
 import {v4 as uuidv4} from 'uuid';
 import {produceProposal} from './propose';
-import { SendTxResult } from '@/types/tx';
-import { GetProposalsResponse } from './xion';
-import { AppChains, chainConfigMap, channelOpenInitOptions } from '@/constants/app';
+import {SendTxResult} from '@/types/tx';
+import {GetProposalsResponse} from './xion';
+import {AppChains, chainConfigMap, channelOpenInitOptions} from '@/constants/app';
 
 export async function getIcaAccountAddress(client: any, ica_controller_address: string) {
     const contract_response = await client?.queryContractSmart(ica_controller_address, {get_contract_state: {}});
@@ -123,9 +123,9 @@ export async function createIcaProposal({
     multisig: string;
     icaController: string;
 }) {
-
     const proposalMsg = {
-        propose: produceProposal(injectiveMsg, icaControllerAddress),
+        propose: produceProposal(injectiveMsg, icaController),
+    };
     const proxy = chainConfigMap[AppChains.XION_TESTNET].proxyMultisig.address;
     const multisigProposal = {
         propose: produceProposal(injectiveMsg, icaController),
