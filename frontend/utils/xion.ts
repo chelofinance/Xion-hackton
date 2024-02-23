@@ -2,6 +2,7 @@ import {
   AllChains,
   AppChains,
   COIN_DICT,
+  ICA_CONTROLLER_FALLBACK,
   INJ_ICA_ACCOUNT_PLACEHOLDER,
   ProposalStatus,
   TokenSymbols,
@@ -111,11 +112,11 @@ export const getBalanceOnXion = async (
   }
 };
 
-export const getIcaAccountAddress = async (signingClient: XionSigningClient, icaControllerAddress: string): Promise<string> => {
+export const getIcaAccountAddress = async (signingClient: XionSigningClient, icaControllerAddress: string): Promise<string | undefined> => {
   const msg = {get_contract_state: {}};
   const response = await signingClient?.queryContractSmart(icaControllerAddress, msg);
   const icaAccountAddress: string | undefined = response?.contract_state?.address;
-  return icaAccountAddress ?? INJ_ICA_ACCOUNT_PLACEHOLDER;
+  return icaAccountAddress;
 }
 
 export type GetVaultMultisigsResponse = {
@@ -141,10 +142,10 @@ export const getVaultMultisigs = async (
       
       const accm = await accmPromise;
 
-      return icaControllerAddress && icaAccountAddress ? [...accm, {
+      return icaControllerAddress ? [...accm, {
         multisigAddress: multisig,
-        icaControllerAddress,
-        icaAccountAddress,
+        icaControllerAddress: icaAccountAddress ? icaControllerAddress : ICA_CONTROLLER_FALLBACK,
+        icaAccountAddress: icaAccountAddress ?? INJ_ICA_ACCOUNT_PLACEHOLDER,
       }] : accm;
     }, Promise.resolve([])) ?? [];
 
