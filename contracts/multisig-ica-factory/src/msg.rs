@@ -69,7 +69,7 @@ pub enum QueryMsg {
     /// get multisig and controller by creator
     #[returns(ICAControllerResponse)]
     QueryMultisigByCreator(Addr),
-    
+
     /// get multisig and controller by member
     #[returns(ICAControllerResponse)]
     QueryMultisigByMember(Addr),
