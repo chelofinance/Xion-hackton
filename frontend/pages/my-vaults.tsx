@@ -50,9 +50,7 @@ const MyVaults: NextPage = () => {
     const multisigBalance = getBalanceOnXion(TokenSymbols.INJ);
 
     const {depositToVaultMultisig, isProcessing: isDepositToVaultProcessing} = useDepositToVaultMultisig();
-
-    const {getBalance: getBalanceOnInjective} = useBalanceOnInjective(fallbackVault?.icaAccountAddress);
-    const vaultBalance = getBalanceOnInjective(TokenSymbols.INJ);
+    const vaultBalance = {usd: BigNumber(0), shifted: BigNumber(0), decimals: 18};
 
     const myNFTVaultsValueUSD = useMemo(() => {
         return myVaults.reduce((accm, vault) => {
@@ -115,7 +113,7 @@ const MyVaults: NextPage = () => {
         if (result?.isSuccess) {
             await updateBalanceOnXion();
         }
-    }, [depositToVaultMultisig, depositAmount, fallbackVault, userWallet]);
+    }, [depositAmount, fallbackVault, userWallet]);
 
     const getDepositAmountErrorMsg = useCallback((value: string) => {
         if (value === '' || value === '0') return 'Enter amount';

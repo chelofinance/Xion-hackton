@@ -12,3 +12,11 @@ export const decodeBase64 = (msg: string) => {
     return null;
   }
 };
+
+export const safeJsonParse = (msg: string) => {
+  try {
+    return JSON.parse(msg);
+  } catch (err) {
+    return null;
+  }
+};
