@@ -5,7 +5,7 @@ import {ProposalStatus} from '@/constants/app';
 import {ProposalResponse, getMultisigThreshold, getProposals, getVoters} from '@/utils/xion';
 import useRaisingNFTVaults from '../useRaisingNFTVaults';
 import {RaisingNFT} from '@/types/asset';
-import {decodeBase64} from '@/utils/text';
+import {decodeBase64, safeJsonParse} from '@/utils/text';
 import {registry} from '@/utils/propose';
 import {CosmwasmWasmV1Tx} from '@injectivelabs/core-proto-ts';
 
@@ -72,10 +72,10 @@ const useProposals = (address: string | undefined): UseProposals => {
                     typeUrl: protobufMsg.type_url,
                     value: protobufMsg.value,
                 }) as CosmwasmWasmV1Tx.MsgExecuteContract;
+                const nftCall = safeJsonParse(atob(Buffer.from(msgExecuteBuy.msg).toString('base64')));
 
-                return msgExecuteBuy.contract === nft.buyContractAddress;
+                return nftCall && nftCall.buy_token.token_id === nft.tokenId;
             });
-            console.log('RAFAEL', proposal, nft);
             return nft ?? null;
         },
         [nfts.length]

@@ -5,13 +5,7 @@ import NFTTumbnail from '@/components/NFTThumbnail';
 import Card from '@/components/Card';
 import {formatNumber, formatUSD, simpleFormat} from '@/utils/number';
 import CoinAmount from '@/components/CoinAmount';
-import {
-  AppChains,
-  chainConfigMap,
-  CHAIN_METADATA_DICT,
-  TokenSymbols,
-  COIN_DICT,
-} from '@/constants/app';
+import {AppChains, chainConfigMap, CHAIN_METADATA_DICT, TokenSymbols, COIN_DICT} from '@/constants/app';
 import Button, {ButtonProps} from '@/components/Button';
 import ProgressBar from '@/components/ProgressBar';
 import {useCallback, useMemo, useRef, useState} from 'react';
@@ -36,7 +30,8 @@ import useDepositToVaultMultisig from '@/hooks/useDepositToVaultMultisig';
 import useBalanceOnXion from '@/hooks/useBalanceOnXion';
 import useBalanceOnInjective from '@/hooks/useBalanceOnInjective';
 import CheckItem from '@/components/CheckItem';
-import { shortenAddress } from '@/utils/text';
+import {shortenAddress} from '@/utils/text';
+import useICABuy from '@/hooks/useICABuy';
 
 const CONFIG = chainConfigMap[AppChains.XION_TESTNET];
 const coin = COIN_DICT[TokenSymbols.INJ];
@@ -90,15 +85,17 @@ const RaisingVault: NextPage = () => {
     return leftovers > 0 ? leftovers : 0;
   }, [nft, myVaultBalance.shifted]);
 
-  const maxDepositAmountUSD = useMemo(
-    () => new BigNumber(maxDepositAmount * oraclePrice),
-    [maxDepositAmount, oraclePrice]
-  );
+  const maxDepositAmountUSD = useMemo(() => new BigNumber(maxDepositAmount * oraclePrice), [maxDepositAmount, oraclePrice]);
 
   const minDepositAmount = 0.000000000000000001;
 
   const [depositAmount, setDepositAmount] = useState<number>(maxDepositAmount);
   const [isDepositAmountValid, setIsDepositAmountValid] = useState<boolean>(true);
+  const {buyNftIca, isProcessing: isProcessingBuy} = useICABuy();
+  const [isSelectVaultOpen, setIsSelectVaultOpen] = useState<boolean>(false);
+  const [selectedVault, setSelectedVault] = useState<MyVault>(myVaults[0]);
+
+  const fallbackSelectedVault = useMemo(() => selectedVault ?? myVaults[0], [selectedVault, myVaults]);
 
   const onChange = useCallback((debouncedValue: string, isValid: boolean) => {
     setIsDepositAmountValid(isValid);
@@ -182,61 +179,9 @@ const RaisingVault: NextPage = () => {
       await updateBalance();
     } catch (err) {
       console.log('ERR TRANSFER', err);
-      alert("An error occured. Check console for details.")
+      alert('An error occured. Check console for details.');
     }
   };
-
-  const [{client: cosmosCli, signer}, setCosmos] = useState<{
-    client: InjectiveSigningStargateClient | null;
-    signer: any;
-  }>({
-    client: null,
-    signer: null,
-  });
-
-  const {client} = useAbstraxionSigningClient();
-  const {data: abstraxionAccount} = useAbstraxionAccount();
-
-  const [isSelectVaultOpen, setIsSelectVaultOpen] = useState<boolean>(false);
-  const [selectedVault, setSelectedVault] = useState<MyVault>();
-
-  const fallbackSelectedVault = useMemo(() => selectedVault ?? myVaults[0], [selectedVault, myVaults]);
-
-  const handleICABuyNft = useCallback(async () => {
-    if (!nft) return;
-
-    const proposingVault = myVault ?? fallbackSelectedVault;
-
-    if (!proposingVault) {
-      alert('Create a vault to buy NFTs.')
-      return;
-    }
-
-    // const vaultUsed = myVaults.find((vault) => vault.multisigAddress === router.query.vault) || (myVaults[0] as MyVault);
-
-    try {
-      const proposalMsg = createIcaBuyMsg({
-        ica: proposingVault.icaControllerAddress || 'relaying',
-        buyContract: nft.buyContractAddress,
-        nftContract: nft.collection.contractAddress,
-        tokenId: nft.tokenId,
-        cost: nft.fixedPrice.value.shiftedBy(COIN_DICT[nft.fixedPrice.symbol].decimals).dp(0).toString(),
-      });
-
-      const { proposal_id } = await createIcaProposal({
-        client,
-        account: abstraxionAccount,
-        injectiveMsg: proposalMsg,
-        multisig: proposingVault.multisigAddress,
-        icaController: proposingVault.icaControllerAddress,
-      });
-
-      console.log('createIcaProposal response:', { proposal_id })
-
-    } catch (error) {
-      console.log('createIcaProposal faile:', error);
-    }
-  }, [nft, myVault, fallbackSelectedVault]);
 
   const handleICASellNft = async () => {
     if (!nft) return;
@@ -302,25 +247,27 @@ const RaisingVault: NextPage = () => {
               <ChainLabel chain={nft.chain} />
             </div>
 
-            {myVault && <Card color="glass" className="flex flex-col items-stretch gap-y-2 p-4 text-body">
-              <div className="flex items-stretch justify-between gap-x-2 text-body">
-                <span className="h-6 flex flex-col justify-center Font_label_14px">Participants</span>
+            {myVault && (
+              <Card color="glass" className="flex flex-col items-stretch gap-y-2 p-4 text-body">
+                <div className="flex items-stretch justify-between gap-x-2 text-body">
+                  <span className="h-6 flex flex-col justify-center Font_label_14px">Participants</span>
 
-                <span className="flex items-baseline gap-x-1 Font_data_16px_num">
-                  {formatNumber(nft.participants)}
-                  <span className="Font_caption_xs">joining</span>
-                </span>
-              </div>
+                  <span className="flex items-baseline gap-x-1 Font_data_16px_num">
+                    {formatNumber(nft.participants)}
+                    <span className="Font_caption_xs">joining</span>
+                  </span>
+                </div>
 
-              <div className="flex flex-col items-end gap-y-4">
-                <ProgressBar
-                  currentNumber={raisedAmountUSD.toNumber()}
-                  targetNumber={priceUSD.toNumber()}
-                  formatOptions={{currencySymbol: '$'}}
-                  currentNumberCaption={`raised`}
-                />
-              </div>
-            </Card>}
+                <div className="flex flex-col items-end gap-y-4">
+                  <ProgressBar
+                    currentNumber={raisedAmountUSD.toNumber()}
+                    targetNumber={priceUSD.toNumber()}
+                    formatOptions={{currencySymbol: '$'}}
+                    currentNumberCaption={`raised`}
+                  />
+                </div>
+              </Card>
+            )}
 
             <Card color="glass" className="flex items-stretch justify-between gap-x-4 p-4 text-body">
               <div className="h-6 flex flex-col justify-center Font_label_14px">Fixed price</div>
@@ -356,9 +303,9 @@ const RaisingVault: NextPage = () => {
                     <div className="h-6 Font_label_14px">Select vault to make buy proposal.</div>
 
                     <ul className="flex flex-wrap gap-x-2">
-                      {myVaults.map(myVault => (
+                      {myVaults.map((myVault) => (
                         <li key={myVault.multisigAddress}>
-                          <CheckItem 
+                          <CheckItem
                             label={shortenAddress(myVault.multisigAddress)}
                             checked={fallbackSelectedVault?.multisigAddress === myVault.multisigAddress}
                             onChange={(isChecked) => {
@@ -372,7 +319,15 @@ const RaisingVault: NextPage = () => {
                     </ul>
 
                     <div className="flex justify-end">
-                      <Button iconType="arrow_forward" color="on_primary" label="Propose buy" onClick={handleICABuyNft} />
+                      <Button
+                        iconType="arrow_forward"
+                        color="on_primary"
+                        label="Propose buy"
+                        status={isProcessingBuy ? 'processing' : 'enabled'}
+                        onClick={() => {
+                          buyNftIca(nft, selectedVault);
+                        }}
+                      />
                     </div>
                   </Card>
                 )}

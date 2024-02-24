@@ -5,7 +5,7 @@ import {produceProposal} from './propose';
 import {SendTxResult} from '@/types/tx';
 import {GetProposalsResponse, XionSigningClient} from './xion';
 import {AppChains, chainConfigMap, channelOpenInitOptions} from '@/constants/app';
-import { AbstraxionAccount } from '@/types/wallet';
+import {AbstraxionAccount} from '@/types/wallet';
 
 export async function getIcaAccountAddress(client: any, ica_controller_address: string) {
     const contract_response = await client?.queryContractSmart(ica_controller_address, {get_contract_state: {}});
@@ -124,9 +124,6 @@ export async function createIcaProposal({
     multisig: string;
     icaController: string;
 }) {
-    const proposalMsg = {
-        propose: produceProposal(injectiveMsg, icaController),
-    };
     const proxy = chainConfigMap[AppChains.XION_TESTNET].proxyMultisig.address;
     const multisigProposal = {
         propose: produceProposal(injectiveMsg, icaController),
@@ -138,9 +135,9 @@ export async function createIcaProposal({
 
     try {
         console.log({
-            multisigProposal, 
+            multisigProposal,
             proxyMessage,
-            proxy, 
+            proxy,
             address: account.bech32Address,
         });
 
@@ -240,23 +237,23 @@ export async function addMember(
     };
 
     const msg = {
-      add_member: {
-        address: memberAddress,
-        fee,
-        sender: account.bech32Address,
-      }
+        add_member: {
+            address: memberAddress,
+            fee,
+            sender: account.bech32Address,
+        },
     };
 
     try {
-      const executionResponse = await client?.execute(
-        account.bech32Address,
-        chainConfigMap[AppChains.XION_TESTNET].proxyMultisig.address,
-        {
-          contract_addr: icaMultisigAddress,
-          payload: msg,
-        },
-        'auto',
-      );
+        const executionResponse = await client?.execute(
+            account.bech32Address,
+            chainConfigMap[AppChains.XION_TESTNET].proxyMultisig.address,
+            {
+                contract_addr: icaMultisigAddress,
+                payload: msg,
+            },
+            'auto'
+        );
         console.log('executionResponse', executionResponse);
         return executionResponse;
     } catch (error) {
@@ -284,7 +281,7 @@ export const createChannelProposal = async ({
         const fullProposal = {
             propose: {
                 title: 'ICA transaction',
-                description: 'some desc :)',
+                description: 'Create ICA',
                 msgs: [
                     {
                         wasm: {
