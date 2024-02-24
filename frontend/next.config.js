@@ -1,4 +1,3 @@
-//@ts-check
 const { withSentryConfig } = require('@sentry/nextjs');
 const withBundleAnalyzer = require('@next/bundle-analyzer');
 const withPWA = require('next-pwa')({
@@ -90,7 +89,7 @@ const withBundleAnalyzerOptions = { enabled: process.env.ANALYZE === 'true' };
 
 const config = withBundleAnalyzer(withBundleAnalyzerOptions)(
   nextConfig
-  // withSentryConfig(nextConfig, sentryWebpackPluginOptions, sentryOptions)
 );
+// const sentryConfig = withSentryConfig(nextConfig, sentryWebpackPluginOptions, sentryOptions);
 
 module.exports = withPWA(config);

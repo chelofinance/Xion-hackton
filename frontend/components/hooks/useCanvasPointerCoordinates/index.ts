@@ -1,8 +1,9 @@
 import type { ThreeEvent } from '@react-three/fiber';
-import { PointerEventHandler, useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
+import { Object3DEventMap } from 'three';
 
 const useCanvasPointerCoordinates = () => {
-  const [lastObject, setLastObject] = useState<THREE.Object3D<THREE.Event> | undefined>(undefined);
+  const [lastObject, setLastObject] = useState<THREE.Object3D<Object3DEventMap> | undefined>(undefined);
   const [isObejctInteractedEver, setIsObejctInteractedEver] = useState<boolean>(false);
 
   const followPointer = useCallback(
@@ -16,7 +17,7 @@ const useCanvasPointerCoordinates = () => {
 
   const persistInteractedObject = useCallback(
     (event: ThreeEvent<PointerEvent>) => {
-      const itersectedObject: THREE.Object3D<THREE.Event> | undefined = event.intersections[0]?.eventObject;
+      const itersectedObject: THREE.Object3D<Object3DEventMap> | undefined = event.intersections[0]?.eventObject;
       setLastObject(itersectedObject);
 
       if (itersectedObject && !isObejctInteractedEver) setIsObejctInteractedEver(true);
