@@ -223,7 +223,7 @@ export async function getBalance(client: any, address: string) {
     }
 }
 
-export async function addMember(
+export async function joinVault(
     client: any,
     account: any,
     icaMultisigAddress: string,

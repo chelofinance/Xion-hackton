@@ -2,7 +2,7 @@ import type {NextPage} from 'next';
 import Main from '@/components/Main';
 import Heading from '@/components/Heading';
 import Card from '@/components/Card';
-import {formatNumber, formatUSD} from '@/utils/number';
+import {formatNumber, formatUSD, simpleFormat} from '@/utils/number';
 import {useCallback, useMemo, useRef, useState} from 'react';
 import useOraclePrice from '@/hooks/useOraclePrice';
 import BigNumber from 'bignumber.js';
@@ -18,7 +18,7 @@ import {useRouter} from 'next/router';
 import {AllChains, PROPOSAL_STATUS_LABEL_DICT, ProposalStatus, TokenSymbols} from '@/constants/app';
 import Tag from '@/components/Tag';
 import useProposals from '@/hooks/useProposals';
-import useAddMember from '@/hooks/useAddMember';
+import useJoinVault from '@/hooks/useJoinVault';
 import TextInput from '@/components/TextInput';
 import CoinAmount from '@/components/CoinAmount';
 import useDepositToVaultMultisig from '@/hooks/useDepositToVaultMultisig';
@@ -77,13 +77,13 @@ const MyVaults: NextPage = () => {
 
     const {voteProposal} = useProposals(fallbackVault?.icaControllerAddress ?? '');
 
-    const {addMember} = useAddMember(fallbackVault?.icaControllerAddress ?? '');
+    const {joinVault, processing: addMemberLoading} = useJoinVault();
 
-    const addMemberForm = useRef<HTMLFormElement>(null);
+    const joinVaultForm = useRef<HTMLFormElement>(null);
     const depositForm = useRef<HTMLFormElement>(null);
 
-    const [newMemberAddress, setNewMemberAddress] = useState<string>('');
-    const onChangeNewMemberAddress = (debouncedValue: string) => {
+    const [newVaultAddress, setNewMemberAddress] = useState<string>('');
+    const onChangeVaultAddress = (debouncedValue: string) => {
         setNewMemberAddress(debouncedValue);
     };
 
@@ -135,6 +135,13 @@ const MyVaults: NextPage = () => {
         await createVault();
         await updateMyVaults();
     }, [createVault, updateMyVaults]);
+    const handleJoinVault = useCallback(
+        async (newVaultAddress: string) => {
+            await joinVault(newVaultAddress);
+            await updateMyVaults();
+        },
+        [joinVault, updateMyVaults]
+    );
 
     const Content =
         userWallet === null ? (
@@ -206,7 +213,7 @@ const MyVaults: NextPage = () => {
                                                 href="raising-vault"
                                                 nft={myVault.proposals[0].nft}
                                                 amountLabel="Fixed price"
-                                                formattedAmount={formatNumber(myVault.proposals[0].nft.fixedPrice.value, 18)}
+                                                formattedAmount={simpleFormat(myVault.proposals[0].nft.fixedPrice.value, 18)}
                                                 vaultAddress={myVault.multisigAddress}
                                             />
                                         )}
@@ -240,207 +247,211 @@ const MyVaults: NextPage = () => {
                     </div>
                 </section>
 
-                {fallbackVault && (
-                    <section className="grow shrink flex flex-col gap-y-8">
-                        <Heading tagName="h3">Vault {shortenAddress(fallbackVault.multisigAddress)}</Heading>
+                <section className="grow shrink flex flex-col gap-y-8">
+                    {fallbackVault && (
+                        <>
+                            <Heading tagName="h3">Vault {shortenAddress(fallbackVault.multisigAddress)}</Heading>
 
-                        <Card color="glass" className="flex flex-col justify-between items-stretch gap-y-4 p-4">
-                            <div className="Font_label_14px">Balance</div>
+                            <Card color="glass" className="flex flex-col justify-between items-stretch gap-y-4 p-4">
+                                <div className="Font_label_14px">Balance</div>
 
-                            <div className="space-y-1">
-                                <BalanceTotal
-                                    formattedNumber={formatUSD(vaultBalance.usd.plus(multisigBalance.usd))}
-                                    isLoading={false}
-                                />
-
-                                <div className="flex items-center gap-x-2">
-                                    <CoinAmount
-                                        size="sm"
-                                        symbol={TokenSymbols.INJ}
-                                        chain={AllChains.INJECTIVE_TESTNET}
-                                        formattedAmount={formatNumber(vaultBalance.shifted, vaultBalance.decimals)}
+                                <div className="space-y-1">
+                                    <BalanceTotal
+                                        formattedNumber={formatUSD(vaultBalance.usd.plus(multisigBalance.usd))}
+                                        isLoading={false}
                                     />
-                                    <CopyHelper toCopy={fallbackVault.icaAccountAddress} className="text-caption">
-                                        <span className="w-fit truncate Font_caption_xs">
-                                            {shortenAddress(fallbackVault.icaAccountAddress, 4, 4)}
-                                        </span>
-                                    </CopyHelper>
-                                </div>
 
-                                <div className="flex items-center gap-x-2">
-                                    <CoinAmount
-                                        size="sm"
-                                        symbol={TokenSymbols.INJ}
-                                        chain={AllChains.XION_TESTNET}
-                                        formattedAmount={formatNumber(multisigBalance.shifted, multisigBalance.decimals)}
-                                    />
-                                    <CopyHelper toCopy={fallbackVault.multisigAddress} className="text-caption">
-                                        <span className="w-fit truncate Font_caption_xs">
-                                            {shortenAddress(fallbackVault.multisigAddress, 4, 4)}
-                                        </span>
-                                    </CopyHelper>
-                                </div>
-                            </div>
-
-                            <div className="flex items-center justify-end gap-x-2">
-                                <Button
-                                    // size="sm"
-                                    iconType="arrow_forward"
-                                    label="Merge balance"
-                                    status={multisigBalance.shifted.gt(0) ? 'enabled' : 'disabled'}
-                                    onClick={handleMergeBalance}
-                                />
-                                <Button
-                                    // size="sm"
-                                    // color="secondary"
-                                    label="Deposit"
-                                    iconType={isDepositFormOpen ? 'expand_less' : 'expand_more'}
-                                    status={isDepositToVaultProcessing ? 'processing' : 'enabled'}
-                                    onClick={() => setIsDepositFormOpen(!isDepositFormOpen)}
-                                />
-                            </div>
-
-                            {isDepositFormOpen && (
-                                <Card color="primary" className="flex flex-col justify-between items-stretch gap-y-4 p-4">
-                                    {/* <div className="Font_label_14px text-white">Deposit</div> */}
-
-                                    <form ref={depositForm} className="flex flex-col items-stretch gap-y-8">
-                                        <div className="flex items-stretch justify-between gap-x-4">
-                                            <div className="w-1/3 h-[3.125rem] flex items-center Font_label_14px whitespace-nowrap">
-                                                Amount
-                                            </div>
-
-                                            <AmountInput
-                                                required
-                                                form={depositForm.current}
-                                                label="Amount"
-                                                placeholder="0.0"
-                                                initialValue={depositAmount}
-                                                getErrorMsg={getDepositAmountErrorMsg}
-                                                onChange={onChangeDepositAmount}
-                                            />
-                                        </div>
-
-                                        <div className="flex items-center justify-end gap-x-2">
-                                            <Button
-                                                color="on_primary"
-                                                type="text"
-                                                label="Cancel"
-                                                className="w-full md:w-fit"
-                                                onClick={() => setIsDepositFormOpen(false)}
-                                            />
-                                            <Button
-                                                color="on_primary"
-                                                label="OK"
-                                                iconType="arrow_forward"
-                                                className="w-full md:w-fit"
-                                                status={
-                                                    isDepositToVaultProcessing
-                                                        ? 'processing'
-                                                        : isDepositAmountValid
-                                                            ? 'enabled'
-                                                            : 'disabled'
-                                                }
-                                                onClick={handleDepositToVault}
-                                            />
-                                        </div>
-                                    </form>
-                                </Card>
-                            )}
-                        </Card>
-
-                        <section className="space-y-4 mt-4">
-                            <Heading tagName="h4">Buy Proposals</Heading>
-
-                            {fallbackVault.proposals.map((proposal) => (
-                                <Card key={proposal.proposal.id} color="primary" className="space-y-4 p-4">
-                                    <div>
-                                        #{proposal.proposal.id} {proposal.proposal.description}
+                                    <div className="flex items-center gap-x-2">
+                                        <CoinAmount
+                                            size="sm"
+                                            symbol={TokenSymbols.INJ}
+                                            chain={AllChains.INJECTIVE_TESTNET}
+                                            formattedAmount={formatNumber(vaultBalance.shifted, vaultBalance.decimals)}
+                                        />
+                                        <CopyHelper toCopy={fallbackVault.icaAccountAddress} className="text-caption">
+                                            <span className="w-fit truncate Font_caption_xs">
+                                                {shortenAddress(fallbackVault.icaAccountAddress, 4, 4)}
+                                            </span>
+                                        </CopyHelper>
                                     </div>
 
-                                    <NFTVaultLinkCard
-                                        key={proposal.nft.tokenId}
-                                        href="raising-vault"
-                                        nft={proposal.nft}
-                                        amountLabel="Fixed price"
-                                        formattedAmount={formatNumber(proposal.nft.fixedPrice.value, 18)}
-                                        vaultAddress={fallbackVault.multisigAddress}
+                                    <div className="flex items-center gap-x-2">
+                                        <CoinAmount
+                                            size="sm"
+                                            symbol={TokenSymbols.INJ}
+                                            chain={AllChains.XION_TESTNET}
+                                            formattedAmount={formatNumber(multisigBalance.shifted, multisigBalance.decimals)}
+                                        />
+                                        <CopyHelper toCopy={fallbackVault.multisigAddress} className="text-caption">
+                                            <span className="w-fit truncate Font_caption_xs">
+                                                {shortenAddress(fallbackVault.multisigAddress, 4, 4)}
+                                            </span>
+                                        </CopyHelper>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center justify-end gap-x-2">
+                                    <Button
+                                        // size="sm"
+                                        iconType="arrow_forward"
+                                        label="Merge balance"
+                                        status={multisigBalance.shifted.gt(0) ? 'enabled' : 'disabled'}
+                                        onClick={handleMergeBalance}
                                     />
+                                    <Button
+                                        // size="sm"
+                                        // color="secondary"
+                                        label="Deposit"
+                                        iconType={isDepositFormOpen ? 'expand_less' : 'expand_more'}
+                                        status={isDepositToVaultProcessing ? 'processing' : 'enabled'}
+                                        onClick={() => setIsDepositFormOpen(!isDepositFormOpen)}
+                                    />
+                                </div>
 
-                                    {proposal.proposal.status === ProposalStatus.Pending && (
-                                        <div className="flex justify-end gap-x-2">
-                                            <Button
-                                                color="on_primary"
-                                                label="No"
-                                                onClick={() =>
-                                                    voteProposal(fallbackVault.multisigAddress, proposal.proposal.id, true)
-                                                }
-                                            />
-                                            <Button
-                                                color="on_primary"
-                                                label="Yes"
-                                                onClick={() =>
-                                                    voteProposal(fallbackVault.multisigAddress, proposal.proposal.id, true)
-                                                }
-                                            />
+                                {isDepositFormOpen && (
+                                    <Card color="primary" className="flex flex-col justify-between items-stretch gap-y-4 p-4">
+                                        {/* <div className="Font_label_14px text-white">Deposit</div> */}
+
+                                        <form ref={depositForm} className="flex flex-col items-stretch gap-y-8">
+                                            <div className="flex items-stretch justify-between gap-x-4">
+                                                <div className="w-1/3 h-[3.125rem] flex items-center Font_label_14px whitespace-nowrap">
+                                                    Amount
+                                                </div>
+
+                                                <AmountInput
+                                                    required
+                                                    form={depositForm.current}
+                                                    label="Amount"
+                                                    placeholder="0.0"
+                                                    initialValue={depositAmount}
+                                                    getErrorMsg={getDepositAmountErrorMsg}
+                                                    onChange={onChangeDepositAmount}
+                                                />
+                                            </div>
+
+                                            <div className="flex items-center justify-end gap-x-2">
+                                                <Button
+                                                    color="on_primary"
+                                                    type="text"
+                                                    label="Cancel"
+                                                    className="w-full md:w-fit"
+                                                    onClick={() => setIsDepositFormOpen(false)}
+                                                />
+                                                <Button
+                                                    color="on_primary"
+                                                    label="OK"
+                                                    iconType="arrow_forward"
+                                                    className="w-full md:w-fit"
+                                                    status={
+                                                        isDepositToVaultProcessing
+                                                            ? 'processing'
+                                                            : isDepositAmountValid
+                                                                ? 'enabled'
+                                                                : 'disabled'
+                                                    }
+                                                    onClick={handleDepositToVault}
+                                                />
+                                            </div>
+                                        </form>
+                                    </Card>
+                                )}
+                            </Card>
+
+                            <section className="space-y-4 mt-4">
+                                <Heading tagName="h4">Buy Proposals</Heading>
+
+                                {fallbackVault.proposals.map((proposal) => (
+                                    <Card key={proposal.proposal.id} color="primary" className="space-y-4 p-4">
+                                        <div>
+                                            #{proposal.proposal.id} {proposal.proposal.description}
                                         </div>
-                                    )}
 
-                                    {proposal.proposal.status !== ProposalStatus.Pending && (
-                                        <div className="flex justify-end gap-x-2">
-                                            <Tag size="sm" label={PROPOSAL_STATUS_LABEL_DICT[proposal.proposal.status]} />
-                                        </div>
-                                    )}
-                                </Card>
-                            ))}
+                                        <NFTVaultLinkCard
+                                            key={proposal.nft.tokenId}
+                                            href="raising-vault"
+                                            nft={proposal.nft}
+                                            amountLabel="Fixed price"
+                                            formattedAmount={simpleFormat(proposal.nft.fixedPrice.value, 18)}
+                                            vaultAddress={fallbackVault.multisigAddress}
+                                        />
 
-                            {fallbackVault.proposals.length === 0 && (
+                                        {proposal.proposal.status === ProposalStatus.Pending && (
+                                            <div className="flex justify-end gap-x-2">
+                                                <Button
+                                                    color="on_primary"
+                                                    label="No"
+                                                    onClick={() =>
+                                                        voteProposal(fallbackVault.multisigAddress, proposal.proposal.id, true)
+                                                    }
+                                                />
+                                                <Button
+                                                    color="on_primary"
+                                                    label="Yes"
+                                                    onClick={() =>
+                                                        voteProposal(fallbackVault.multisigAddress, proposal.proposal.id, true)
+                                                    }
+                                                />
+                                            </div>
+                                        )}
+
+                                        {proposal.proposal.status !== ProposalStatus.Pending && (
+                                            <div className="flex justify-end gap-x-2">
+                                                <Tag size="sm" label={PROPOSAL_STATUS_LABEL_DICT[proposal.proposal.status]} />
+                                            </div>
+                                        )}
+                                    </Card>
+                                ))}
+
+                                {fallbackVault.proposals.length === 0 && (
+                                    <Card color="glass" className="p-4 text-body">
+                                        No proposal found
+                                    </Card>
+                                )}
+
+                                <div className="flex justify-end">
+                                    <Button
+                                        iconType="arrow_forward"
+                                        label="Go market"
+                                        onClick={() =>
+                                            router.push('/#home-nfts-table', {query: {vault: fallbackVault.multisigAddress}})
+                                        }
+                                    />
+                                </div>
+                            </section>
+                        </>
+                    )}
+                    <div className="flex flex-col grow gap-y-4">
+                        {!fallbackVault && (
+                            <div className="flex flex-col">
                                 <Card color="glass" className="p-4 text-body">
-                                    No proposal found
+                                    No vault found.
                                 </Card>
-                            )}
-
-                            <div className="flex justify-end">
-                                <Button
-                                    iconType="arrow_forward"
-                                    label="Go market"
-                                    onClick={() =>
-                                        router.push('/#home-nfts-table', {query: {vault: fallbackVault.multisigAddress}})
-                                    }
-                                />
                             </div>
-                        </section>
-
-                        <section className="space-y-4 mt-4">
-                            <Heading tagName="h4">Add member</Heading>
+                        )}
+                        <div className="space-y-4 mt-4">
+                            <Heading tagName="h4">Join Vault</Heading>
 
                             <TextInput
-                                form={addMemberForm.current}
-                                initialValue={newMemberAddress}
-                                onChange={onChangeNewMemberAddress}
+                                form={joinVaultForm.current}
+                                initialValue={newVaultAddress}
+                                onChange={onChangeVaultAddress}
                                 type="text"
-                                label="New member address"
-                                placeholder="New member address"
+                                label="Vault address"
+                                placeholder="Address of vault"
                             />
 
                             <div className="flex justify-end">
                                 <Button
-                                    label="Add member"
-                                    status={newMemberAddress.length === 0 ? 'disabled' : 'enabled'}
-                                    onClick={() => addMember(newMemberAddress)}
+                                    label="Join Vault"
+                                    status={
+                                        newVaultAddress.length === 0 ? 'disabled' : addMemberLoading ? 'processing' : 'enabled'
+                                    }
+                                    onClick={() => handleJoinVault(newVaultAddress)}
                                 />
                             </div>
-                        </section>
-                    </section>
-                )}
-
-                {!fallbackVault && (
-                    <div className="grow shrink flex flex-col gap-y-4">
-                        <Card color="glass" className="p-4 text-body">
-                            No vault found.
-                        </Card>
+                        </div>
                     </div>
-                )}
+                </section>
             </div>
         );
 
