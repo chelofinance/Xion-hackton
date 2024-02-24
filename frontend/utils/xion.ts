@@ -9,9 +9,9 @@ import {
   chainConfigMap,
   channelOpenInitOptions,
 } from '@/constants/app';
-import { MultisigICAVault } from '@/types/asset';
+import {MultisigICAVault} from '@/types/asset';
 import type {SendTxResult} from '@/types/tx';
-import { AbstraxionAccount } from '@/types/wallet';
+import {AbstraxionAccount} from '@/types/wallet';
 import {useAbstraxionAccount, useAbstraxionSigningClient} from '@burnt-labs/abstraxion';
 import {DeliverTxResponse} from '@cosmjs/cosmwasm-stargate';
 import type {Coin} from '@cosmjs/stargate';
@@ -112,12 +112,15 @@ export const getBalanceOnXion = async (
   }
 };
 
-export const getIcaAccountAddress = async (signingClient: XionSigningClient, icaControllerAddress: string): Promise<string | undefined> => {
+export const getIcaAccountAddress = async (
+  signingClient: XionSigningClient,
+  icaControllerAddress: string
+): Promise<string | undefined> => {
   const msg = {get_contract_state: {}};
   const response = await signingClient?.queryContractSmart(icaControllerAddress, msg);
-  const icaAccountAddress: string | undefined = response?.contract_state?.address;
+  const icaAccountAddress: string | undefined = response?.ica_info?.ica_address;
   return icaAccountAddress;
-}
+};
 
 export type GetVaultMultisigsResponse = {
   controllers: readonly string[];
@@ -136,18 +139,24 @@ export const getVaultMultisigs = async (
   try {
     const response: GetVaultMultisigsResponse | undefined = await signingClient?.queryContractSmart(icaFactoryAddress, msg);
 
-    const vaultMutisigs = response?.multisigs.reduce<Promise<readonly MultisigICAVault[]>>(async (accmPromise, multisig, index) => {
-      const icaControllerAddress = response.controllers[index];
-      const icaAccountAddress = await getIcaAccountAddress(signingClient, icaControllerAddress);
-      
-      const accm = await accmPromise;
+    const vaultMutisigs =
+      response?.multisigs.reduce<Promise<readonly MultisigICAVault[]>>(async (accmPromise, multisig, index) => {
+        const icaControllerAddress = response.controllers[index];
+        const icaAccountAddress = await getIcaAccountAddress(signingClient, icaControllerAddress);
 
-      return icaControllerAddress ? [...accm, {
-        multisigAddress: multisig,
-        icaControllerAddress: icaAccountAddress ? icaControllerAddress : ICA_CONTROLLER_FALLBACK,
-        icaAccountAddress: icaAccountAddress ?? INJ_ICA_ACCOUNT_PLACEHOLDER,
-      }] : accm;
-    }, Promise.resolve([])) ?? [];
+        const accm = await accmPromise;
+
+        return icaControllerAddress
+          ? [
+            ...accm,
+            {
+              multisigAddress: multisig,
+              icaControllerAddress: icaControllerAddress, //the ica controller should not fallback. it always exists
+              icaAccountAddress: icaAccountAddress ?? INJ_ICA_ACCOUNT_PLACEHOLDER,
+            },
+          ]
+          : accm;
+      }, Promise.resolve([])) ?? [];
 
     return vaultMutisigs;
   } catch (error) {

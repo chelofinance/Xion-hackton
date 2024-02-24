@@ -1,3 +1,21 @@
+import {TokenSymbols, COIN_DICT, AllChains} from '@/constants/app';
+
+export const createSendIbcMsg = ({icaAddress, amount}: {icaAddress: string; multisigAddress: string; amount: string}) => {
+    return {
+        ibc: {
+            transfer: {
+                channel_id: 'channel-215',
+                to_address: icaAddress,
+                amount: {
+                    amount: amount,
+                    denom: COIN_DICT[TokenSymbols.INJ].denomOn[AllChains.XION_TESTNET],
+                },
+                timeout: {},
+            },
+        },
+    };
+};
+
 export const createIcaBuyMsg = ({
     ica,
     buyContract,
