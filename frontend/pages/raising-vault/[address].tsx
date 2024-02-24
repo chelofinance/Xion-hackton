@@ -29,6 +29,7 @@ import CheckItem from '@/components/CheckItem';
 import {shortenAddress} from '@/utils/text';
 import useICABuy from '@/hooks/useICABuy';
 import useMyVaults from '@/hooks/useMyVaults';
+import useICASell from '@/hooks/useICASell';
 
 const coin = COIN_DICT[TokenSymbols.INJ];
 
@@ -88,6 +89,7 @@ const RaisingVault: NextPage = () => {
   const [depositAmount, setDepositAmount] = useState<number>(maxDepositAmount);
   const [isDepositAmountValid, setIsDepositAmountValid] = useState<boolean>(true);
   const {buyNftIca, isProcessing: isProcessingBuy} = useICABuy();
+  const {sellNftIca, isProcessing: isProcessingSell} = useICASell();
   const [isSelectVaultOpen, setIsSelectVaultOpen] = useState<boolean>(false);
   const [selectedVault, setSelectedVault] = useState<MyVault>(myVaults[0]);
 
@@ -152,6 +154,14 @@ const RaisingVault: NextPage = () => {
     [buyNftIca, updateMyVaults]
   );
 
+  const handleSellNft = useCallback(
+    async (nft: RaisingNFT, vault?: MyVault) => {
+      await sellNftIca(nft, vault);
+      await updateMyVaults();
+    },
+    [sellNftIca, updateMyVaults]
+  );
+
   const myNFTPriceUSD = useMemo<BigNumber>(() => {
     if (!myNFT) return new BigNumber(0);
     const oraclePrice = getOraclePrice(myNFT.fixedPrice.symbol);
@@ -184,16 +194,6 @@ const RaisingVault: NextPage = () => {
     } catch (err) {
       console.log('ERR TRANSFER', err);
       alert('An error occured. Check console for details.');
-    }
-  };
-
-  const handleICASellNft = async () => {
-    if (!nft) return;
-
-    try {
-      // sell
-    } catch (err) {
-      console.log('ERR:', err);
     }
   };
 
@@ -360,12 +360,12 @@ const RaisingVault: NextPage = () => {
                   label="Sell"
                   iconType="arrow_forward"
                   className="w-full md:w-fit"
-                  onClick={handleICASellNft}
+                  onClick={() => handleSellNft(nft, myVault)}
                 />
               </div>
             )}
 
-            {myVault && !isRaisedAll && (
+            {myVault && !isRaisedAll && !isOwningVault && (
               <Card color="primary" className="flex items-stretch justify-between gap-x-4 p-4">
                 <div className="h-6 flex flex-col justify-center Font_label_14px">Deposit up to</div>
 
@@ -385,7 +385,7 @@ const RaisingVault: NextPage = () => {
               </Card>
             )}
 
-            {myVault && !isRaisedAll && !isDepositFormOpen && (
+            {myVault && !isRaisedAll && !isDepositFormOpen && !isOwningVault && (
               <div className="flex justify-end items-center gap-x-4">
                 <Button
                   color="primary"
