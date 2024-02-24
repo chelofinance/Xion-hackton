@@ -28,7 +28,7 @@ import useCreateVault from '@/hooks/useCreateVault';
 import useMyVaults from '@/hooks/useMyVaults';
 import {MyVault} from '@/types/asset';
 import AmountInput from '@/components/form-presets/AmountInput';
-import { useAbstraxionAccount } from '@burnt-labs/abstraxion';
+import {useAbstraxionAccount} from '@burnt-labs/abstraxion';
 
 const MyVaults: NextPage = () => {
     const router = useRouter();
@@ -95,12 +95,12 @@ const MyVaults: NextPage = () => {
     const [isDepositAmountValid, setIsDepositAmountValid] = useState<boolean>(true);
 
     const onChangeDepositAmount = useCallback((debouncedValue: string, isValid: boolean) => {
-      setIsDepositAmountValid(isValid);
-  
-      const amount = parseFloat(debouncedValue);
-      if (!isNaN(amount)) {
-        setDepositAmount(amount);
-      }
+        setIsDepositAmountValid(isValid);
+
+        const amount = parseFloat(debouncedValue);
+        if (!isNaN(amount)) {
+            setDepositAmount(amount);
+        }
     }, []);
 
     const handleDepositToVault = useCallback(async () => {
@@ -192,9 +192,13 @@ const MyVaults: NextPage = () => {
                                 </Card>
                             )}
 
-                            {myVaults.map(myVault => (
+                            {myVaults.map((myVault) => (
                                 <li key={myVault.multisigAddress}>
-                                    <Card size="sm" color={fallbackVault?.multisigAddress === myVault.multisigAddress ? 'primary' : 'glass'} className="flex flex-col items-stretch p-4">
+                                    <Card
+                                        size="sm"
+                                        color={fallbackVault?.multisigAddress === myVault.multisigAddress ? 'primary' : 'glass'}
+                                        className="flex flex-col items-stretch p-4"
+                                    >
                                         <CopyHelper toCopy={myVault.multisigAddress}>
                                             <div className="Font_caption_sm">{shortenAddress(myVault.multisigAddress)}</div>
                                         </CopyHelper>
@@ -209,29 +213,30 @@ const MyVaults: NextPage = () => {
                                             />
                                         )}
 
-                                        {fallbackVault?.multisigAddress !== myVault.multisigAddress && <div className="flex justify-end">
-                                            <Button 
-                                                size="sm"
-                                                iconType="chevron_right"
-                                                // color="secondary" 
-                                                label="Manage"
-                                                // labelHidden
-                                                onClick={() => setSelectedVault(myVault)}
-                                            />
-                                        </div>}
+                                        {fallbackVault?.multisigAddress !== myVault.multisigAddress && (
+                                            <div className="flex justify-end">
+                                                <Button
+                                                    size="sm"
+                                                    iconType="chevron_right"
+                                                    // color="secondary"
+                                                    label="Manage"
+                                                    // labelHidden
+                                                    onClick={() => setSelectedVault(myVault)}
+                                                />
+                                            </div>
+                                        )}
                                     </Card>
                                 </li>
                             ))}
-                        
                         </ul>
 
                         <div className="flex justify-end items-center">
-                            <Button 
+                            <Button
                                 // size="sm"
                                 iconType="add"
-                                label="Create vault" 
+                                label="Create vault"
                                 status={isCreateVaultProcessing ? 'processing' : 'enabled'}
-                                onClick={handleCreateVault} 
+                                onClick={handleCreateVault}
                             />
                         </div>
                     </div>
@@ -303,7 +308,9 @@ const MyVaults: NextPage = () => {
 
                                     <form ref={depositForm} className="flex flex-col items-stretch gap-y-8">
                                         <div className="flex items-stretch justify-between gap-x-4">
-                                            <div className="w-1/3 h-[3.125rem] flex items-center Font_label_14px whitespace-nowrap">Amount</div>
+                                            <div className="w-1/3 h-[3.125rem] flex items-center Font_label_14px whitespace-nowrap">
+                                                Amount
+                                            </div>
 
                                             <AmountInput
                                                 required
@@ -329,7 +336,13 @@ const MyVaults: NextPage = () => {
                                                 label="OK"
                                                 iconType="arrow_forward"
                                                 className="w-full md:w-fit"
-                                                status={isDepositToVaultProcessing ? 'processing' : isDepositAmountValid ? 'enabled' : 'disabled'}
+                                                status={
+                                                    isDepositToVaultProcessing
+                                                        ? 'processing'
+                                                        : isDepositAmountValid
+                                                            ? 'enabled'
+                                                            : 'disabled'
+                                                }
                                                 onClick={handleDepositToVault}
                                             />
                                         </div>
@@ -337,8 +350,6 @@ const MyVaults: NextPage = () => {
                                 </Card>
                             )}
                         </Card>
-
-
 
                         <section className="space-y-4 mt-4">
                             <Heading tagName="h4">Buy Proposals</Heading>
@@ -392,7 +403,13 @@ const MyVaults: NextPage = () => {
                             )}
 
                             <div className="flex justify-end">
-                                <Button iconType="arrow_forward" label="Go market" onClick={() => router.push('/#home-nfts-table')} />
+                                <Button
+                                    iconType="arrow_forward"
+                                    label="Go market"
+                                    onClick={() =>
+                                        router.push('/#home-nfts-table', {query: {vault: fallbackVault.multisigAddress}})
+                                    }
+                                />
                             </div>
                         </section>
 

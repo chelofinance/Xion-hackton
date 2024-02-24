@@ -72,10 +72,10 @@ const useProposals = (address: string | undefined): UseProposals => {
                     typeUrl: protobufMsg.type_url,
                     value: protobufMsg.value,
                 }) as CosmwasmWasmV1Tx.MsgExecuteContract;
+                const nftCall = Buffer.from(msgExecuteBuy.msg).toString('base64');
 
                 return msgExecuteBuy.contract === nft.buyContractAddress;
             });
-            console.log('RAFAEL', proposal, nft);
             return nft ?? null;
         },
         [nfts.length]

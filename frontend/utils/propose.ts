@@ -31,7 +31,7 @@ const buildWasmContractMsg = ({value}: EncodeObject) => {
     value: {
       sender: value.sender,
       contract: value.contract,
-      msg: Buffer.from(JSON.stringify(message)).toString('base64'),
+      msg: Buffer.from(JSON.stringify(message)),
       funds: value.funds,
     },
   };
@@ -53,13 +53,13 @@ export const produceProposal = (msg: EncodeObject, icaControllerAddress: string)
           },
         },
       ],
-      packet_memo: "Created by Chelo",
+      packet_memo: 'Created by Chelo',
     },
   };
 
   return {
     title: 'ICA transaction',
-    description: 'some desc :)',
+    description: 'NFT buy',
     msgs: [
       {
         wasm: {
@@ -71,6 +71,6 @@ export const produceProposal = (msg: EncodeObject, icaControllerAddress: string)
         },
       },
     ],
-    sender: "",// Will be updated later
+    sender: '', // Will be updated later
   };
 };
