@@ -132,8 +132,10 @@ fn cw3_controls_cw20() {
         .unwrap();
 
     // only 1 vote and msg mint fails
-    let execute_proposal_msg = ExecuteMsg::Execute { proposal_id: 1, 
-        sender: None, };
+    let execute_proposal_msg = ExecuteMsg::Execute {
+        proposal_id: 1,
+        sender: None,
+    };
     // execute mint
     router
         .execute_contract(addr1, multisig_addr, &execute_proposal_msg, &[])

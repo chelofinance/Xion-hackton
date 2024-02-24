@@ -15,7 +15,7 @@ const execute: Action = async (action) => {
     args.contract as string,
     args.message as object,
     "auto",
-    "",
+    "Executed by scripts",
     funds
   );
 

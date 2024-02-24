@@ -65,13 +65,13 @@ export const chainConfigMap: Record<AppChains, ContractsDict> = {
       collectionId: '65ca322f3e56373c6b5d1a66',
     },
     cw3FixedMultisig: {
-      codeId: '256',
+      codeId: '272',
     },
     icaFactory: {
-      address: 'xion1m7a6vv87lr3cueq5xr6p8gk296784eg264p7vhp34g2whm708v5qdxzcwp',
+      address: 'xion1zgf4n9pah470yecjve4j9yq42v3a3w2rwxmt8trcc5c0rqmjktrqslcj5u',
     },
     proxyMultisig: {
-      address: 'xion15akp3vrj5zn2u9ktejwjz2s2uf2usk9rdtfkz4klh66w9n5t4xts83n0vl',
+      address: 'xion1zp5jjzar20jppvrax0up642y565udndm4tvxstn7qh5tyw6c43wqz6r6gd',
     },
   },
 };

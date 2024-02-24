@@ -1,12 +1,18 @@
+use cosmwasm_schema::cw_serde;
 use cosmwasm_std::Addr;
-use schemars::JsonSchema;
-use serde::{Deserialize, Serialize};
+use cosmwasm_std::Coin;
 
-#[derive(Serialize, Deserialize, JsonSchema)]
+#[cw_serde]
 pub struct InstantiateMsg {}
 
-#[derive(Serialize, Deserialize, JsonSchema)]
+#[cw_serde]
+pub enum Payload {
+    MultisigExecuteMsg(multisig::msg::ExecuteMsg),
+    SendToken { funds: Vec<Coin> },
+}
+
+#[cw_serde]
 pub struct ExecuteMsg {
     pub contract_addr: Addr,
-    pub payload: multisig::msg::ExecuteMsg,
+    pub payload: Payload,
 }
