@@ -5,7 +5,7 @@ import NFTTumbnail from '@/components/NFTThumbnail';
 import Card from '@/components/Card';
 import {formatNumber, formatUSD, simpleFormat} from '@/utils/number';
 import CoinAmount from '@/components/CoinAmount';
-import {AppChains, chainConfigMap, CHAIN_METADATA_DICT, TokenSymbols, COIN_DICT} from '@/constants/app';
+import {CHAIN_METADATA_DICT, TokenSymbols, COIN_DICT} from '@/constants/app';
 import Button, {ButtonProps} from '@/components/Button';
 import ProgressBar from '@/components/ProgressBar';
 import {useCallback, useMemo, useRef, useState} from 'react';
@@ -17,23 +17,19 @@ import BigNumber from 'bignumber.js';
 import useRaisingNFTVault from '@/hooks/useRaisingNFTVaults';
 import {MyVault, RaisingNFT} from '@/types/asset';
 import {useAtom} from 'jotai';
-import {myVaultsAtom, userWalletAtom} from '@/store/states';
+import {userWalletAtom} from '@/store/states';
 import NumberText from '@/components/NumberText';
 import {useRouter} from 'next/router';
 import PageLoader from '@/components/PageLoader';
 import Tag from '@/components/Tag';
-import {createIcaBuyMsg} from '@/utils/ica';
-import {createIcaProposal, executeProposal} from '@/utils/multisig';
-import {useAbstraxionAccount, useAbstraxionSigningClient} from '@burnt-labs/abstraxion';
-import {InjectiveSigningStargateClient} from '@injectivelabs/sdk-ts/dist/cjs/core/stargate';
 import useDepositToVaultMultisig from '@/hooks/useDepositToVaultMultisig';
 import useBalanceOnXion from '@/hooks/useBalanceOnXion';
 import useBalanceOnInjective from '@/hooks/useBalanceOnInjective';
 import CheckItem from '@/components/CheckItem';
 import {shortenAddress} from '@/utils/text';
 import useICABuy from '@/hooks/useICABuy';
+import useMyVaults from '@/hooks/useMyVaults';
 
-const CONFIG = chainConfigMap[AppChains.XION_TESTNET];
 const coin = COIN_DICT[TokenSymbols.INJ];
 
 const RaisingVault: NextPage = () => {
@@ -41,8 +37,9 @@ const RaisingVault: NextPage = () => {
   const {address} = router.query;
 
   const nftList = useRaisingNFTVault();
+  const [userWallet] = useAtom(userWalletAtom);
+  const {myVaults, updateMyVaults} = useMyVaults(userWallet?.account.bech32Address);
   const nft = nftList.find((nft) => `${nft.collection.contractAddress}${nft.tokenId}` === address);
-  const [myVaults] = useAtom(myVaultsAtom);
   const {myNFT, myVault} = useMemo<{
     myNFT: RaisingNFT | undefined;
     myVault: MyVault | undefined;
@@ -63,7 +60,6 @@ const RaisingVault: NextPage = () => {
     () => !!nft && myVaultBalance.shifted.gte(nft.fixedPrice.value),
     [nft, myVaultBalance.shifted]
   );
-  const [userWallet] = useAtom(userWalletAtom);
 
   const {getBalance, updateBalance} = useBalanceOnXion(userWallet?.account.bech32Address);
 
@@ -148,6 +144,14 @@ const RaisingVault: NextPage = () => {
     if (nft) router.push(`/nft/${nft.collection.contractAddress}${nft.tokenId}`);
   }, [nft]);
 
+  const handleBuyNft = useCallback(
+    async (nft: RaisingNFT, vault: MyVault) => {
+      await buyNftIca(nft, vault);
+      await updateMyVaults();
+    },
+    [buyNftIca, updateMyVaults]
+  );
+
   const myNFTPriceUSD = useMemo<BigNumber>(() => {
     if (!myNFT) return new BigNumber(0);
     const oraclePrice = getOraclePrice(myNFT.fixedPrice.symbol);
@@ -226,7 +230,10 @@ const RaisingVault: NextPage = () => {
               <Card color="primary" className="p-4 space-y-1">
                 <div className="flex items-center justify-between gap-x-4">
                   <div className="h-6 flex flex-col justify-center Font_label_14px">My deposit</div>
-                  <NumberText color="on_primary" formattedNumber={formatUSD(myNFTPriceUSD.times(myVault.share))} />
+                  <NumberText
+                    color="on_primary"
+                    formattedNumber={formatUSD(Number(simpleFormat(myNFTPriceUSD.times(myVault.share))))}
+                  />
                 </div>
 
                 <div className="flex items-center justify-between gap-x-4">
@@ -325,7 +332,7 @@ const RaisingVault: NextPage = () => {
                         label="Propose buy"
                         status={isProcessingBuy ? 'processing' : 'enabled'}
                         onClick={() => {
-                          buyNftIca(nft, selectedVault);
+                          handleBuyNft(nft, selectedVault);
                         }}
                       />
                     </div>
@@ -370,7 +377,9 @@ const RaisingVault: NextPage = () => {
                     formattedAmount={simpleFormat(maxDepositAmount, COIN_DICT[nft.fixedPrice.symbol].decimals)}
                   />
                   <div className="flex items-center justify-between">
-                    <span className="Font_caption_md_num text-ground">{formatUSD(maxDepositAmountUSD)}</span>
+                    <span className="Font_caption_md_num text-ground">
+                      {formatUSD(Number(simpleFormat(maxDepositAmountUSD)))}
+                    </span>
                   </div>
                 </div>
               </Card>
