@@ -1,4 +1,4 @@
-import {Config} from "./types";
+import { Config } from "./types";
 
 const config: Config = {
   networks: {
@@ -13,8 +13,8 @@ const config: Config = {
     "injective-testnet": {
       chainId: "injective-888",
       node: "https://testnet.sentry.tm.injective.network:443",
-      gasPrice: "700000000inj",
-      gasAdjustment: 2,
+      gasPrice: "500000000inj",
+      gasAdjustment: 1.3,
       prefix: "inj",
       denom: "inj",
     },
@@ -25,6 +25,38 @@ const config: Config = {
       gasAdjustment: 1.3,
       prefix: "xion",
       denom: "uxion",
+    },
+    "archway-testnet": {
+      chainId: "constantine-3",
+      node: "https://rpc.constantine.archway.tech",
+      gasPrice: "1000000000000aconst",
+      gasAdjustment: 1.3,
+      prefix: "archway",
+      denom: "aconst",
+    },
+    "osmosis-testnet": {
+      chainId: "osmo-test-5",
+      node: "https://rpc.osmotest5.osmosis.zone",
+      gasPrice: "0.025uosmo",
+      gasAdjustment: 1.3,
+      prefix: "osmo",
+      denom: "uosmo",
+    },
+    "archway-devnet": {
+      chainId: "constantine-3",
+      node: "https://rpc.constantine.archway.io:443",
+      gasPrice: "10000000000aconst",
+      gasAdjustment: 1.3,
+      prefix: "archway",
+      denom: "aconst",
+    },
+    "neutron-testnet": {
+      chainId: "pion-1",
+      node: "https://rpc-falcron.pion-1.ntrn.tech",
+      gasPrice: "0.02untrn",
+      gasAdjustment: 1.3,
+      prefix: "neutron",
+      denom: "untrn",
     },
   },
 };
