@@ -4,13 +4,13 @@ import '@burnt-labs/ui/dist/index.css';
 import '@burnt-labs/abstraxion/dist/index.css';
 import '@/styles/globals.css';
 import type {AppProps} from 'next/app';
-import {DehydratedState, Hydrate, QueryClient, QueryClientProvider, useQueryErrorResetBoundary} from '@tanstack/react-query';
+import {DehydratedState, HydrationBoundary, QueryClient, QueryClientProvider, useQueryErrorResetBoundary} from '@tanstack/react-query';
 import {Suspense, useRef} from 'react';
 import queryClient from '@/data/queryClient';
 import Fallback from '@/components/Fallback';
 import Head from 'next/head';
 import {NextSeo} from 'next-seo';
-import {SEO} from 'next-seo.config';
+import {SEO} from '../next-seo.config';
 import SentryErrorBoundary from '@/components/ErrorBoundary/SentryErrorBoundary';
 import AppHeader from '@/components/AppHeader';
 import {ModalProvider} from '@/hooks/useModal/ModalProvider';
@@ -104,7 +104,7 @@ function MyApp({Component, pageProps}: AppProps<{dehydratedState: DehydratedStat
           >
             <GraphqlProvider apolloClient={talisApolloClient}>
               <QueryClientProvider client={queryClientRef.current}>
-                <Hydrate state={pageProps.dehydratedState}>
+                <HydrationBoundary state={pageProps.dehydratedState}>
                   <AbstraxionProvider config={abstraxionProviderConfig}>
                     <MetaDataUpdater />
                     <UserAgentDetector />
@@ -114,7 +114,7 @@ function MyApp({Component, pageProps}: AppProps<{dehydratedState: DehydratedStat
                       <AppFooter />
                     </ModalProvider>
                   </AbstraxionProvider>
-                </Hydrate>
+                </HydrationBoundary>
               </QueryClientProvider>
             </GraphqlProvider>
           </AnalyticsProvider>
