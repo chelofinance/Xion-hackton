@@ -154,14 +154,14 @@ const MyVaults: NextPage = () => {
     const handleJoinVault = useCallback(
         async (newVaultAddress: string) => {
             await joinVault(newVaultAddress);
-            await updateMyVaults();
+            setTimeout(updateMyVaults, 1500);
         },
         [joinVault, updateMyVaults]
     );
     const handleExecuteProposal = useCallback(
         async (proposal: string | number) => {
             await executeProposal(fallbackVault, proposal);
-            await updateMyVaults();
+            setTimeout(updateMyVaults, 1500); //wait for blockchain state update
         },
         [fallbackVault, executeProposal, updateMyVaults]
     );
@@ -190,6 +190,14 @@ const MyVaults: NextPage = () => {
         ) ?? [];
 
     const {sellNftIca, isProcessing: isProcessingSell} = useICASell();
+
+    const handleSell = useCallback(
+        async (nft?: RaisingNFT) => {
+            await sellNftIca(fallbackVault, nft);
+            setTimeout(updateMyVaults, 1500); //wait for blockchain state
+        },
+        [sellNftIca, updateMyVaults, fallbackVault]
+    );
 
     const Content =
         userWallet === null ? (
@@ -582,6 +590,7 @@ const MyVaults: NextPage = () => {
                                                     color="secondary"
                                                     iconType="arrow_forward"
                                                     label="Execute sell"
+                                                    status={loadingExecuteProposal ? 'processing' : 'enabled'}
                                                     onClick={() => handleExecuteProposal(proposal.proposal.id)}
                                                 />
                                             </div>
@@ -620,7 +629,7 @@ const MyVaults: NextPage = () => {
                                                 href="raising-vault"
                                                 nft={vaultOwnedNFT}
                                                 amountLabel="Fixed price"
-                                                formattedAmount={formatNumber(
+                                                formattedAmount={simpleFormat(
                                                     vaultOwnedNFT.fixedPrice.value,
                                                     COIN_DICT[vaultOwnedNFT.fixedPrice.symbol].decimals
                                                 )}
@@ -632,10 +641,8 @@ const MyVaults: NextPage = () => {
                                                     <Button
                                                         iconType="arrow_forward"
                                                         label="Propose sell"
-                                                        onClick={async () => {
-                                                            await sellNftIca(vaultOwnedNFT, fallbackVault);
-                                                            await updateMyVaults();
-                                                        }}
+                                                        onClick={() => handleSell(vaultOwnedNFT)}
+                                                        status={isProcessingSell ? 'processing' : 'enabled'}
                                                     />
                                                 </div>
                                             )}
