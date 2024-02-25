@@ -33,43 +33,32 @@ export const transferOnXion = async (
 ): Promise<SendTxResult<DeliverTxResponse>> => {
   const {symbol, depositAmount, senderAddress, recipientAddress} = args;
 
+  const proxy = chainConfigMap[AppChains.XION_TESTNET].proxyMultisig.address;
   const coin = COIN_DICT[symbol];
   const denom = coin.denomOn[AllChains.XION_TESTNET];
   const amount = new BigNumber(depositAmount).shiftedBy(coin.decimals).dp(0).toString();
+  const funds: Coin[] = [
+    {
+      denom,
+      amount,
+    },
+  ];
 
-  //const fee = {
-  //amount: [
-  //{
-  //denom: COIN_DICT[TokenSymbols.XION].denomOn[AllChains.XION_TESTNET],
-  //amount: '0',
-  //},
-  //],
-  //gas: '200000',
-  //};
+  const proxyMsg = {
+    contract_addr: recipientAddress,
+    payload: {
+      send_token: {funds},
+    },
+  };
 
   try {
-    console.log(
+    const response = await signingClient?.execute(
       senderAddress,
-      recipientAddress,
-      [
-        {
-          denom,
-          amount,
-        },
-      ],
-      'auto'
-    );
-
-    const response = await signingClient?.sendTokens(
-      senderAddress,
-      recipientAddress,
-      [
-        {
-          denom,
-          amount,
-        },
-      ],
-      'auto'
+      proxy,
+      proxyMsg,
+      'auto',
+      `deposit to ${recipientAddress}`,
+      funds
     );
 
     if (!response) {
