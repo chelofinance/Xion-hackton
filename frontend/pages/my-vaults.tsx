@@ -49,7 +49,7 @@ const MyVaults: NextPage = () => {
 
     const [selectedVault, setSelectedVault] = useState<MyVault>();
 
-    const fallbackVault = selectedVault ?? (myVaults[0] as MyVault | undefined);
+    const fallbackVault = selectedVault ?? (myVaults[0] || (null as MyVault | null));
 
     const {getBalance: getMyBalanceOnXion, isBalanceFetching: isMyBalanceFetching} = useBalanceOnXion(
         client,
