@@ -29,7 +29,7 @@ import CheckItem from '@/components/CheckItem';
 import {shortenAddress} from '@/utils/text';
 import useICABuy from '@/hooks/useICABuy';
 import useMyVaults from '@/hooks/useMyVaults';
-import { useAbstraxionSigningClient } from '@burnt-labs/abstraxion';
+import {useAbstraxionSigningClient} from '@burnt-labs/abstraxion';
 import useICASell from '@/hooks/useICASell';
 
 const coin = COIN_DICT[TokenSymbols.INJ];
@@ -41,7 +41,7 @@ const RaisingVault: NextPage = () => {
   const nftList = useRaisingNFTVault();
   const [userWallet] = useAtom(userWalletAtom);
 
-  const { client } = useAbstraxionSigningClient();
+  const {client} = useAbstraxionSigningClient();
   const isClientLoading = !client;
 
   const {myVaults, updateMyVaults} = useMyVaults(client, userWallet?.account.bech32Address);
@@ -50,7 +50,9 @@ const RaisingVault: NextPage = () => {
     myNFT: RaisingNFT | undefined;
     myVault: MyVault | undefined;
   }>(() => {
-    const myVault = myVaults.find((myVault) => myVault.proposals.find((proposal) => proposal.nft.tokenId === nft?.tokenId));
+    const myVault = myVaults.find((myVault) =>
+      myVault.proposals.find((proposal) => proposal.nft.tokenId === nft?.tokenId && proposal.proposal.status !== 'executed')
+    );
     const myNFT = myVault?.proposals.find((proposal) => proposal.nft.tokenId === nft?.tokenId)?.nft;
 
     return {

@@ -68,10 +68,10 @@ export const chainConfigMap: Record<AppChains, ContractsDict> = {
       codeId: '282',
     },
     icaFactory: {
-      address: 'xion134v97d8xu7hwuu6h33s0049yz8ju7254q32amlx5qfmngygpsk8q3hlp98',
+      address: 'xion1efllr3gy9jxjcyfrq4qgdcjnaxxvqms7khgp3l8zeeazr33ge9lqupqjv9',
     },
     proxyMultisig: {
-      address: 'xion1fcw3u2yslyszdaamvz3dea2jyhwhxlyuz5euujpzvrra9awdk6lqwdtcwd',
+      address: 'xion1q8e58uuyr0xvufla30uzf723falmd2d6wt2gta3s5nvzj8kp9custt4gz0',
     },
   },
 };

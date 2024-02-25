@@ -18,7 +18,7 @@ library = []
 
 [dependencies]
 cosmwasm-schema = {workspace=true}
-cosmwasm-std ={workspace=true}
+cosmwasm-std ={workspace=true, features = ['stargate']}
 schemars ={workspace=true}
 serde ={workspace=true}
 thiserror ={workspace=true}

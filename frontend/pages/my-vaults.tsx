@@ -2,7 +2,7 @@ import type {NextPage} from 'next';
 import Main from '@/components/Main';
 import Heading from '@/components/Heading';
 import Card from '@/components/Card';
-import {formatNumber, formatUSD} from '@/utils/number';
+import {formatNumber, formatUSD, simpleFormat} from '@/utils/number';
 import {useCallback, useMemo, useRef, useState} from 'react';
 import useOraclePrice from '@/hooks/useOraclePrice';
 import BigNumber from 'bignumber.js';
@@ -164,7 +164,7 @@ const MyVaults: NextPage = () => {
     );
 
     const isRaised = useCallback(
-        (nft: RaisingNFT) => multisigBalance.shifted.gte(nft.fixedPrice.value),
+        (nft: RaisingNFT) => multisigBalance.shifted.gte(simpleFormat(nft.fixedPrice.value, 18)),
         [multisigBalance.shifted]
     );
 
@@ -414,7 +414,7 @@ const MyVaults: NextPage = () => {
                                             href="raising-vault"
                                             nft={proposal.nft}
                                             amountLabel="Fixed price"
-                                            formattedAmount={formatNumber(
+                                            formattedAmount={simpleFormat(
                                                 proposal.nft.fixedPrice.value,
                                                 COIN_DICT[proposal.nft.fixedPrice.symbol].decimals
                                             )}
@@ -455,7 +455,13 @@ const MyVaults: NextPage = () => {
                                                     color="secondary"
                                                     iconType="increase"
                                                     label={isRaised(proposal.nft) ? 'Execute buy' : 'Insufficient balance'}
-                                                    status={isRaised(proposal.nft) ? 'enabled' : 'disabled'}
+                                                    status={
+                                                        isRaised(proposal.nft)
+                                                            ? loadingExecuteProposal
+                                                                ? 'processing'
+                                                                : 'enabled'
+                                                            : 'disabled'
+                                                    }
                                                     onClick={() => {
                                                         handleExecuteProposal(proposal.proposal.id);
                                                     }}

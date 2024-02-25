@@ -1,14 +1,14 @@
 import {AbstraxionAccount, ConnectedWallet} from '@/types/wallet';
 import useProcessing from '../useProcessing';
 import {useAbstraxionAccount, useAbstraxionSigningClient} from '@burnt-labs/abstraxion';
-import {createIcaMultisig, createIcaProposal} from '@/utils/multisig';
+import {createIcaMultisig, createIcaProposal, executeProposal} from '@/utils/multisig';
 import {AppChains, chainConfigMap, COIN_DICT} from '@/constants/app';
 import {useCallback} from 'react';
 import {SendTxResult} from '@/types/tx';
 import {MyVault, RaisingNFT} from '@/types/asset';
 import {createIcaBuyMsg, createSendIbcMsg} from '@/utils/ica';
 import {start} from 'repl';
-import { XionSigningClient } from '@/utils/xion';
+import {XionSigningClient} from '@/utils/xion';
 // import { createICAMultisigVault } from "@/utils/xion";
 
 type CreatedVault = {
@@ -33,13 +33,11 @@ const useICABuy = (client: XionSigningClient) => {
       // const vaultUsed = myVaults.find((vault) => vault.multisigAddress === router.query.vault) || (myVaults[0] as MyVault);
 
       try {
-        //const sendIcaTokens = createSendIbcMsg({
-        //icaAddress: vault.icaAccountAddress,
-        //multisigAddress: vault.multisigAddress,
-        //amount: nft.fixedPrice.value.toString(),
-        //});
-        console.log('ICA ACCOUNT', vault.icaAccountAddress);
-        //throw new Error('pinga');
+        const sendIcaTokens = createSendIbcMsg({
+          icaAddress: vault.icaAccountAddress,
+          multisigAddress: vault.multisigAddress,
+          amount: nft.fixedPrice.value.toString(),
+        });
         const buyNft = createIcaBuyMsg({
           ica: vault.icaControllerAddress || 'relaying',
           buyContract: nft.buyContractAddress,
@@ -52,13 +50,12 @@ const useICABuy = (client: XionSigningClient) => {
           client,
           account,
           injectiveMsgs: [buyNft],
-          //xionMsgs: [sendIcaTokens],
-          xionMsgs: [],
+          xionMsgs: [sendIcaTokens],
           multisig: vault.multisigAddress,
           icaController: vault.icaControllerAddress,
         });
 
-        console.log('createIcaProposal response:', {proposal_id});
+        console.log('createIcaProposal response:', {proposal_id, multisig: vault.multisigAddress});
       } catch (error) {
         console.log('createIcaProposal faile:', error);
       }

@@ -147,13 +147,11 @@ export async function createIcaProposal({
         });
 
         const executionResponse = await client?.execute(account.bech32Address, proxy, proxyMessage, 'auto');
-        console.log('executionResponse', executionResponse);
-
-        const proposal_id: string | undefined = executionResponse?.events
-            .find((e: any) => e.type === 'wasm')
-            ?.attributes.find((a: any) => a.key === 'proposal_id')?.value;
+        const event = executionResponse?.events.find((ev) => ev.attributes.some((attr) => attr.key === 'proposal_id'));
+        const proposal_id = event?.attributes.find((attr) => attr.key === 'proposal_id')?.value;
 
         console.log('proposal_id', proposal_id);
+        console.log('executionResponse', executionResponse);
 
         return {proposal_id};
     } catch (error) {
@@ -196,8 +194,10 @@ export async function executeProposal(client: XionSigningClient, account: any, i
 
     try {
         const executionResponse = await client?.execute(account.bech32Address, proxy, proxyMsg, 'auto');
+        console.log('transaction', executionResponse);
         return {success: true, response: executionResponse as ExecutionResult};
     } catch (error) {
+        console.log('ERR transaction', error);
         return {success: false, response: error};
     }
 }

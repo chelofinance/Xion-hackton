@@ -709,7 +709,13 @@ mod tests {
             to_address: SOMEBODY.into(),
             amount: vec![coin(1, "BTC")],
         };
-        let msgs = vec![CosmosMsg::Bank(bank_msg)];
+        let msgs = vec![
+            CosmosMsg::Bank(bank_msg),
+            CosmosMsg::Stargate {
+                type_url: "test".to_string(),
+                value: to_json_binary("{}").unwrap(),
+            },
+        ];
 
         // Only voters can propose
         let info = mock_info(SOMEBODY, &[]);

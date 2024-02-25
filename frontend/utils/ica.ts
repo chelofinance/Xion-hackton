@@ -1,6 +1,11 @@
 import {TokenSymbols, COIN_DICT, AllChains} from '@/constants/app';
+import BigNumber from 'bignumber.js';
 
 export const createSendIbcMsg = ({icaAddress, amount}: {icaAddress: string; multisigAddress: string; amount: string}) => {
+    const timestamp = BigNumber(Date.now() + 600_000)
+        .multipliedBy(1_000_000)
+        .toString();
+
     return {
         ibc: {
             transfer: {
@@ -10,7 +15,9 @@ export const createSendIbcMsg = ({icaAddress, amount}: {icaAddress: string; mult
                     amount: amount,
                     denom: COIN_DICT[TokenSymbols.INJ].denomOn[AllChains.XION_TESTNET],
                 },
-                timeout: {},
+                timeout: {
+                    timestamp: timestamp, //nanoseconds
+                },
             },
         },
     };
