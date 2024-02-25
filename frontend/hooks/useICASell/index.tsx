@@ -28,7 +28,7 @@ const useICASell = () => {
       }
 
       try {
-        const proposalMsg = createIcaSellMsgInjective({
+        const proposalMsg = createIcaSellMsg({
           ica: vault.icaAccountAddress,
           nftContract: nft.collection.contractAddress,
           tokenId: nft.tokenId,
