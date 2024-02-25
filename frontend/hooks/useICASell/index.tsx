@@ -33,7 +33,8 @@ const useICASell = () => {
         const {proposal_id} = await createIcaProposal({
           client,
           account,
-          injectiveMsg: proposalMsg,
+          injectiveMsgs: [proposalMsg],
+          xionMsgs: [],
           multisig: vault.multisigAddress,
           icaController: vault.icaControllerAddress,
         });

@@ -1,8 +1,9 @@
-export type TagColor = 'secondary';
+export type TagColor = 'secondary' | 'success';
 export type TagSize = 'sm';
 
 export const COLOR_CLASS_DICS: Record<TagColor, string> = {
   secondary: 'bg-secondary text-ground',
+  success: 'bg-semantic_success text-ground',
 };
 
 export const SIZE_CLASS_DICS: Record<TagSize, string> = {
