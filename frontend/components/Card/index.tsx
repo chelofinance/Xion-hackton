@@ -1,7 +1,7 @@
 import { useMergeRefs } from '@floating-ui/react';
 import { ForwardedRef, ReactNode, forwardRef } from 'react';
 
-export type CardColor = 'primary' | 'on_primary' | 'glass' | 'secondary';
+export type CardColor = 'primary' | 'on_primary' | 'glass' | 'secondary' | 'caption';
 export type CardSize = 'sm' | 'md';
 
 const CARD_BG_COLOR_DICT: Record<CardColor, string> = {
@@ -9,6 +9,7 @@ const CARD_BG_COLOR_DICT: Record<CardColor, string> = {
   on_primary: 'bg-ground text-ground',
   glass: 'Bg_glass border border-solid border-primary_line_light',
   secondary: 'bg-secondary text-white',
+  caption: 'bg-caption text-white',
 };
 
 const CARD_RADIUS_CLASS_DICT: Record<CardSize, string> = {
