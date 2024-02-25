@@ -5,6 +5,9 @@ import NumberText from '@/components/NumberText';
 import { TokenSymbols } from '@/constants/app';
 import Tag from '../Tag';
 import Icon from '../Icon';
+import { TextColor } from '../styles';
+
+type NFTVaultLinkCardColor = 'on_primary' | 'body';
 
 type NFTVaultLinkCardProps = {
   href: string;
@@ -12,13 +15,21 @@ type NFTVaultLinkCardProps = {
   amountLabel: string;
   formattedAmount: string;
   vaultAddress: string;
+  color?: NFTVaultLinkCardColor;
 };
 
-const NFTVaultLinkCard = ({ href, nft, amountLabel, formattedAmount, vaultAddress }: NFTVaultLinkCardProps) => {
+const COLOR_DICT: Record<NFTVaultLinkCardColor, { border: string; text: TextColor }> = {
+  on_primary: { border: 'border-ground', text: 'on_primary' },
+  body: { border: 'border-primary_line_light', text: 'body' },
+};
+
+const NFTVaultLinkCard = ({ href, nft, amountLabel, formattedAmount, vaultAddress, color = 'on_primary' }: NFTVaultLinkCardProps) => {
+  const colors = COLOR_DICT[color];
+
   return (
     <Link
       href={`/${href}/${nft.collection.contractAddress}${nft.tokenId}`}
-      className="group/nft-vault-link overflow-hidden Transition_500 transition-colors rounded-card_md border border-solid border-ground"
+      className={`group/nft-vault-link overflow-hidden Transition_500 transition-colors rounded-card_md border border-solid ${colors.border}`}
     >
       <div className="flex items-center justify-between gap-x-4">
         <div className="flex items-center gap-x-4">
@@ -35,7 +46,7 @@ const NFTVaultLinkCard = ({ href, nft, amountLabel, formattedAmount, vaultAddres
 
             <div className="flex items-baseline gap-x-2">
               <div className="Font_caption_xs">{amountLabel}</div>
-              <NumberText size="lg" color="on_primary" formattedNumber={formattedAmount} unit={TokenSymbols.INJ} />
+              <NumberText size="lg" color={colors.text} formattedNumber={formattedAmount} unit={TokenSymbols.INJ} />
             </div>
           </div>
         </div>
