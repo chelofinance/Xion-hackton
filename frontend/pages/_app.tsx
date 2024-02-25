@@ -4,7 +4,7 @@ import '@burnt-labs/ui/dist/index.css';
 import '@burnt-labs/abstraxion/dist/index.css';
 import '@/styles/globals.css';
 import type {AppProps} from 'next/app';
-import {DehydratedState, HydrationBoundary, QueryClient, QueryClientProvider, useQueryErrorResetBoundary} from '@tanstack/react-query';
+import {DehydratedState, Hydrate, QueryClient, QueryClientProvider, useQueryErrorResetBoundary} from '@tanstack/react-query';
 import {Suspense, useRef} from 'react';
 import queryClient from '@/data/queryClient';
 import Fallback from '@/components/Fallback';
@@ -104,7 +104,7 @@ function MyApp({Component, pageProps}: AppProps<{dehydratedState: DehydratedStat
           >
             <GraphqlProvider apolloClient={talisApolloClient}>
               <QueryClientProvider client={queryClientRef.current}>
-                <HydrationBoundary state={pageProps.dehydratedState}>
+                <Hydrate state={pageProps.dehydratedState}>
                   <AbstraxionProvider config={abstraxionProviderConfig}>
                     <MetaDataUpdater />
                     <UserAgentDetector />
@@ -114,7 +114,7 @@ function MyApp({Component, pageProps}: AppProps<{dehydratedState: DehydratedStat
                       <AppFooter />
                     </ModalProvider>
                   </AbstraxionProvider>
-                </HydrationBoundary>
+                </Hydrate>
               </QueryClientProvider>
             </GraphqlProvider>
           </AnalyticsProvider>

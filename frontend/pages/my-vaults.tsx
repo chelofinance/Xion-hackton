@@ -27,7 +27,8 @@ import useCreateVault from '@/hooks/useCreateVault';
 import useMyVaults from '@/hooks/useMyVaults';
 import {MyVault} from '@/types/asset';
 import AmountInput from '@/components/form-presets/AmountInput';
-import {useAbstraxionAccount} from '@burnt-labs/abstraxion';
+import {useAbstraxionAccount, useAbstraxionSigningClient} from '@burnt-labs/abstraxion';
+import WaitingSymbol from '@/components/WaitingSymbol';
 
 const MyVaults: NextPage = () => {
     const router = useRouter();
@@ -35,20 +36,23 @@ const MyVaults: NextPage = () => {
     const [userWallet] = useAtom(userWalletAtom);
     const {getOraclePrice} = useOraclePrice();
 
-    const {myVaults, updateMyVaults} = useMyVaults(userWallet?.account.bech32Address);
+    const { client } = useAbstraxionSigningClient();
+    const isClientLoading = !client;
+
+    const {myVaults, updateMyVaults} = useMyVaults(client, userWallet?.account.bech32Address);
 
     const [selectedVault, setSelectedVault] = useState<MyVault>();
 
     const fallbackVault = selectedVault ?? myVaults[0];
 
-    const {getBalance: getMyBalanceOnXion} = useBalanceOnXion(userWallet?.account.bech32Address);
+    const {getBalance: getMyBalanceOnXion, isBalanceFetching: isMyBalanceFetching} = useBalanceOnXion(client, userWallet?.account.bech32Address);
     const myINJBalance = getMyBalanceOnXion(TokenSymbols.INJ);
     const myXIONBalance = getMyBalanceOnXion(TokenSymbols.XION);
 
-    const {getBalance: getBalanceOnXion, updateBalance: updateBalanceOnXion} = useBalanceOnXion(fallbackVault?.multisigAddress);
+    const {getBalance: getBalanceOnXion, updateBalance: updateBalanceOnXion} = useBalanceOnXion(client, fallbackVault?.multisigAddress);
     const multisigBalance = getBalanceOnXion(TokenSymbols.INJ);
 
-    const {depositToVaultMultisig, isProcessing: isDepositToVaultProcessing} = useDepositToVaultMultisig();
+    const {depositToVaultMultisig, isProcessing: isDepositToVaultProcessing} = useDepositToVaultMultisig(client);
     const vaultBalance = {usd: BigNumber(0), shifted: BigNumber(0), decimals: 18};
 
     const myNFTVaultsValueUSD = useMemo(() => {
@@ -76,7 +80,7 @@ const MyVaults: NextPage = () => {
 
     const {voteProposal} = useProposals(fallbackVault?.icaControllerAddress ?? '');
 
-    const {joinVault, processing: addMemberLoading} = useJoinVault();
+    const {joinVault, processing: addMemberLoading} = useJoinVault(client);
 
     const joinVaultForm = useRef<HTMLFormElement>(null);
     const depositForm = useRef<HTMLFormElement>(null);
@@ -157,22 +161,26 @@ const MyVaults: NextPage = () => {
                             <div className="space-y-4 p-4">
                                 <AccountAddress wallet={userWallet} />
 
-                                <div className="space-y-1">
-                                    <BalanceTotal
-                                        formattedNumber={formatUSD(myINJBalance.usd.plus(myXIONBalance.usd))}
-                                        isLoading={false}
-                                    />
-                                    <CoinAmount
-                                        size="sm"
-                                        symbol={TokenSymbols.INJ}
-                                        formattedAmount={formatNumber(myINJBalance.shifted, myINJBalance.decimals)}
-                                    />
-                                    <CoinAmount
-                                        size="sm"
-                                        symbol={TokenSymbols.XION}
-                                        formattedAmount={formatNumber(myXIONBalance.shifted, myXIONBalance.decimals)}
-                                    />
-                                </div>
+                                {isMyBalanceFetching ? (
+                                    <WaitingSymbol color="primary" />
+                                ) : (
+                                    <div className="space-y-1">
+                                        <BalanceTotal
+                                            formattedNumber={formatUSD(myINJBalance.usd.plus(myXIONBalance.usd))}
+                                            isLoading={false}
+                                        />
+                                        <CoinAmount
+                                            size="sm"
+                                            symbol={TokenSymbols.INJ}
+                                            formattedAmount={formatNumber(myINJBalance.shifted, myINJBalance.decimals)}
+                                        />
+                                        <CoinAmount
+                                            size="sm"
+                                            symbol={TokenSymbols.XION}
+                                            formattedAmount={formatNumber(myXIONBalance.shifted, myXIONBalance.decimals)}
+                                        />
+                                    </div>
+                                )}
                             </div>
                         </Card>
                     </div>
@@ -256,11 +264,11 @@ const MyVaults: NextPage = () => {
 
                                 <div className="space-y-1">
                                     <BalanceTotal
-                                        formattedNumber={formatUSD(vaultBalance.usd.plus(multisigBalance.usd))}
+                                        formattedNumber={formatUSD(multisigBalance.usd)}
                                         isLoading={false}
                                     />
 
-                                    <div className="flex items-center gap-x-2">
+                                    {/* <div className="flex items-center gap-x-2">
                                         <CoinAmount
                                             size="sm"
                                             symbol={TokenSymbols.INJ}
@@ -272,7 +280,7 @@ const MyVaults: NextPage = () => {
                                                 {shortenAddress(fallbackVault.icaAccountAddress, 4, 4)}
                                             </span>
                                         </CopyHelper>
-                                    </div>
+                                    </div> */}
 
                                     <div className="flex items-center gap-x-2">
                                         <CoinAmount

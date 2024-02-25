@@ -136,6 +136,8 @@ export const getVaultMultisigs = async (
   try {
     const response: GetVaultMultisigsResponse | undefined = await signingClient?.queryContractSmart(icaFactoryAddress, msg);
 
+    console.log('getVaultMultisigs response:', response);
+    
     const vaultMutisigs = response?.multisigs.reduce<Promise<readonly MultisigICAVault[]>>(async (accmPromise, multisig, index) => {
       const icaControllerAddress = response.controllers[index];
       const icaAccountAddress = await getIcaAccountAddress(signingClient, icaControllerAddress);

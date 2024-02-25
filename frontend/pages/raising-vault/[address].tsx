@@ -29,6 +29,7 @@ import CheckItem from '@/components/CheckItem';
 import {shortenAddress} from '@/utils/text';
 import useICABuy from '@/hooks/useICABuy';
 import useMyVaults from '@/hooks/useMyVaults';
+import { useAbstraxionSigningClient } from '@burnt-labs/abstraxion';
 
 const coin = COIN_DICT[TokenSymbols.INJ];
 
@@ -38,7 +39,11 @@ const RaisingVault: NextPage = () => {
 
   const nftList = useRaisingNFTVault();
   const [userWallet] = useAtom(userWalletAtom);
-  const {myVaults, updateMyVaults} = useMyVaults(userWallet?.account.bech32Address);
+
+  const { client } = useAbstraxionSigningClient();
+  const isClientLoading = !client;
+
+  const {myVaults, updateMyVaults} = useMyVaults(client, userWallet?.account.bech32Address);
   const nft = nftList.find((nft) => `${nft.collection.contractAddress}${nft.tokenId}` === address);
   const {myNFT, myVault} = useMemo<{
     myNFT: RaisingNFT | undefined;
@@ -61,7 +66,7 @@ const RaisingVault: NextPage = () => {
     [nft, myVaultBalance.shifted]
   );
 
-  const {getBalance, updateBalance} = useBalanceOnXion(userWallet?.account.bech32Address);
+  const {getBalance, updateBalance} = useBalanceOnXion(client, userWallet?.account.bech32Address);
 
   const [isDepositFormOpen, setIsDepositFormOpen] = useState<boolean>(false);
 
@@ -87,9 +92,9 @@ const RaisingVault: NextPage = () => {
 
   const [depositAmount, setDepositAmount] = useState<number>(maxDepositAmount);
   const [isDepositAmountValid, setIsDepositAmountValid] = useState<boolean>(true);
-  const {buyNftIca, isProcessing: isProcessingBuy} = useICABuy();
+  const {buyNftIca, isProcessing: isProcessingBuy} = useICABuy(client);
   const [isSelectVaultOpen, setIsSelectVaultOpen] = useState<boolean>(false);
-  const [selectedVault, setSelectedVault] = useState<MyVault>(myVaults[0]);
+  const [selectedVault, setSelectedVault] = useState<MyVault | undefined>(myVaults[0]);
 
   const fallbackSelectedVault = useMemo(() => selectedVault ?? myVaults[0], [selectedVault, myVaults]);
 
@@ -146,7 +151,7 @@ const RaisingVault: NextPage = () => {
 
   const handleBuyNft = useCallback(
     async (nft: RaisingNFT, vault: MyVault) => {
-      await buyNftIca(nft, vault);
+      await buyNftIca(vault, nft);
       await updateMyVaults();
     },
     [buyNftIca, updateMyVaults]
@@ -161,7 +166,7 @@ const RaisingVault: NextPage = () => {
 
   const isOwningVault = useMemo<boolean>(() => nft?.ownerAddress === myVault?.multisigAddress, [nft, myVault]);
 
-  const {depositToVaultMultisig, isProcessing: isDepositToVaultProcessing} = useDepositToVaultMultisig();
+  const {depositToVaultMultisig, isProcessing: isDepositToVaultProcessing} = useDepositToVaultMultisig(client);
 
   const handleDeposit = async () => {
     if (!userWallet) {
@@ -329,10 +334,10 @@ const RaisingVault: NextPage = () => {
                       <Button
                         iconType="arrow_forward"
                         color="on_primary"
-                        label="Propose buy"
-                        status={isProcessingBuy ? 'processing' : 'enabled'}
+                        label={isClientLoading ? 'Loading client' : 'Propose buy'}
+                        status={isClientLoading ? 'disabled' : isProcessingBuy ? 'processing' : 'enabled'}
                         onClick={() => {
-                          handleBuyNft(nft, selectedVault);
+                          handleBuyNft(nft, fallbackSelectedVault);
                         }}
                       />
                     </div>

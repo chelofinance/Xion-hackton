@@ -1,17 +1,15 @@
 import {MyVault} from '@/types/asset';
-import {HandleDepositArgs, transferOnXion} from '@/utils/xion';
+import {HandleDepositArgs, XionSigningClient, transferOnXion} from '@/utils/xion';
 import {useAbstraxionSigningClient} from '@burnt-labs/abstraxion';
 import {useCallback} from 'react';
 import useProcessing from '../useProcessing';
 
-const useDepositToVaultMultisig = () => {
-    const {client: abstraxionClient} = useAbstraxionSigningClient();
-
+const useDepositToVaultMultisig = (client: XionSigningClient) => {
     const {target, startProcessing, stopProcessing} = useProcessing<boolean>();
 
     const depositToVaultMultisig = useCallback(
         async (vault: MyVault, args: Omit<HandleDepositArgs, 'recipientAddress'>) => {
-            if (!abstraxionClient) {
+            if (!client) {
                 console.log('Signing client not found');
                 return null;
             }
@@ -20,7 +18,7 @@ const useDepositToVaultMultisig = () => {
 
             const recipientAddress = vault.icaControllerAddress;
 
-            const result = await transferOnXion(abstraxionClient, {
+            const result = await transferOnXion(client, {
                 ...args,
                 recipientAddress,
             });
@@ -35,7 +33,7 @@ const useDepositToVaultMultisig = () => {
 
             return result;
         },
-        [abstraxionClient]
+        [client]
     );
 
     return {

@@ -8,6 +8,7 @@ import {SendTxResult} from '@/types/tx';
 import {MyVault, RaisingNFT} from '@/types/asset';
 import {createIcaBuyMsg} from '@/utils/ica';
 import {start} from 'repl';
+import { XionSigningClient } from '@/utils/xion';
 // import { createICAMultisigVault } from "@/utils/xion";
 
 type CreatedVault = {
@@ -15,20 +16,19 @@ type CreatedVault = {
   multisigAddress: string | undefined;
 };
 
-const useICABuy = () => {
+const useICABuy = (client: XionSigningClient) => {
   const {target, startProcessing, stopProcessing} = useProcessing<boolean>();
   const {data: account} = useAbstraxionAccount();
-  const {client} = useAbstraxionSigningClient();
 
   const buyNftIca = useCallback(
-    async (nft?: RaisingNFT, vault?: MyVault) => {
+    async (vault: MyVault, nft?: RaisingNFT) => {
       startProcessing(true);
       if (!nft) return;
 
-      if (!vault) {
-        alert('Create a vault to buy NFTs.');
-        return;
-      }
+      // if (!vault) {
+      //   alert('Create a vault to buy NFTs.');
+      //   return;
+      // }
 
       // const vaultUsed = myVaults.find((vault) => vault.multisigAddress === router.query.vault) || (myVaults[0] as MyVault);
 
