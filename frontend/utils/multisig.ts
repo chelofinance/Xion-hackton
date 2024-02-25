@@ -6,6 +6,7 @@ import {SendTxResult} from '@/types/tx';
 import {GetProposalsResponse, XionSigningClient} from './xion';
 import {AppChains, chainConfigMap, channelOpenInitOptions} from '@/constants/app';
 import {AbstraxionAccount} from '@/types/wallet';
+import {ExecutionResult} from 'graphql-ws';
 
 export async function getIcaAccountAddress(client: any, ica_controller_address: string) {
     const contract_response = await client?.queryContractSmart(ica_controller_address, {get_contract_state: {}});
@@ -179,20 +180,25 @@ export async function voteProposal(client: any, account: any, icaMultisigAddress
     }
 }
 
-export async function executeProposal(client: any, account: any, icaMultisigAddress: string, proposalId: number) {
-    const msg = {
+export async function executeProposal(client: XionSigningClient, account: any, icaMultisigAddress: string, proposalId: number) {
+    const proxy = chainConfigMap[AppChains.XION_TESTNET].proxyMultisig.address;
+    const multisigMsg = {
         execute: {
             proposal_id: proposalId,
         },
     };
+    const proxyMsg = {
+        contract_addr: icaMultisigAddress,
+        payload: {
+            multisig_execute_msg: multisigMsg,
+        },
+    };
 
     try {
-        const executionResponse = await client?.execute(account.bech32Address, icaMultisigAddress, msg, 'auto');
-        console.log('executionResponse', executionResponse);
-        return executionResponse;
+        const executionResponse = await client?.execute(account.bech32Address, proxy, proxyMsg, 'auto');
+        return {success: true, response: executionResponse as ExecutionResult};
     } catch (error) {
-        console.log('error', error);
-        alert(error);
+        return {success: false, response: error};
     }
 }
 

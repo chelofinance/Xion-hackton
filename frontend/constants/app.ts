@@ -88,7 +88,12 @@ export const XION_RPC = 'https://testnet-rpc.xion-api.com:443';
 export const abstraxionProviderConfig = {
   contracts: [
     chainConfigMap[AppChains.XION_TESTNET].icaFactory.address,
-    chainConfigMap[AppChains.XION_TESTNET].proxyMultisig.address,
+    {
+      address: chainConfigMap[AppChains.XION_TESTNET].proxyMultisig.address,
+      amounts: [
+        {denom: 'ibc/0166AE2224341A3F70943E315DAC6EDF012A638D0F9358794FF7525BA1DFC191', amount: '100000000000000000000000'},
+      ],
+    },
   ],
   // rpcUrl: XION_RPC,
 };

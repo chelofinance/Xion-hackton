@@ -29,10 +29,10 @@ import {MyVault, RaisingNFT} from '@/types/asset';
 import AmountInput from '@/components/form-presets/AmountInput';
 import {useAbstraxionAccount, useAbstraxionSigningClient} from '@burnt-labs/abstraxion';
 import WaitingSymbol from '@/components/WaitingSymbol';
-import { MOCK_PROPOSALS } from '@/constants/mock';
 import NFTTumbnail from '@/components/NFTThumbnail';
 import ProgressBar from '@/components/ProgressBar';
-import { executeProposal } from '@/utils/multisig';
+import {executeProposal} from '@/utils/multisig';
+import useExecuteProposal from '@/hooks/useExecuteProposal';
 
 const MyVaults: NextPage = () => {
     const router = useRouter();
@@ -40,7 +40,7 @@ const MyVaults: NextPage = () => {
     const [userWallet] = useAtom(userWalletAtom);
     const {getOraclePrice} = useOraclePrice();
 
-    const { client } = useAbstraxionSigningClient();
+    const {client} = useAbstraxionSigningClient();
     const isClientLoading = !client;
 
     const {myVaults, updateMyVaults} = useMyVaults(client, userWallet?.account.bech32Address);
@@ -49,15 +49,20 @@ const MyVaults: NextPage = () => {
 
     const fallbackVault = selectedVault ?? myVaults[0];
 
-    const {getBalance: getMyBalanceOnXion, isBalanceFetching: isMyBalanceFetching} = useBalanceOnXion(client, userWallet?.account.bech32Address);
+    const {getBalance: getMyBalanceOnXion, isBalanceFetching: isMyBalanceFetching} = useBalanceOnXion(
+        client,
+        userWallet?.account.bech32Address
+    );
     const myINJBalance = getMyBalanceOnXion(TokenSymbols.INJ);
     const myXIONBalance = getMyBalanceOnXion(TokenSymbols.XION);
 
-    const {getBalance: getBalanceOnXion, updateBalance: updateBalanceOnXion} = useBalanceOnXion(client, fallbackVault?.multisigAddress);
+    const {getBalance: getBalanceOnXion, updateBalance: updateBalanceOnXion} = useBalanceOnXion(
+        client,
+        fallbackVault?.multisigAddress
+    );
     const multisigBalance = getBalanceOnXion(TokenSymbols.INJ);
 
     const {depositToVaultMultisig, isProcessing: isDepositToVaultProcessing} = useDepositToVaultMultisig(client);
-    const vaultBalance = {usd: BigNumber(0), shifted: BigNumber(0), decimals: 18};
 
     const myNFTVaultsValueUSD = useMemo(() => {
         return myVaults.reduce((accm, vault) => {
@@ -78,8 +83,8 @@ const MyVaults: NextPage = () => {
     }, [getOraclePrice, myVaults, userWallet?.account.bech32Address]);
 
     const formattedTotalUSD = useMemo(
-        () => formatUSD(vaultBalance.usd.plus(myNFTVaultsValueUSD)),
-        [vaultBalance.usd, myNFTVaultsValueUSD]
+        () => formatUSD(multisigBalance.usd.plus(myNFTVaultsValueUSD)),
+        [multisigBalance.usd, myNFTVaultsValueUSD]
     );
 
     const {voteProposal} = useProposals(fallbackVault?.icaControllerAddress ?? '');
@@ -137,6 +142,7 @@ const MyVaults: NextPage = () => {
     const {data: abstraxionAccount} = useAbstraxionAccount();
 
     const {createVault, isProcessing: isCreateVaultProcessing} = useCreateVault(abstraxionAccount);
+    const {executeProposal, isProcessing: loadingExecuteProposal} = useExecuteProposal(abstraxionAccount);
 
     const handleCreateVault = useCallback(async () => {
         await createVault();
@@ -149,8 +155,18 @@ const MyVaults: NextPage = () => {
         },
         [joinVault, updateMyVaults]
     );
+    const handleExecuteProposal = useCallback(
+        async (proposal: string | number) => {
+            await executeProposal(fallbackVault, proposal);
+            await updateMyVaults();
+        },
+        [fallbackVault, executeProposal, updateMyVaults]
+    );
 
-    const isRaised = useCallback((nft: RaisingNFT) => vaultBalance.shifted.gte(nft.fixedPrice.value), [vaultBalance.shifted]);
+    const isRaised = useCallback(
+        (nft: RaisingNFT) => multisigBalance.shifted.gte(nft.fixedPrice.value),
+        [multisigBalance.shifted]
+    );
 
     const Content =
         userWallet === null ? (
@@ -221,16 +237,17 @@ const MyVaults: NextPage = () => {
                                             <div className="Font_caption_sm">{shortenAddress(myVault.multisigAddress)}</div>
                                         </CopyHelper>
 
-                                        {/* back to myVault.proposals[0] */}
-                                        {MOCK_PROPOSALS[0]?.nft && (
+                                        {myVault.proposals.length > 0 && myVault.proposals[0]?.nft && (
                                             <div className="flex items-center gap-x-2">
                                                 <NFTTumbnail
                                                     size="sm"
-                                                    imgSrc={MOCK_PROPOSALS[0]?.nft.imgSrc}
+                                                    imgSrc={myVault.proposals[0]?.nft.imgSrc}
                                                     className="rounded-card_sm"
                                                 />
 
-                                                {MOCK_PROPOSALS.length > 1 && <div className="Font_caption_sm">+ {MOCK_PROPOSALS.length - 1} more</div>}
+                                                {myVault.proposals.length > 1 && (
+                                                    <div className="Font_caption_sm">+ {myVault.proposals.length - 1} more</div>
+                                                )}
                                             </div>
                                         )}
 
@@ -272,24 +289,7 @@ const MyVaults: NextPage = () => {
                                 <div className="Font_label_14px">Balance</div>
 
                                 <div className="space-y-1">
-                                    <BalanceTotal
-                                        formattedNumber={formatUSD(multisigBalance.usd)}
-                                        isLoading={false}
-                                    />
-
-                                    {/* <div className="flex items-center gap-x-2">
-                                        <CoinAmount
-                                            size="sm"
-                                            symbol={TokenSymbols.INJ}
-                                            chain={AllChains.INJECTIVE_TESTNET}
-                                            formattedAmount={formatNumber(vaultBalance.shifted, vaultBalance.decimals)}
-                                        />
-                                        <CopyHelper toCopy={fallbackVault.icaAccountAddress} className="text-caption">
-                                            <span className="w-fit truncate Font_caption_xs">
-                                                {shortenAddress(fallbackVault.icaAccountAddress, 4, 4)}
-                                            </span>
-                                        </CopyHelper>
-                                    </div> */}
+                                    <BalanceTotal formattedNumber={formatUSD(multisigBalance.usd)} isLoading={false} />
 
                                     <div className="flex items-center gap-x-2">
                                         <CoinAmount
@@ -301,6 +301,14 @@ const MyVaults: NextPage = () => {
                                         <CopyHelper toCopy={fallbackVault.multisigAddress} className="text-caption">
                                             <span className="truncate Font_caption_xs">
                                                 {shortenAddress(fallbackVault.multisigAddress, 4, 4)}
+                                            </span>
+                                        </CopyHelper>
+                                    </div>
+                                    <div className="flex items-center gap-x-2">
+                                        <span>ica:</span>
+                                        <CopyHelper toCopy={fallbackVault.icaAccountAddress} className="text-caption">
+                                            <span className="w-fit truncate Font_caption_xs">
+                                                {shortenAddress(fallbackVault.icaAccountAddress, 4, 4)}
                                             </span>
                                         </CopyHelper>
                                     </div>
@@ -376,18 +384,29 @@ const MyVaults: NextPage = () => {
                             <section className="space-y-4 mt-4">
                                 <Heading tagName="h4">Buy Proposals</Heading>
 
-                                {/* back to fallbackVault.proposals */}
-                                {MOCK_PROPOSALS.map((proposal) => (
-                                    <Card key={proposal.proposal.id} color="primary" className="flex flex-col items-stretch gap-y-4 p-4">
+                                {fallbackVault.proposals.map((proposal) => (
+                                    <Card
+                                        key={proposal.proposal.id}
+                                        color="primary"
+                                        className="flex flex-col items-stretch gap-y-4 p-4"
+                                    >
                                         <div className="flex justify-between items-center gap-x-4">
                                             <div className="flex items-baseline gap-x-4">
-                                                <span className="Font_caption_xs text-caption_on_primary">#{proposal.proposal.id}</span> 
+                                                <span className="Font_caption_xs text-caption_on_primary">
+                                                    #{proposal.proposal.id}
+                                                </span>
                                                 <div className="w-[300px] truncate Font_label_14px">
                                                     {proposal.proposal.description}
                                                 </div>
                                             </div>
 
-                                            <Tag size="sm" color={proposal.proposal.status === ProposalStatus.Passed ? 'success' : 'secondary'} label={proposal.proposal.status} />
+                                            <Tag
+                                                size="sm"
+                                                color={
+                                                    proposal.proposal.status === ProposalStatus.Passed ? 'success' : 'secondary'
+                                                }
+                                                label={proposal.proposal.status}
+                                            />
                                         </div>
 
                                         <NFTVaultLinkCard
@@ -395,14 +414,17 @@ const MyVaults: NextPage = () => {
                                             href="raising-vault"
                                             nft={proposal.nft}
                                             amountLabel="Fixed price"
-                                            formattedAmount={formatNumber(proposal.nft.fixedPrice.value, COIN_DICT[proposal.nft.fixedPrice.symbol].decimals)}
+                                            formattedAmount={formatNumber(
+                                                proposal.nft.fixedPrice.value,
+                                                COIN_DICT[proposal.nft.fixedPrice.symbol].decimals
+                                            )}
                                             vaultAddress={fallbackVault.multisigAddress}
                                         />
 
                                         <ProgressBar
-                                            currentNumber={vaultBalance.shifted.toNumber()}
+                                            currentNumber={multisigBalance.shifted.toNumber()}
                                             targetNumber={proposal.nft.fixedPrice.value.toNumber()}
-                                            decimals={vaultBalance.decimals}
+                                            decimals={multisigBalance.decimals}
                                             currentNumberCaption="raised"
                                         />
 
@@ -435,7 +457,7 @@ const MyVaults: NextPage = () => {
                                                     label={isRaised(proposal.nft) ? 'Execute buy' : 'Insufficient balance'}
                                                     status={isRaised(proposal.nft) ? 'enabled' : 'disabled'}
                                                     onClick={() => {
-                                                        // executeProposal
+                                                        handleExecuteProposal(proposal.proposal.id);
                                                     }}
                                                 />
                                                 {/* <Tag size="sm" label={PROPOSAL_STATUS_LABEL_DICT[proposal.proposal.status]} /> */}
@@ -444,8 +466,7 @@ const MyVaults: NextPage = () => {
                                     </Card>
                                 ))}
 
-                                {/* back to fallbackVault.proposals */}
-                                {MOCK_PROPOSALS.length === 0 && (
+                                {fallbackVault.proposals.length === 0 && (
                                     <Card color="glass" className="p-4 text-body">
                                         No proposal found
                                     </Card>

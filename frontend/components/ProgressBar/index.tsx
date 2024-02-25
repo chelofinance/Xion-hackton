@@ -1,6 +1,5 @@
-import { FormatAmountOptions, formatNumber } from '@/utils/number';
-import { useMemo } from 'react';
-import CaptionAmount from '../CaptionAmount';
+import {FormatAmountOptions, formatNumber} from '@/utils/number';
+import {useMemo} from 'react';
 
 type ProgressBarProps = {
   currentNumber: number;
@@ -11,7 +10,14 @@ type ProgressBarProps = {
   className?: string;
 };
 
-const ProgressBar = ({ currentNumber, targetNumber, currentNumberCaption, decimals, formatOptions, className = '' }: ProgressBarProps) => {
+const ProgressBar = ({
+  currentNumber,
+  targetNumber,
+  currentNumberCaption,
+  decimals,
+  formatOptions,
+  className = '',
+}: ProgressBarProps) => {
   const percentage = useMemo<number>(() => (currentNumber / targetNumber) * 100, [currentNumber, targetNumber]);
   const percentageFormatted = useMemo<string>(() => formatNumber(percentage, 0), [percentage]);
   const currentNumberFormatted = useMemo<string>(
@@ -31,7 +37,8 @@ const ProgressBar = ({ currentNumber, targetNumber, currentNumberCaption, decima
       </div>
 
       <div className="w-full h-4 rounded-full overflow-hidden bg-white">
-        <div className="h-full rounded-full bg-secondary" style={{ width: `${percentage}%` }}></div>
+        <div className="h-full rounded-full bg-primary" style={{width: `${percentage}%`}}></div>
+        <div className="h-full rounded-full bg-secondary" style={{width: `${percentage}%`}}></div>
       </div>
     </div>
   );
