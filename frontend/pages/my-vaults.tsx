@@ -15,7 +15,7 @@ import CopyHelper from '@/components/CopyHelper';
 import {shortenAddress} from '@/utils/text';
 import Button from '@/components/Button';
 import {useRouter} from 'next/router';
-import {AllChains, COIN_DICT, PROPOSAL_STATUS_LABEL_DICT, ProposalStatus, TokenSymbols} from '@/constants/app';
+import {AllChains, COIN_DICT, ProposalStatus, TokenSymbols} from '@/constants/app';
 import Tag from '@/components/Tag';
 import useProposals from '@/hooks/useProposals';
 import useJoinVault from '@/hooks/useJoinVault';
@@ -33,6 +33,8 @@ import NFTTumbnail from '@/components/NFTThumbnail';
 import ProgressBar from '@/components/ProgressBar';
 import {executeProposal} from '@/utils/multisig';
 import useExecuteProposal from '@/hooks/useExecuteProposal';
+import useRaisingNFTVaults from '@/hooks/useRaisingNFTVaults';
+import useICASell from '@/hooks/useICASell';
 
 const MyVaults: NextPage = () => {
     const router = useRouter();
@@ -82,10 +84,11 @@ const MyVaults: NextPage = () => {
         }, new BigNumber(0));
     }, [getOraclePrice, myVaults, userWallet?.account.bech32Address]);
 
-    const formattedTotalUSD = useMemo(
-        () => formatUSD(multisigBalance.usd.plus(myNFTVaultsValueUSD)),
-        [multisigBalance.usd, myNFTVaultsValueUSD]
-    );
+    const nfts = useRaisingNFTVaults();
+
+    const vaultOwnedNFTs = useMemo(() => {
+        return nfts.filter((nft) => nft.ownerAddress === fallbackVault?.icaAccountAddress);
+    }, [nfts, fallbackVault?.icaAccountAddress]);
 
     const {voteProposal} = useProposals(fallbackVault?.icaControllerAddress ?? '');
 
@@ -168,6 +171,11 @@ const MyVaults: NextPage = () => {
         [multisigBalance.shifted]
     );
 
+    const buyProposals = useMemo(() => fallbackVault?.proposals.filter(proposal => !proposal.nft.onSale), [fallbackVault?.proposals]) ?? [];
+    const sellProposals = useMemo(() => fallbackVault?.proposals.filter(proposal => proposal.nft.onSale), [fallbackVault?.proposals]) ?? [];
+
+    const {sellNftIca, isProcessing: isProcessingSell} = useICASell();
+  
     const Content =
         userWallet === null ? (
             <Card color="glass" className="p-4 text-body Font_body_md">
@@ -384,11 +392,12 @@ const MyVaults: NextPage = () => {
                             <section className="space-y-4 mt-4">
                                 <Heading tagName="h4">Buy Proposals</Heading>
 
-                                {fallbackVault.proposals.map((proposal) => (
-                                    <Card
-                                        key={proposal.proposal.id}
-                                        color="primary"
-                                        className="flex flex-col items-stretch gap-y-4 p-4"
+                                {/* MOCK_PROPOSALS */}
+                                {buyProposals.map((proposal) => (
+                                    <Card 
+                                      key={proposal.proposal.id} 
+                                      color={proposal.proposal.status === ProposalStatus.Rejected ? 'caption' : 'primary'} 
+                                      className="flex flex-col items-stretch gap-y-4 p-4"
                                     >
                                         <div className="flex justify-between items-center gap-x-4">
                                             <div className="flex items-baseline gap-x-4">
@@ -466,13 +475,13 @@ const MyVaults: NextPage = () => {
                                                         handleExecuteProposal(proposal.proposal.id);
                                                     }}
                                                 />
-                                                {/* <Tag size="sm" label={PROPOSAL_STATUS_LABEL_DICT[proposal.proposal.status]} /> */}
                                             </div>
                                         )}
                                     </Card>
                                 ))}
 
-                                {fallbackVault.proposals.length === 0 && (
+                                {/* MOCK_PROPOSALS */}
+                                {buyProposals.length === 0 && (
                                     <Card color="glass" className="p-4 text-body">
                                         No proposal found
                                     </Card>
@@ -488,9 +497,123 @@ const MyVaults: NextPage = () => {
                                         }
                                     />
                                 </div>
+
+                                <Heading tagName="h4" className="!mt-8">Sell Proposals</Heading>
+
+                                {/* MOCK_PROPOSALS */}
+                                {sellProposals.map((proposal) => (
+                                    <Card key={proposal.proposal.id} color={proposal.proposal.status === ProposalStatus.Rejected ? 'caption' : 'primary'} className="flex flex-col items-stretch gap-y-4 p-4">
+                                        <div className="flex justify-between items-center gap-x-4">
+                                            <div className="flex items-baseline gap-x-4">
+                                                <span className="Font_caption_xs text-caption_on_primary">#{proposal.proposal.id}</span> 
+                                                <div className="w-[300px] truncate Font_label_14px">
+                                                    {proposal.proposal.description}
+                                                </div>
+                                            </div>
+
+                                            <Tag size="sm" color={proposal.proposal.status === ProposalStatus.Passed ? 'success' : 'secondary'} label={proposal.proposal.status} />
+                                        </div>
+
+                                        <NFTVaultLinkCard
+                                            key={proposal.nft.tokenId}
+                                            href="raising-vault"
+                                            nft={proposal.nft}
+                                            amountLabel="Fixed price"
+                                            formattedAmount={formatNumber(proposal.nft.fixedPrice.value, COIN_DICT[proposal.nft.fixedPrice.symbol].decimals)}
+                                            vaultAddress={fallbackVault.multisigAddress}
+                                        />
+
+                                        {proposal.proposal.status === ProposalStatus.Pending && (
+                                            <div className="flex justify-end gap-x-2">
+                                                <Button
+                                                    color="on_primary"
+                                                    iconType="decrease"
+                                                    label="No"
+                                                    onClick={() =>
+                                                        voteProposal(fallbackVault.multisigAddress, proposal.proposal.id, true)
+                                                    }
+                                                />
+                                                <Button
+                                                    color="on_primary"
+                                                    iconType="increase"
+                                                    label="Yes"
+                                                    onClick={() =>
+                                                        voteProposal(fallbackVault.multisigAddress, proposal.proposal.id, true)
+                                                    }
+                                                />
+                                            </div>
+                                        )}
+
+                                        {proposal.proposal.status === ProposalStatus.Passed && (
+                                            <div className="flex justify-end gap-x-2">
+                                                <Button
+                                                    color="secondary"
+                                                    iconType="arrow_forward"
+                                                    label="Execute sell"
+                                                    onClick={() => handleExecuteProposal(proposal.proposal.id)}
+                                                />
+                                            </div>
+                                        )}
+                                    </Card>
+                                ))}
+
+                                {/* MOCK_PROPOSALS */}
+                                {sellProposals.length === 0 && (
+                                    <Card color="glass" className="p-4 text-body">
+                                        No proposal found
+                                    </Card>
+                                )}
+                            </section>
+
+                            <section className="space-y-4 mt-4">
+                                <Heading tagName="h4">NFT Holdings</Heading>
+
+                                <ul className="space-y-4">
+                                    {/* MOCK_OWNED_NFTS */}
+                                    {vaultOwnedNFTs.map(vaultOwnedNFT => (
+                                        <Card key={vaultOwnedNFT.tokenId} color="glass" className="flex flex-col items-stretch gap-y-4 p-4">
+                                            {vaultOwnedNFT.onSale && (
+                                                <div className="flex justify-end">
+                                                    <Tag size="sm" label="On sale" />
+                                                </div>
+                                            )}
+
+                                            <NFTVaultLinkCard
+                                                key={vaultOwnedNFT.tokenId}
+                                                color="body"
+                                                href="raising-vault"
+                                                nft={vaultOwnedNFT}
+                                                amountLabel="Fixed price"
+                                                formattedAmount={formatNumber(vaultOwnedNFT.fixedPrice.value, COIN_DICT[vaultOwnedNFT.fixedPrice.symbol].decimals)}
+                                                vaultAddress={fallbackVault.multisigAddress}
+                                            />
+
+                                            {!vaultOwnedNFT.onSale && (
+                                                <div className="flex justify-end">
+                                                    <Button
+                                                        iconType="arrow_forward"
+                                                        label="Propose sell"
+                                                        onClick={async () => {
+                                                            await sellNftIca(vaultOwnedNFT, fallbackVault);
+                                                            await updateMyVaults();
+                                                        }}
+                                                    />
+                                                </div>
+                                            )}
+                                        </Card>
+                                    ))}
+
+                                    {/* MOCK_OWNED_NFTS */}
+                                    {vaultOwnedNFTs.length === 0 && (
+                                        <Card color="glass" className="text-body p-4">
+                                            <div className="Font_body_md">Not found.</div>
+                                        </Card>
+                                    )}
+                                </ul>
                             </section>
                         </>
                     )}
+
                     <div className="flex flex-col grow gap-y-4">
                         {!fallbackVault && (
                             <div className="flex flex-col">
