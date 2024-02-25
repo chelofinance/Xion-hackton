@@ -1,6 +1,5 @@
 import {MyVault} from '@/types/asset';
 import {HandleDepositArgs, XionSigningClient, transferOnXion} from '@/utils/xion';
-import {useAbstraxionSigningClient} from '@burnt-labs/abstraxion';
 import {useCallback} from 'react';
 import useProcessing from '../useProcessing';
 
@@ -16,7 +15,7 @@ const useDepositToVaultMultisig = (client: XionSigningClient) => {
 
             startProcessing(true);
 
-            const recipientAddress = vault.icaControllerAddress;
+            const recipientAddress = vault.multisigAddress;
 
             const result = await transferOnXion(client, {
                 ...args,
