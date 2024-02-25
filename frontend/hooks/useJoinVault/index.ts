@@ -3,14 +3,15 @@ import {useState} from 'react';
 import {joinVault as joinVaultAsMember} from '@/utils/multisig';
 import useProcessing from '../useProcessing';
 import {COIN_DICT, TokenSymbols, AllChains} from '@/constants/app';
+import { XionSigningClient } from '@/utils/xion';
 
 const WEIGHT_DECIMALS = 1000000000000000;
 
-const useJoinVault = (): {
+const useJoinVault = (client: XionSigningClient): {
   joinVault: (multisigVaultAddress: string) => Promise<void>;
   processing: boolean;
 } => {
-  const {client: abstraxionClient} = useAbstraxionSigningClient();
+  // const {client: abstraxionClient} = useAbstraxionSigningClient();
   const {data: account} = useAbstraxionAccount();
   const {target, startProcessing, stopProcessing} = useProcessing<boolean>();
 
@@ -22,7 +23,7 @@ const useJoinVault = (): {
     try {
       const coin = COIN_DICT[TokenSymbols.INJ].denomOn[AllChains.XION_TESTNET];
       const response = await joinVaultAsMember(
-        abstraxionClient,
+        client,
         account,
         multisigVaultAddress,
         account.bech32Address,

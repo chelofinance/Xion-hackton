@@ -11,7 +11,7 @@ import Contracts from "@/config/contracts.config";
 import {
   createIcaMultisig, createProposal, executeProposal, getBalance,
   getIcaAccountAddress, getIcaControllerAddress, getProposalList,
-  voteProposal, addMember, getAbstractAddress, getMemberList, getMultisigs
+  voteProposal, addMember, getAbstractAddress, getMemberList, getMultisigs, sendToken
 } from "./utils";
 
 
@@ -47,7 +47,7 @@ export default function Page(): JSX.Element {
     })
   );
 
-  const [newMemberAddress, setNewMemberAddress] = useState<string>("");
+  const [enteredMemberAddress, setEnteredMemberAddress] = useState<string>("");
   const [feeAmount, setFeeAmount] = useState<string>("1000000000000000");
 
   useEffect(() => {
@@ -190,10 +190,19 @@ export default function Page(): JSX.Element {
   async function addMemberHandler() {
     setLoading(true);
 
-    const response = await addMember(client, account, icaMultisigAddress, newMemberAddress, feeAmount)
+    const response = await addMember(client, account, icaMultisigAddress, enteredMemberAddress, feeAmount)
 
     console.log("response", response);
-    setNewMemberAddress("");
+    setEnteredMemberAddress("");
+    setLoading(false);
+  }
+
+  async function sendTokensHandler() {
+    setLoading(true);
+
+    const response = await sendToken(client, account, enteredMemberAddress, feeAmount)
+
+    console.log("response", response);
     setLoading(false);
   }
 
@@ -286,11 +295,6 @@ export default function Page(): JSX.Element {
               onChange={(e) => {
                 setProposalJson(e.target.value);
               }}
-              style={{
-                color: "black",
-                width: "100%",
-                height: "100%",
-              }}
             />
             <Button
               disabled={loading}
@@ -301,36 +305,33 @@ export default function Page(): JSX.Element {
               {loading ? "LOADING..." : "Create Proposal"}
             </Button>
           </div>
+          <br /><br />
           <div>
-            <br />
-            <h3>Add New Member</h3>
-            Address:
-            <input type="text" name="new_member_address"
-              value={newMemberAddress}
+            <label>Add New Member/Send tokens</label>
+            <input type="text" name="new_member_address" placeholder="Address"
+              value={enteredMemberAddress}
               onChange={(e) => {
-                setNewMemberAddress(e.target.value);
-              }}
-              style={{
-                color: "black",
+                setEnteredMemberAddress(e.target.value);
               }}
             />
-            <br />
-            Fee: <br /><input type="text" name="fee_amount"
-              style={{
-                color: "black",
-              }}
+            <input type="text" name="fee_amount" placeholder="Amount(uxion)"
               value={feeAmount}
               onChange={(e) => {
                 setFeeAmount(e.target.value);
-              }} /> uxion <br />
-            <br />
+              }} />
             <Button
-              disabled={loading}
-              fullWidth
+              disabled={loading}              
               onClick={addMemberHandler}
               structure="base"
             >
               {loading ? "LOADING..." : "Add Member"}
+            </Button>
+            <Button
+              disabled={loading}
+              onClick={sendTokensHandler}
+              structure="base"
+            >
+              {loading ? "LOADING..." : "Send Tokens"}
             </Button>
           </div>
         </div>
@@ -403,9 +404,9 @@ export default function Page(): JSX.Element {
             {icaAccountAddress ? (
               <span className="info-value">{icaAccountAddress}</span>
             ) : (
-              <button disabled={loading} onClick={getIcaAccountAddressHandler}>
+              <Button disabled={loading} onClick={getIcaAccountAddressHandler}>
                 {loading ? "LOADING..." : "Refetch ICA Account Address"}
-              </button>)}
+              </Button>)}
           </div>
         </div>
       )

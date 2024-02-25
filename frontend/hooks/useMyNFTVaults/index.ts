@@ -48,17 +48,12 @@ const useMyNFTVaults = (): readonly MyNFTVault[] => {
     };
 
     const loadVaultInfo = async (vault: string, client: any) => {
-        console.log('LOAD VAULT INFo', vault, {list_proposals: {start_after: 0}});
         const proposals = (await client?.queryContractSmart(vault, {list_proposals: {start_after: 0}})) as {
             proposals: ProposalResponse[];
         };
-        console.log(proposals, vault, {list_voters: {}});
         const voters = (await client?.queryContractSmart(vault, {list_voters: {}})) as VotersResponse;
-        console.log(voters, vault, {threshold: {}});
         const threshold = (await client?.queryContractSmart(vault, {threshold: {}})) as ThresholdResponse;
-        console.log(threshold);
         const matchedNfts = proposals.proposals.map((prop) => getNftByProposal(prop));
-        console.log(matchedNfts);
 
         return {
             proposals: matchedNfts,
@@ -80,28 +75,16 @@ const useMyNFTVaults = (): readonly MyNFTVault[] => {
         const response: {multisigs: string[]; controllers: string[]} = await client?.queryContractSmart(factory, {
             query_multisig_by_member: account.bech32Address,
         });
-        console.log(
-            'RESPONSE',
-            response,
-            factory,
-            {
-                query_multisig_by_member: account.bech32Address,
-            },
-            client
-        );
         const multisigs = response.multisigs || [];
         const controllers = response.controllers || [];
 
         const vaultProps = await Promise.all(multisigs.map((vault) => loadVaultInfo(vault, client)));
-        console.log({vaultProps});
         const controllerProps = await Promise.all(controllers.map((vault) => loadControllerInfo(vault, client)));
-        console.log({controllerProps});
 
         const ica: ICA[] = controllerProps.map((cont, i) => ({
             icaMultisigAddress: cont.controller,
             icaControllerAddress: cont.ica_info || INJ_ICA_ACCOUNT_PLACEHOLDER,
         }));
-        console.log({ica});
         const multisig: Multisig[] = vaultProps.map((cont) => ({
             voters: cont.voters.voters.map((vot) => ({
                 addr: vot.addr,
@@ -110,7 +93,6 @@ const useMyNFTVaults = (): readonly MyNFTVault[] => {
             })),
             govThreshold: Number(cont.threshold.absolute_count),
         }));
-        console.log({multisig});
 
         const finalVaults: MyNFTVault[] = vaultProps.map((prop, i) => ({
             share: 100,

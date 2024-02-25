@@ -1,28 +1,23 @@
-import type {MyNFTVault, MyVault, NFTVault, RaisingNFT} from '@/types/asset';
+import type {MyVault} from '@/types/asset';
 import {
-    GetMultisigThresholdResponse,
-    GetVotersResponse,
-    ProposalResponse,
-    VoterResponse,
+    XionSigningClient,
     getMultisigThreshold,
     getVaultMultisigs,
     getVoters,
 } from '@/utils/xion';
-import {useAbstraxionSigningClient} from '@burnt-labs/abstraxion';
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback} from 'react';
 import useProposals from '../useProposals';
 import {useAtom} from 'jotai';
 import {myVaultsAtom} from '@/store/states';
 
 const useMyVaults = (
+    client: XionSigningClient,
     address: string | undefined
 ): {
     myVaults: readonly MyVault[];
     updateMyVaults: () => Promise<void>;
 } => {
     const [myVaults, setMyVaults] = useAtom(myVaultsAtom);
-
-    const {client: abstraxionClient} = useAbstraxionSigningClient();
 
     const {getVaultProposals} = useProposals(address);
 
@@ -32,17 +27,17 @@ const useMyVaults = (
             return;
         }
 
-        if (!abstraxionClient) {
+        if (!client) {
             console.log('Signing client not found.');
             return;
         }
 
-        const vaultMultisigs = await getVaultMultisigs(abstraxionClient, address);
+        const vaultMultisigs = await getVaultMultisigs(client, address);
 
         const vaults = await Promise.all(
             vaultMultisigs.map(async (vaultMultisig) => {
-                const voters = (await getVoters(abstraxionClient, vaultMultisig.multisigAddress))?.voters;
-                const threshold = (await getMultisigThreshold(abstraxionClient, vaultMultisig.multisigAddress))?.absolute_count;
+                const voters = (await getVoters(client, vaultMultisig.multisigAddress))?.voters;
+                const threshold = (await getMultisigThreshold(client, vaultMultisig.multisigAddress))?.absolute_count;
                 const proposals = await getVaultProposals(vaultMultisig.multisigAddress);
 
                 const myWeight = voters?.find((voter) => voter.addr === address)?.weight ?? '1';
@@ -59,7 +54,7 @@ const useMyVaults = (
         );
 
         setMyVaults(vaults);
-    }, [abstraxionClient, address, getVaultProposals]);
+    }, [client, address, getVaultProposals]);
 
     return {
         myVaults,

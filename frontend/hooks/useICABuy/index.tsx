@@ -6,8 +6,9 @@ import {AppChains, chainConfigMap, COIN_DICT} from '@/constants/app';
 import {useCallback} from 'react';
 import {SendTxResult} from '@/types/tx';
 import {MyVault, RaisingNFT} from '@/types/asset';
-import {createIcaBuyMsg} from '@/utils/ica';
+import {createIcaBuyMsg, createSendIbcMsg} from '@/utils/ica';
 import {start} from 'repl';
+import { XionSigningClient } from '@/utils/xion';
 // import { createICAMultisigVault } from "@/utils/xion";
 
 type CreatedVault = {
@@ -15,25 +16,31 @@ type CreatedVault = {
   multisigAddress: string | undefined;
 };
 
-const useICABuy = () => {
+const useICABuy = (client: XionSigningClient) => {
   const {target, startProcessing, stopProcessing} = useProcessing<boolean>();
   const {data: account} = useAbstraxionAccount();
-  const {client} = useAbstraxionSigningClient();
 
   const buyNftIca = useCallback(
-    async (nft?: RaisingNFT, vault?: MyVault) => {
+    async (vault: MyVault, nft?: RaisingNFT) => {
       startProcessing(true);
       if (!nft) return;
 
-      if (!vault) {
-        alert('Create a vault to buy NFTs.');
-        return;
-      }
+      // if (!vault) {
+      //   alert('Create a vault to buy NFTs.');
+      //   return;
+      // }
 
       // const vaultUsed = myVaults.find((vault) => vault.multisigAddress === router.query.vault) || (myVaults[0] as MyVault);
 
       try {
-        const proposalMsg = createIcaBuyMsg({
+        //const sendIcaTokens = createSendIbcMsg({
+        //icaAddress: vault.icaAccountAddress,
+        //multisigAddress: vault.multisigAddress,
+        //amount: nft.fixedPrice.value.toString(),
+        //});
+        console.log('ICA ACCOUNT', vault.icaAccountAddress);
+        //throw new Error('pinga');
+        const buyNft = createIcaBuyMsg({
           ica: vault.icaControllerAddress || 'relaying',
           buyContract: nft.buyContractAddress,
           nftContract: nft.collection.contractAddress,
@@ -44,7 +51,9 @@ const useICABuy = () => {
         const {proposal_id} = await createIcaProposal({
           client,
           account,
-          injectiveMsg: proposalMsg,
+          injectiveMsgs: [buyNft],
+          //xionMsgs: [sendIcaTokens],
+          xionMsgs: [],
           multisig: vault.multisigAddress,
           icaController: vault.icaControllerAddress,
         });

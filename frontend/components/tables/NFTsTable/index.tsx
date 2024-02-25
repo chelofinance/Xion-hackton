@@ -17,6 +17,7 @@ import {COIN_DICT, TokenSymbols} from '@/constants/app';
 import useMyVaults from '@/hooks/useMyVaults';
 import {useAtom} from 'jotai';
 import {userWalletAtom} from '@/store/states';
+import { useAbstraxionSigningClient } from '@burnt-labs/abstraxion';
 
 type NFTsTableRow = {
   id: string;
@@ -40,7 +41,11 @@ const coin = COIN_DICT[TokenSymbols.INJ];
 const NFTsTable = ({className = '', tooltipLayer}: NFTsTableProps) => {
   const {getOraclePrice} = useOraclePrice();
   const [userWallet] = useAtom(userWalletAtom);
-  const {myVaults, updateMyVaults} = useMyVaults(userWallet?.account.bech32Address);
+
+  const { client } = useAbstraxionSigningClient();
+  const isClientLoading = !client;
+  
+  const {myVaults, updateMyVaults} = useMyVaults(client, userWallet?.account.bech32Address);
   const nfts = useRaisingNFTVaults();
 
   const rows = useMemo<readonly NFTsTableRow[]>(() => {

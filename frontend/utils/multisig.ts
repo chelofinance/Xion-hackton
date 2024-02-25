@@ -1,7 +1,7 @@
 // This is a copy from /demo/app/utils.tsx
 
 import {v4 as uuidv4} from 'uuid';
-import {produceProposal} from './propose';
+import {produceProposal, ProposalMessage} from './propose';
 import {SendTxResult} from '@/types/tx';
 import {GetProposalsResponse, XionSigningClient} from './xion';
 import {AppChains, chainConfigMap, channelOpenInitOptions} from '@/constants/app';
@@ -114,23 +114,27 @@ export async function createIcaMultisig(
 export async function createIcaProposal({
     client,
     account,
-    injectiveMsg,
+    injectiveMsgs,
+    xionMsgs,
     multisig,
     icaController,
 }: {
     client: XionSigningClient;
     account: AbstraxionAccount;
-    injectiveMsg: any;
+    xionMsgs: ProposalMessage[];
+    injectiveMsgs: any[];
     multisig: string;
     icaController: string;
 }) {
     const proxy = chainConfigMap[AppChains.XION_TESTNET].proxyMultisig.address;
     const multisigProposal = {
-        propose: produceProposal(injectiveMsg, icaController),
+        propose: produceProposal(xionMsgs, injectiveMsgs, icaController),
     };
     const proxyMessage = {
         contract_addr: multisig,
-        payload: multisigProposal,
+        payload: {
+            multisig_execute_msg: multisigProposal,
+        },
     };
 
     try {

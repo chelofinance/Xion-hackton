@@ -1,5 +1,5 @@
 import {ButtonProps} from '@/components/Button';
-import {useModal as useXionModal, useAbstraxionAccount} from '@burnt-labs/abstraxion';
+import {useModal as useXionModal, useAbstraxionAccount, useAbstraxionSigningClient} from '@burnt-labs/abstraxion';
 import useModal from '@/hooks/useModal';
 import useAccountButton from './useAccountButton';
 import { shortenAddress } from '@/utils/text';
@@ -79,7 +79,10 @@ const useAccountOrConnectButton = (): {
     }
   }, []);
 
-  const { updateMyVaults } = useMyVaults(userWallet?.account.bech32Address);
+  const { client } = useAbstraxionSigningClient();
+  const isClientLoading = !client;
+  
+  const { updateMyVaults } = useMyVaults(client, userWallet?.account.bech32Address);
 
   useEffect(() => {
     updateMyVaults();

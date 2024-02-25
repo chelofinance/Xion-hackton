@@ -77,16 +77,16 @@ yarn start --action query --contract neutron1zf2tdlq9pn8jq680rlsgwtsgljt54ctu0ul
 ### Xion code ids for each contract
 
 - ica_controller: 59
-- proxy: 271
-- multisig: 272
-- factory: 273
+- proxy: 281
+- multisig: 282
+- factory: 283
 
 ### Xion addresses
 
-- factory: xion1zgf4n9pah470yecjve4j9yq42v3a3w2rwxmt8trcc5c0rqmjktrqslcj5u
+- factory: xion134v97d8xu7hwuu6h33s0049yz8ju7254q32amlx5qfmngygpsk8q3hlp98
 
-- proxy: xion1zp5jjzar20jppvrax0up642y565udndm4tvxstn7qh5tyw6c43wqz6r6gd
+- proxy: xion1fcw3u2yslyszdaamvz3dea2jyhwhxlyuz5euujpzvrra9awdk6lqwdtcwd
 
-- example multisig: xion1fpavej8zwhsyvndzvcn5mxk942kmtly3ldjekmguecpqkfly2rfsqmdsx4
+- example multisig: xion1ezunhuqyv5kg4s202nv6x5lv0xge5z845t56waeu8yj48rvv95vq686hln
 
-- example ica_controller: xion1rx4d9jh4d362wdcxdpjnjg87dm6le490m8rz553qe4klj6esq2vq6fwaql
+- example ica_controller: xion1809qa4kqzn0cyjmfcfpfdy6zmlq6rghftaq6fqd46mmgjxlzae4qrf9mcl
