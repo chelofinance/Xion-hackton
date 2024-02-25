@@ -157,7 +157,7 @@ const RaisingVault: NextPage = () => {
 
   const handleSellNft = useCallback(
     async (nft: RaisingNFT, vault?: MyVault) => {
-      await sellNftIca(nft, vault);
+      await sellNftIca(vault, nft);
       await updateMyVaults();
     },
     [sellNftIca, updateMyVaults]
