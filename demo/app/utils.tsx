@@ -158,7 +158,7 @@ export async function createProposal(
 
   console.log("msg", JSON.stringify({
     contract_addr: icaMultisigAddress,
-    payload: proposalMsg,
+    payload: { multisig_execute_msg: proposalMsg },
   }))
 
   try {
@@ -167,7 +167,7 @@ export async function createProposal(
       contracts.proxyMultisig.address,
       {
         contract_addr: icaMultisigAddress,
-        payload: proposalMsg,
+        payload: { multisig_execute_msg: proposalMsg },
       },
       "auto"
     );
@@ -201,7 +201,7 @@ export async function voteProposal(
 
   console.log("fullmsg", JSON.stringify({
     contract_addr: icaMultisigAddress,
-    payload: msg,
+    payload: { multisig_execute_msg: msg },
   }));
 
   try {
@@ -210,7 +210,7 @@ export async function voteProposal(
       contracts.proxyMultisig.address,
       {
         contract_addr: icaMultisigAddress,
-        payload: msg,
+        payload: { multisig_execute_msg: msg },
       },
       "auto"
     );
@@ -236,7 +236,7 @@ export async function executeProposal(
 
   console.log("fullmsg", JSON.stringify({
     contract_addr: icaMultisigAddress,
-    payload: msg,
+    payload: { multisig_execute_msg: msg },
   }));
 
   try {
@@ -245,7 +245,7 @@ export async function executeProposal(
       contracts.proxyMultisig.address,
       {
         contract_addr: icaMultisigAddress,
-        payload: msg,
+        payload: { multisig_execute_msg: msg },
       },
       "auto"
     );
@@ -351,7 +351,7 @@ export async function addMember(
 
   console.log("msg2", JSON.stringify({
     contract_addr: icaMultisigAddress,
-    payload: msg,
+    payload: { multisig_execute_msg: msg },
   }))
 
   try {
@@ -360,13 +360,56 @@ export async function addMember(
       contracts.proxyMultisig.address,
       {
         contract_addr: icaMultisigAddress,
-        payload: msg,
+        payload: { multisig_execute_msg: msg },
       },
       "auto",
     );
     console.log("executionResponse", executionResponse);
 
     return executionResponse;
+  } catch (error) {
+    console.log("error", error);
+    alert(error);
+  }
+}
+
+export async function sendToken(
+  client: any,
+  account: any,
+  enteredMemberAddress: string,
+  feeAmount: string
+) {
+
+  const fees = [{
+    amount: feeAmount,
+    denom: "uxion",
+  }]
+  const msg = {
+    send_token: {
+      funds: fees
+    }
+  };
+
+  console.log("send_token msg:", JSON.stringify({
+    contract_addr: enteredMemberAddress,
+    payload: msg,
+  }))
+
+  try {
+    const sendTokenResponse = await client?.execute(
+      account.bech32Address,
+      contracts.proxyMultisig.address,
+      {
+        contract_addr: enteredMemberAddress,
+        payload: msg,
+      },
+      "auto",
+      "Sent via demo app",
+      fees
+    );
+    console.log("sendTokenResponse", sendTokenResponse);
+
+    return sendTokenResponse;
   } catch (error) {
     console.log("error", error);
     alert(error);
