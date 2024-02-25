@@ -1,9 +1,9 @@
 import GoogleAnalytics from '@/analytics/googleAnalytics/GoogleAnalytics';
 import Mixpanel from '@/analytics/mixpanel/Mixpanel';
 import XION_CHAIN_LOGO from '@/resources/logos/chain_logo_xion.png';
-import type { NFTVault, RaisingNFT } from '@/types/asset';
-import { ChannelInitOptions } from '@/types/channel';
-import { ContractsDict } from '@/types/contract';
+import type {NFTVault, RaisingNFT} from '@/types/asset';
+import {ChannelInitOptions} from '@/types/channel';
+import {ContractsDict} from '@/types/contract';
 import BigNumber from 'bignumber.js';
 
 export const googleAnalytics = new GoogleAnalytics('google analytics');
@@ -37,7 +37,7 @@ export enum AppChains {
   XION_TESTNET = 'xion-testnet',
 }
 
-export const SUPPORTED_CHAINS_DICT: Record<AppChains, { logoURL: string }> = {
+export const SUPPORTED_CHAINS_DICT: Record<AppChains, {logoURL: string}> = {
   [AppChains.XION_TESTNET]: {
     logoURL: XION_CHAIN_LOGO.src,
   },
@@ -50,7 +50,7 @@ export enum AllChains {
   INJECTIVE_TESTNET = 'Injective Testnet',
 }
 
-export const CHAIN_METADATA_DICT: Record<AllChains, { explorerAddressURL: string }> = {
+export const CHAIN_METADATA_DICT: Record<AllChains, {explorerAddressURL: string}> = {
   [AllChains.XION_TESTNET]: {
     explorerAddressURL: '',
   },
@@ -65,7 +65,7 @@ export const chainConfigMap: Record<AppChains, ContractsDict> = {
       collectionId: '65ca322f3e56373c6b5d1a66',
     },
     cw3FixedMultisig: {
-      codeId: "272",
+      codeId: '272',
     },
     icaFactory: {
       address: 'xion1zgf4n9pah470yecjve4j9yq42v3a3w2rwxmt8trcc5c0rqmjktrqslcj5u',
@@ -78,8 +78,8 @@ export const chainConfigMap: Record<AppChains, ContractsDict> = {
 
 export const channelOpenInitOptions: Record<AppChains, ChannelInitOptions> = {
   [AppChains.XION_TESTNET]: {
-    connectionId: "connection-45",
-    counterpartyConnectionId: "connection-213"
+    connectionId: 'connection-43',
+    counterpartyConnectionId: 'connection-211',
   },
 };
 
@@ -88,7 +88,7 @@ export const XION_RPC = 'https://testnet-rpc.xion-api.com:443';
 export const abstraxionProviderConfig = {
   contracts: [
     chainConfigMap[AppChains.XION_TESTNET].icaFactory.address,
-    chainConfigMap[AppChains.XION_TESTNET].proxyMultisig.address
+    chainConfigMap[AppChains.XION_TESTNET].proxyMultisig.address,
   ],
   // rpcUrl: XION_RPC,
 };
@@ -105,7 +105,7 @@ export enum TokenSymbols {
   XION = 'XION',
 }
 
-export type CoinData = { denomOn: Record<AllChains, string>; decimals: number };
+export type CoinData = {denomOn: Record<AllChains, string>; decimals: number};
 
 export const COIN_DICT: Record<TokenSymbols, CoinData> = {
   [TokenSymbols.INJ]: {
@@ -243,7 +243,6 @@ export const PROPOSAL_STATUS_LABEL_DICT: Record<ProposalStatus, string> = {
   [ProposalStatus.Passed]: 'Passed',
   [ProposalStatus.Executed]: 'Executed',
 };
-
 
 // Due to unstable relayers, ICA Account address could be empty when creating a proposal.
 // So, to avoid errors in demo, we use a placeholder address.

@@ -92,8 +92,8 @@ const useProposals = (address: string | undefined): UseProposals => {
         > => {
             try {
                 const proposalsData = await getProposals(abstraxionClient, icaMultisigAddress);
-                const votersData = await getVoters(abstraxionClient, icaMultisigAddress);
-                const thresholdData = await getMultisigThreshold(abstraxionClient, icaMultisigAddress);
+                //const votersData = await getVoters(abstraxionClient, icaMultisigAddress);
+                //const thresholdData = await getMultisigThreshold(abstraxionClient, icaMultisigAddress);
 
                 const buyNFTsByProposal = proposalsData?.proposals.reduce<
                     {
