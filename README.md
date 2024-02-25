@@ -25,7 +25,6 @@ At the heart of this initiative is the ICA controller, empowering direct and ver
 
 The project's application in facilitating a group NFT purchase on the Injective Talis marketplace not only serves to demonstrate the ICA controller's functional prowess but also underscores its potential in enabling communal investment ventures within digital asset realms.
 
-
 **Conclusion: Advancing Blockchain Interoperability**
 
 Nomos, through the strategic application of ICA controllers, is setting a new paradigm for blockchain interoperability and cross-chain asset management. By facilitating innovative use cases like collective NFT ownership and democratizing decision-making processes, Nomos is not just showcasing technological innovation but is also fostering a more cohesive and accessible blockchain ecosystem for the future.
@@ -78,7 +77,7 @@ yarn start --action query --contract neutron1zf2tdlq9pn8jq680rlsgwtsgljt54ctu0ul
 
 - ica_controller: 59
 - proxy: 281
-- multisig: 282
+- multisig: 284
 - factory: 283
 
 ### Xion addresses

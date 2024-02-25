@@ -19,7 +19,7 @@ library = []
 
 [dependencies]
 cosmwasm-schema = { workspace = true }
-cosmwasm-std = { workspace = true }
+cosmwasm-std = { workspace = true, features = ["cosmwasm_1_3", "stargate"] }
 cw-storage-plus = { workspace = true }
 cw-ownable = { workspace = true }
 cw2 = { workspace = true }

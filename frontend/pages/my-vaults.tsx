@@ -2,7 +2,7 @@ import type {NextPage} from 'next';
 import Main from '@/components/Main';
 import Heading from '@/components/Heading';
 import Card from '@/components/Card';
-import {formatNumber, formatUSD} from '@/utils/number';
+import {formatNumber, formatUSD, simpleFormat} from '@/utils/number';
 import {useCallback, useMemo, useRef, useState} from 'react';
 import useOraclePrice from '@/hooks/useOraclePrice';
 import BigNumber from 'bignumber.js';
@@ -167,15 +167,30 @@ const MyVaults: NextPage = () => {
     );
 
     const isRaised = useCallback(
-        (nft: RaisingNFT) => multisigBalance.shifted.gte(nft.fixedPrice.value),
+        (nft: RaisingNFT) => multisigBalance.shifted.gte(simpleFormat(nft.fixedPrice.value, 18)),
         [multisigBalance.shifted]
     );
 
-    const buyProposals = useMemo(() => fallbackVault?.proposals.filter(proposal => !proposal.nft.onSale), [fallbackVault?.proposals]) ?? [];
-    const sellProposals = useMemo(() => fallbackVault?.proposals.filter(proposal => proposal.nft.onSale), [fallbackVault?.proposals]) ?? [];
+    //dont remove these conditions. Are correct acording to talis marketplace
+    const buyProposals =
+        useMemo(
+            () =>
+                fallbackVault?.proposals.filter(
+                    (proposal) => proposal.nft.onSale && proposal.nft.ownerAddress !== fallbackVault.icaAccountAddress
+                ),
+            [fallbackVault?.proposals, fallbackVault.icaAccountAddress]
+        ) ?? [];
+    const sellProposals =
+        useMemo(
+            () =>
+                fallbackVault?.proposals.filter(
+                    (proposal) => !proposal.nft.onSale && proposal.nft.ownerAddress === fallbackVault.icaAccountAddress
+                ),
+            [fallbackVault?.proposals, fallbackVault.icaAccountAddress]
+        ) ?? [];
 
     const {sellNftIca, isProcessing: isProcessingSell} = useICASell();
-  
+
     const Content =
         userWallet === null ? (
             <Card color="glass" className="p-4 text-body Font_body_md">
@@ -394,10 +409,10 @@ const MyVaults: NextPage = () => {
 
                                 {/* MOCK_PROPOSALS */}
                                 {buyProposals.map((proposal) => (
-                                    <Card 
-                                      key={proposal.proposal.id} 
-                                      color={proposal.proposal.status === ProposalStatus.Rejected ? 'caption' : 'primary'} 
-                                      className="flex flex-col items-stretch gap-y-4 p-4"
+                                    <Card
+                                        key={proposal.proposal.id}
+                                        color={proposal.proposal.status === ProposalStatus.Rejected ? 'caption' : 'primary'}
+                                        className="flex flex-col items-stretch gap-y-4 p-4"
                                     >
                                         <div className="flex justify-between items-center gap-x-4">
                                             <div className="flex items-baseline gap-x-4">
@@ -423,7 +438,7 @@ const MyVaults: NextPage = () => {
                                             href="raising-vault"
                                             nft={proposal.nft}
                                             amountLabel="Fixed price"
-                                            formattedAmount={formatNumber(
+                                            formattedAmount={simpleFormat(
                                                 proposal.nft.fixedPrice.value,
                                                 COIN_DICT[proposal.nft.fixedPrice.symbol].decimals
                                             )}
@@ -464,7 +479,13 @@ const MyVaults: NextPage = () => {
                                                     color="secondary"
                                                     iconType="increase"
                                                     label={isRaised(proposal.nft) ? 'Execute buy' : 'Insufficient balance'}
-                                                    status={isRaised(proposal.nft) ? 'enabled' : 'disabled'}
+                                                    status={
+                                                        isRaised(proposal.nft)
+                                                            ? loadingExecuteProposal
+                                                                ? 'processing'
+                                                                : 'enabled'
+                                                            : 'disabled'
+                                                    }
                                                     onClick={() => {
                                                         handleExecuteProposal(proposal.proposal.id);
                                                     }}
@@ -492,20 +513,34 @@ const MyVaults: NextPage = () => {
                                     />
                                 </div>
 
-                                <Heading tagName="h4" className="!mt-8">Sell Proposals</Heading>
+                                <Heading tagName="h4" className="!mt-8">
+                                    Sell Proposals
+                                </Heading>
 
                                 {/* MOCK_PROPOSALS */}
                                 {sellProposals.map((proposal) => (
-                                    <Card key={proposal.proposal.id} color={proposal.proposal.status === ProposalStatus.Rejected ? 'caption' : 'primary'} className="flex flex-col items-stretch gap-y-4 p-4">
+                                    <Card
+                                        key={proposal.proposal.id}
+                                        color={proposal.proposal.status === ProposalStatus.Rejected ? 'caption' : 'primary'}
+                                        className="flex flex-col items-stretch gap-y-4 p-4"
+                                    >
                                         <div className="flex justify-between items-center gap-x-4">
                                             <div className="flex items-baseline gap-x-4">
-                                                <span className="Font_caption_xs text-caption_on_primary">#{proposal.proposal.id}</span> 
+                                                <span className="Font_caption_xs text-caption_on_primary">
+                                                    #{proposal.proposal.id}
+                                                </span>
                                                 <div className="w-[300px] truncate Font_label_14px">
                                                     {proposal.proposal.description}
                                                 </div>
                                             </div>
 
-                                            <Tag size="sm" color={proposal.proposal.status === ProposalStatus.Passed ? 'success' : 'secondary'} label={proposal.proposal.status} />
+                                            <Tag
+                                                size="sm"
+                                                color={
+                                                    proposal.proposal.status === ProposalStatus.Passed ? 'success' : 'secondary'
+                                                }
+                                                label={proposal.proposal.status}
+                                            />
                                         </div>
 
                                         <NFTVaultLinkCard
@@ -513,7 +548,10 @@ const MyVaults: NextPage = () => {
                                             href="raising-vault"
                                             nft={proposal.nft}
                                             amountLabel="Fixed price"
-                                            formattedAmount={formatNumber(proposal.nft.fixedPrice.value, COIN_DICT[proposal.nft.fixedPrice.symbol].decimals)}
+                                            formattedAmount={simpleFormat(
+                                                proposal.nft.fixedPrice.value,
+                                                COIN_DICT[proposal.nft.fixedPrice.symbol].decimals
+                                            )}
                                             vaultAddress={fallbackVault.multisigAddress}
                                         />
 
@@ -564,8 +602,12 @@ const MyVaults: NextPage = () => {
 
                                 <ul className="space-y-4">
                                     {/* MOCK_OWNED_NFTS */}
-                                    {vaultOwnedNFTs.map(vaultOwnedNFT => (
-                                        <Card key={vaultOwnedNFT.tokenId} color="glass" className="flex flex-col items-stretch gap-y-4 p-4">
+                                    {vaultOwnedNFTs.map((vaultOwnedNFT) => (
+                                        <Card
+                                            key={vaultOwnedNFT.tokenId}
+                                            color="glass"
+                                            className="flex flex-col items-stretch gap-y-4 p-4"
+                                        >
                                             {vaultOwnedNFT.onSale && (
                                                 <div className="flex justify-end">
                                                     <Tag size="sm" label="On sale" />
@@ -578,7 +620,10 @@ const MyVaults: NextPage = () => {
                                                 href="raising-vault"
                                                 nft={vaultOwnedNFT}
                                                 amountLabel="Fixed price"
-                                                formattedAmount={formatNumber(vaultOwnedNFT.fixedPrice.value, COIN_DICT[vaultOwnedNFT.fixedPrice.symbol].decimals)}
+                                                formattedAmount={formatNumber(
+                                                    vaultOwnedNFT.fixedPrice.value,
+                                                    COIN_DICT[vaultOwnedNFT.fixedPrice.symbol].decimals
+                                                )}
                                                 vaultAddress={fallbackVault.multisigAddress}
                                             />
 

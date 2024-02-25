@@ -29,7 +29,7 @@ import CheckItem from '@/components/CheckItem';
 import {shortenAddress} from '@/utils/text';
 import useICABuy from '@/hooks/useICABuy';
 import useMyVaults from '@/hooks/useMyVaults';
-import { useAbstraxionSigningClient } from '@burnt-labs/abstraxion';
+import {useAbstraxionSigningClient} from '@burnt-labs/abstraxion';
 import useICASell from '@/hooks/useICASell';
 
 const coin = COIN_DICT[TokenSymbols.INJ];
@@ -41,7 +41,7 @@ const RaisingVault: NextPage = () => {
   const nftList = useRaisingNFTVault();
   const [userWallet] = useAtom(userWalletAtom);
 
-  const { client } = useAbstraxionSigningClient();
+  const {client} = useAbstraxionSigningClient();
   const isClientLoading = !client;
 
   const {myVaults, updateMyVaults} = useMyVaults(client, userWallet?.account.bech32Address);
@@ -50,7 +50,9 @@ const RaisingVault: NextPage = () => {
     myNFT: RaisingNFT | undefined;
     myVault: MyVault | undefined;
   }>(() => {
-    const myVault = myVaults.find((myVault) => myVault.proposals.find((proposal) => proposal.nft.tokenId === nft?.tokenId));
+    const myVault = myVaults.find((myVault) =>
+      myVault.proposals.find((proposal) => proposal.nft.tokenId === nft?.tokenId && proposal.proposal.status !== 'executed')
+    );
     const myNFT = myVault?.proposals.find((proposal) => proposal.nft.tokenId === nft?.tokenId)?.nft;
 
     return {
@@ -108,12 +110,6 @@ const RaisingVault: NextPage = () => {
       setDepositAmount(amount);
     }
   }, []);
-
-  const depositButtonProps = useMemo<Pick<ButtonProps, 'status'>>(() => {
-    return {
-      status: isDepositAmountValid ? 'enabled' : 'disabled',
-    };
-  }, [isDepositAmountValid]);
 
   const priceUSD = useMemo(
     () => new BigNumber(nft?.fixedPrice.value.div(10 ** coin.decimals) ?? 0).times(oraclePrice),
@@ -177,6 +173,12 @@ const RaisingVault: NextPage = () => {
   const isOwningVault = useMemo<boolean>(() => nft?.ownerAddress === myVault?.multisigAddress, [nft, myVault]);
 
   const {depositToVaultMultisig, isProcessing: isDepositToVaultProcessing} = useDepositToVaultMultisig(client);
+
+  const depositButtonProps = useMemo<Pick<ButtonProps, 'status'>>(() => {
+    return {
+      status: isDepositAmountValid ? (isDepositToVaultProcessing ? 'processing' : 'enabled') : 'disabled',
+    };
+  }, [isDepositAmountValid, isDepositToVaultProcessing]);
 
   const handleDeposit = async () => {
     if (!userWallet) {
@@ -414,7 +416,8 @@ const RaisingVault: NextPage = () => {
                       form={form.current}
                       label="Deposit amount"
                       placeholder="0.0"
-                      initialValue={depositAmount}
+                      //initialValue={depositAmount} //dont use. Shows big numbers (should not)
+                      initialValue={0}
                       getErrorMsg={getDepositAmountErrorMsg}
                       onChange={onChange}
                     />
@@ -433,7 +436,6 @@ const RaisingVault: NextPage = () => {
                       label="Deposit"
                       iconType="arrow_forward"
                       className="w-full md:w-fit"
-                      status={isDepositToVaultProcessing ? 'processing' : 'enabled'}
                       onClick={handleDeposit}
                       {...depositButtonProps}
                     />

@@ -25,7 +25,7 @@ const useDepositToVaultMultisig = (client: XionSigningClient) => {
             if (result.isSuccess) {
                 alert('Succeed to send tx:' + result.response.transactionHash);
             } else {
-                console.log(`Failed to send tx: ${result.response?.rawLog ?? 'unknown error'}`, result.response);
+                console.log(`Failed to send tx: ${result.response?.logs ?? 'unknown error'}`, result.response);
             }
 
             stopProcessing();

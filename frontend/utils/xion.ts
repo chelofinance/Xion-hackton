@@ -13,7 +13,7 @@ import {MultisigICAVault} from '@/types/asset';
 import type {SendTxResult} from '@/types/tx';
 import {AbstraxionAccount} from '@/types/wallet';
 import {useAbstraxionAccount, useAbstraxionSigningClient} from '@burnt-labs/abstraxion';
-import {DeliverTxResponse} from '@cosmjs/cosmwasm-stargate';
+import {DeliverTxResponse, ExecuteResult} from '@cosmjs/cosmwasm-stargate';
 import type {Coin} from '@cosmjs/stargate';
 import BigNumber from 'bignumber.js';
 import {v4 as uuidv4} from 'uuid';
@@ -30,7 +30,7 @@ export type XionSigningClient = ReturnType<typeof useAbstraxionSigningClient>['c
 export const transferOnXion = async (
   signingClient: XionSigningClient,
   args: HandleDepositArgs
-): Promise<SendTxResult<DeliverTxResponse>> => {
+): Promise<SendTxResult<ExecuteResult>> => {
   const {symbol, depositAmount, senderAddress, recipientAddress} = args;
 
   const proxy = chainConfigMap[AppChains.XION_TESTNET].proxyMultisig.address;
@@ -65,11 +65,7 @@ export const transferOnXion = async (
       return {isSuccess: false, response: undefined};
     }
 
-    if (response.code !== undefined && response.code !== 0) {
-      return {isSuccess: false, response};
-    } else {
-      return {isSuccess: true, response};
-    }
+    return {isSuccess: true, response};
   } catch (error) {
     console.log('Failed to send tx: ', error);
     return {isSuccess: false, response: undefined};

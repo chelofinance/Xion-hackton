@@ -44,37 +44,44 @@ const useProposals = (address: string | undefined): UseProposals => {
 
     const getBuyNFTByProposal = useCallback(
         (proposal: ProposalResponse): RaisingNFT | null => {
+            console.log('RAFAEl', address);
             const nft = nfts.find((nft) => {
-                const decodedMessages = proposal.msgs
-                    .map((msg) => decodeBase64(msg.wasm?.execute.msg) as DecodedMessages | null)
-                    .filter(Boolean);
-                const stargate = decodedMessages.map((msg) => msg?.send_cosmos_msgs.messages[0].stargate).filter(Boolean) as {
-                    type_url: string;
-                    value: string;
-                }[];
+                try {
+                    //decoding might fail for non-expected message types
 
-                const stargateValues = stargate.map((str) => ({
-                    type_url: str.type_url,
-                    value: new Uint8Array(Buffer.from(str.value, 'base64')),
-                }));
-                const protobufMsg = stargateValues.find((val) => {
-                    try {
-                        registry.decode({typeUrl: val.type_url, value: val.value});
-                        return true;
-                    } catch (err) {
-                        return false;
-                    }
-                });
+                    const decodedMessages = proposal.msgs
+                        .map((msg) => decodeBase64(msg.wasm?.execute.msg) as DecodedMessages | null)
+                        .filter(Boolean);
+                    const stargate = decodedMessages.map((msg) => msg?.send_cosmos_msgs.messages[0].stargate).filter(Boolean) as {
+                        type_url: string;
+                        value: string;
+                    }[];
 
-                if (!protobufMsg) return null;
+                    const stargateValues = stargate.map((str) => ({
+                        type_url: str.type_url,
+                        value: new Uint8Array(Buffer.from(str.value, 'base64')),
+                    }));
+                    const protobufMsg = stargateValues.find((val) => {
+                        try {
+                            registry.decode({typeUrl: val.type_url, value: val.value});
+                            return true;
+                        } catch (err) {
+                            return false;
+                        }
+                    });
 
-                const msgExecuteBuy = registry.decode({
-                    typeUrl: protobufMsg.type_url,
-                    value: protobufMsg.value,
-                }) as CosmwasmWasmV1Tx.MsgExecuteContract;
-                const nftCall = safeJsonParse(atob(Buffer.from(msgExecuteBuy.msg).toString('base64')));
+                    if (!protobufMsg) return null;
 
-                return nftCall && nftCall.buy_token.token_id === nft.tokenId;
+                    const msgExecuteBuy = registry.decode({
+                        typeUrl: protobufMsg.type_url,
+                        value: protobufMsg.value,
+                    }) as CosmwasmWasmV1Tx.MsgExecuteContract;
+                    const nftCall = safeJsonParse(atob(Buffer.from(msgExecuteBuy.msg).toString('base64')));
+
+                    return nftCall && nftCall.buy_token.token_id === nft.tokenId;
+                } catch (err) {
+                    return null;
+                }
             });
             return nft ?? null;
         },
@@ -92,6 +99,7 @@ const useProposals = (address: string | undefined): UseProposals => {
         > => {
             try {
                 const proposalsData = await getProposals(abstraxionClient, icaMultisigAddress);
+                console.log('VAULT', {icaMultisigAddress}, proposalsData);
                 //const votersData = await getVoters(abstraxionClient, icaMultisigAddress);
                 //const thresholdData = await getMultisigThreshold(abstraxionClient, icaMultisigAddress);
 
