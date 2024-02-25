@@ -111,12 +111,6 @@ const RaisingVault: NextPage = () => {
     }
   }, []);
 
-  const depositButtonProps = useMemo<Pick<ButtonProps, 'status'>>(() => {
-    return {
-      status: isDepositAmountValid ? 'enabled' : 'disabled',
-    };
-  }, [isDepositAmountValid]);
-
   const priceUSD = useMemo(
     () => new BigNumber(nft?.fixedPrice.value.div(10 ** coin.decimals) ?? 0).times(oraclePrice),
     [oraclePrice]
@@ -179,6 +173,12 @@ const RaisingVault: NextPage = () => {
   const isOwningVault = useMemo<boolean>(() => nft?.ownerAddress === myVault?.multisigAddress, [nft, myVault]);
 
   const {depositToVaultMultisig, isProcessing: isDepositToVaultProcessing} = useDepositToVaultMultisig(client);
+
+  const depositButtonProps = useMemo<Pick<ButtonProps, 'status'>>(() => {
+    return {
+      status: isDepositAmountValid ? (isDepositToVaultProcessing ? 'processing' : 'enabled') : 'disabled',
+    };
+  }, [isDepositAmountValid, isDepositToVaultProcessing]);
 
   const handleDeposit = async () => {
     if (!userWallet) {
@@ -416,7 +416,8 @@ const RaisingVault: NextPage = () => {
                       form={form.current}
                       label="Deposit amount"
                       placeholder="0.0"
-                      initialValue={depositAmount}
+                      //initialValue={depositAmount} //dont use. Shows big numbers (should not)
+                      initialValue={0}
                       getErrorMsg={getDepositAmountErrorMsg}
                       onChange={onChange}
                     />
@@ -435,7 +436,6 @@ const RaisingVault: NextPage = () => {
                       label="Deposit"
                       iconType="arrow_forward"
                       className="w-full md:w-fit"
-                      status={isDepositToVaultProcessing ? 'processing' : 'enabled'}
                       onClick={handleDeposit}
                       {...depositButtonProps}
                     />
