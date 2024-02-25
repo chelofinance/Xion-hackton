@@ -146,6 +146,7 @@ export async function createIcaProposal({
             address: account.bech32Address,
         });
 
+        //return; //TODO testing
         const executionResponse = await client?.execute(account.bech32Address, proxy, proxyMessage, 'auto');
         const event = executionResponse?.events.find((ev) => ev.attributes.some((attr) => attr.key === 'proposal_id'));
         const proposal_id = event?.attributes.find((attr) => attr.key === 'proposal_id')?.value;

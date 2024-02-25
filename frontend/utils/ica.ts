@@ -1,8 +1,9 @@
 import {TokenSymbols, COIN_DICT, AllChains} from '@/constants/app';
 import BigNumber from 'bignumber.js';
+import {INJECTIVE_CONTRACT_MSG_URI, WASM_CONTRACT_MSG_URI} from './propose';
 
 export const createSendIbcMsg = ({icaAddress, amount}: {icaAddress: string; multisigAddress: string; amount: string}) => {
-    const timestamp = BigNumber(Date.now() + 600_000)
+    const timestamp = BigNumber(Date.now() + 10_000_000)
         .multipliedBy(1_000_000)
         .toString();
 
@@ -37,10 +38,10 @@ export const createIcaBuyMsg = ({
     cost: string;
 }) => {
     return {
-        typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
+        typeUrl: WASM_CONTRACT_MSG_URI,
         value: {
             sender: ica,
-            contract: buyContract,
+            contract: 'inj1qt5ztu5l3cdkcwzsv2pe9u2mk3fq56rdckr0r7', //constant
             msg: {
                 buy_token: {
                     token_id: tokenId,
@@ -60,6 +61,80 @@ export const createIcaBuyMsg = ({
 
 export const createIcaSellMsg = ({
     ica,
+    nftContract,
+    tokenId,
+    cost,
+}: {
+    ica: string;
+    nftContract: string;
+    tokenId: string;
+    cost: string;
+}) => {
+    return {
+        typeUrl: WASM_CONTRACT_MSG_URI,
+        value: {
+            sender: ica,
+            contract: nftContract,
+            msg: {
+                send_nft: {
+                    contract: 'inj1qt5ztu5l3cdkcwzsv2pe9u2mk3fq56rdckr0r7', //constant
+                    token_id: tokenId,
+                    msg: Buffer.from(
+                        JSON.stringify({
+                            sell_token: {
+                                token_id: tokenId,
+                                contract_address: nftContract, //nft contract
+                                class_id: 'injective',
+                                price: {native: [{amount: cost, denom: 'inj'}]},
+                            },
+                        })
+                    ).toString('base64'),
+                },
+            },
+            funds: [],
+        },
+    };
+};
+
+export const createIcaSellMsgInjective = ({
+    ica,
+    nftContract,
+    tokenId,
+    cost,
+}: {
+    ica: string;
+    nftContract: string;
+    tokenId: string;
+    cost: string;
+}) => {
+    return {
+        typeUrl: INJECTIVE_CONTRACT_MSG_URI,
+        value: {
+            sender: ica,
+            contract: nftContract,
+            msg: {
+                send_nft: {
+                    contract: 'inj1qt5ztu5l3cdkcwzsv2pe9u2mk3fq56rdckr0r7', //constant
+                    token_id: tokenId,
+                    msg: Buffer.from(
+                        JSON.stringify({
+                            sell_token: {
+                                token_id: tokenId,
+                                contract_address: nftContract, //nft contract
+                                class_id: 'injective',
+                                price: {native: [{amount: cost, denom: 'inj'}]},
+                            },
+                        })
+                    ).toString('base64'),
+                },
+            },
+            funds: '0',
+        },
+    };
+};
+
+export const createIcaBuyMsgInjective = ({
+    ica,
     buyContract,
     nftContract,
     tokenId,
@@ -72,27 +147,18 @@ export const createIcaSellMsg = ({
     cost: string;
 }) => {
     return {
-        typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
+        typeUrl: INJECTIVE_CONTRACT_MSG_URI,
         value: {
             sender: ica,
-            contract: buyContract,
+            contract: 'inj1qt5ztu5l3cdkcwzsv2pe9u2mk3fq56rdckr0r7', //constant
             msg: {
-                send_nft: {
-                    contract: 'inj1qt5ztu5l3cdkcwzsv2pe9u2mk3fq56rdckr0r7', //buy contrat?
+                buy_token: {
                     token_id: tokenId,
-                    msg: Buffer.from(
-                        JSON.stringify({
-                            sell_token: {
-                                token_id: tokenId,
-                                contract_address: 'inj1m6spa200qevzfnrt9ca2ez5dgmd7725l0ruc74', //nft contract
-                                class_id: 'injective',
-                                price: {native: [{amount: cost, denom: 'inj'}]},
-                            },
-                        })
-                    ).toString('base64'),
+                    contract_address: nftContract,
+                    class_id: 'injective',
                 },
             },
-            funds: [],
+            funds: `${cost}inj`,
         },
     };
 };

@@ -88,6 +88,52 @@ const useProposals = (address: string | undefined): UseProposals => {
         [nfts.length]
     );
 
+    const getSellNFTsByProposal = useCallback(
+        (proposal: ProposalResponse): RaisingNFT | null => {
+            console.log('RAFAEl', address);
+            const nft = nfts.find((nft) => {
+                try {
+                    //decoding might fail for non-expected message types
+
+                    const decodedMessages = proposal.msgs
+                        .map((msg) => decodeBase64(msg.wasm?.execute.msg) as DecodedMessages | null)
+                        .filter(Boolean);
+                    const stargate = decodedMessages.map((msg) => msg?.send_cosmos_msgs.messages[0].stargate).filter(Boolean) as {
+                        type_url: string;
+                        value: string;
+                    }[];
+
+                    const stargateValues = stargate.map((str) => ({
+                        type_url: str.type_url,
+                        value: new Uint8Array(Buffer.from(str.value, 'base64')),
+                    }));
+                    const protobufMsg = stargateValues.find((val) => {
+                        try {
+                            registry.decode({typeUrl: val.type_url, value: val.value});
+                            return true;
+                        } catch (err) {
+                            return false;
+                        }
+                    });
+
+                    if (!protobufMsg) return null;
+
+                    const msgExecuteBuy = registry.decode({
+                        typeUrl: protobufMsg.type_url,
+                        value: protobufMsg.value,
+                    }) as CosmwasmWasmV1Tx.MsgExecuteContract;
+                    const nftCall = safeJsonParse(atob(Buffer.from(msgExecuteBuy.msg).toString('base64')));
+
+                    return nftCall?.send_nft && nftCall.send_nft.token_id === nft.tokenId;
+                } catch (err) {
+                    return null;
+                }
+            });
+            return nft ?? null;
+        },
+        [nfts.length]
+    );
+
     const getVaultProposals = useCallback(
         async (
             icaMultisigAddress: string
@@ -112,8 +158,18 @@ const useProposals = (address: string | undefined): UseProposals => {
                     const nft = getBuyNFTByProposal(proposal);
                     return nft ? [...accm, {nft, proposal}] : accm;
                 }, []);
+                const sellNFTsByProposal = proposalsData?.proposals.reduce<
+                    {
+                        nft: RaisingNFT;
+                        proposal: ProposalResponse;
+                    }[]
+                >((accm, proposal) => {
+                    const nft = getSellNFTsByProposal(proposal);
+                    return nft ? [...accm, {nft, proposal}] : accm;
+                }, []);
+                console.log('RAFAEL', proposalsData, sellNFTsByProposal);
 
-                return buyNFTsByProposal;
+                return buyNFTsByProposal.concat(sellNFTsByProposal);
             } catch (e) {
                 console.log(e);
                 return [];

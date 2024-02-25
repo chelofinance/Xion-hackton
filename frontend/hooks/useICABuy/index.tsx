@@ -1,12 +1,12 @@
 import {AbstraxionAccount, ConnectedWallet} from '@/types/wallet';
 import useProcessing from '../useProcessing';
 import {useAbstraxionAccount, useAbstraxionSigningClient} from '@burnt-labs/abstraxion';
-import {createIcaMultisig, createIcaProposal, executeProposal} from '@/utils/multisig';
+import {createChannelProposal, createIcaMultisig, createIcaProposal, executeProposal} from '@/utils/multisig';
 import {AppChains, chainConfigMap, COIN_DICT} from '@/constants/app';
 import {useCallback} from 'react';
 import {SendTxResult} from '@/types/tx';
 import {MyVault, RaisingNFT} from '@/types/asset';
-import {createIcaBuyMsg, createSendIbcMsg} from '@/utils/ica';
+import {createIcaBuyMsg, createIcaBuyMsgInjective, createSendIbcMsg} from '@/utils/ica';
 import {start} from 'repl';
 import {XionSigningClient} from '@/utils/xion';
 // import { createICAMultisigVault } from "@/utils/xion";
@@ -33,18 +33,21 @@ const useICABuy = (client: XionSigningClient) => {
       // const vaultUsed = myVaults.find((vault) => vault.multisigAddress === router.query.vault) || (myVaults[0] as MyVault);
 
       try {
+        //dont modify anything below. Easy to break, hard to fix
         const sendIcaTokens = createSendIbcMsg({
           icaAddress: vault.icaAccountAddress,
           multisigAddress: vault.multisigAddress,
           amount: nft.fixedPrice.value.toString(),
         });
         const buyNft = createIcaBuyMsg({
-          ica: vault.icaControllerAddress || 'relaying',
+          ica: vault.icaAccountAddress,
           buyContract: nft.buyContractAddress,
           nftContract: nft.collection.contractAddress,
           tokenId: nft.tokenId,
-          cost: nft.fixedPrice.value.shiftedBy(COIN_DICT[nft.fixedPrice.symbol].decimals).dp(0).toString(),
+          cost: nft.fixedPrice.value.toString(),
         });
+        console.log('NFT', nft);
+        console.log('TRANSACTIONS', sendIcaTokens, buyNft);
 
         const {proposal_id} = await createIcaProposal({
           client,
