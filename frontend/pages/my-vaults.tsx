@@ -49,7 +49,7 @@ const MyVaults: NextPage = () => {
 
     const [selectedVault, setSelectedVault] = useState<MyVault>();
 
-    const fallbackVault = selectedVault ?? myVaults[0];
+    const fallbackVault = selectedVault ?? (myVaults[0] as MyVault | undefined);
 
     const {getBalance: getMyBalanceOnXion, isBalanceFetching: isMyBalanceFetching} = useBalanceOnXion(
         client,
@@ -176,17 +176,17 @@ const MyVaults: NextPage = () => {
         useMemo(
             () =>
                 fallbackVault?.proposals.filter(
-                    (proposal) => proposal.nft.onSale && proposal.nft.ownerAddress !== fallbackVault.icaAccountAddress
+                    (proposal) => proposal.nft.onSale && proposal.nft.ownerAddress !== fallbackVault?.icaAccountAddress
                 ),
-            [fallbackVault?.proposals, fallbackVault.icaAccountAddress]
+            [fallbackVault?.proposals, fallbackVault?.icaAccountAddress]
         ) ?? [];
     const sellProposals =
         useMemo(
             () =>
                 fallbackVault?.proposals.filter(
-                    (proposal) => !proposal.nft.onSale && proposal.nft.ownerAddress === fallbackVault.icaAccountAddress
+                    (proposal) => !proposal.nft.onSale && proposal.nft.ownerAddress === fallbackVault?.icaAccountAddress
                 ),
-            [fallbackVault?.proposals, fallbackVault.icaAccountAddress]
+            [fallbackVault?.proposals, fallbackVault?.icaAccountAddress]
         ) ?? [];
 
     const {sellNftIca, isProcessing: isProcessingSell} = useICASell();

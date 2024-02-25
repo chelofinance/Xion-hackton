@@ -1,6 +1,6 @@
 import {EncodeObject, GeneratedType, Registry} from '@cosmjs/proto-signing';
 import {InjectiveWasmxV1Beta1Tx} from '@injectivelabs/core-proto-ts';
-import {defaultRegistryTypes as stargateTypes} from '@cosmjs/stargate';
+import {Coin, defaultRegistryTypes as stargateTypes} from '@cosmjs/stargate';
 import {wasmTypes} from '@cosmjs/cosmwasm-stargate';
 
 export type ProposalMessage = any;
@@ -41,10 +41,11 @@ const buildWasmContractMsg = ({value}: EncodeObject) => {
 
 export const produceICAMessages = (msgs: EncodeObject[]) => {
   const messages = msgs.map((msg) => {
-    let encodedMsg;
+    let encodedMsg: Uint8Array;
     if (msg.typeUrl === INJECTIVE_CONTRACT_MSG_URI) encodedMsg = registry.encode(buildInjectiveContractMsg(msg));
     else if (msg.typeUrl === WASM_CONTRACT_MSG_URI) encodedMsg = registry.encode(buildWasmContractMsg(msg));
     else encodedMsg = registry.encode(msg);
+    console.log('ENCODING', Buffer.from(encodedMsg).toString('base64'));
     return {
       stargate: {
         type_url: msg.typeUrl,
@@ -80,6 +81,6 @@ export const produceProposal = (xionMessages: ProposalMessage[], injectiveMessag
         },
       },
     ],
-    sender: '', // Will be updated later
+    sender: '', // Will be updated later on the proxy
   };
 };

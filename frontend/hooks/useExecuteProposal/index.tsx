@@ -10,9 +10,13 @@ const useExecuteProposal = (account: AbstraxionAccount) => {
     const {client} = useAbstraxionSigningClient();
 
     const executeProposal = useCallback(
-        async (vault: MyVault, proposalId: string | number) => {
+        async (vault?: MyVault, proposalId?: string | number) => {
             if (!client) {
                 console.log('Signing client not found');
+                return null;
+            }
+            if (!vault || !proposalId) {
+                console.log('no vault or proposal id');
                 return null;
             }
 

@@ -1,8 +1,9 @@
 import {TokenSymbols, COIN_DICT, AllChains} from '@/constants/app';
 import BigNumber from 'bignumber.js';
+import {INJECTIVE_CONTRACT_MSG_URI} from './propose';
 
 export const createSendIbcMsg = ({icaAddress, amount}: {icaAddress: string; multisigAddress: string; amount: string}) => {
-    const timestamp = BigNumber(Date.now() + 600_000)
+    const timestamp = BigNumber(Date.now() + 10_000_000)
         .multipliedBy(1_000_000)
         .toString();
 
@@ -40,7 +41,7 @@ export const createIcaBuyMsg = ({
         typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
         value: {
             sender: ica,
-            contract: buyContract,
+            contract: 'inj1qt5ztu5l3cdkcwzsv2pe9u2mk3fq56rdckr0r7', //constant
             msg: {
                 buy_token: {
                     token_id: tokenId,
@@ -93,6 +94,36 @@ export const createIcaSellMsg = ({
                 },
             },
             funds: [],
+        },
+    };
+};
+
+export const createIcaBuyMsgInjective = ({
+    ica,
+    buyContract,
+    nftContract,
+    tokenId,
+    cost,
+}: {
+    ica: string;
+    buyContract: string;
+    nftContract: string;
+    tokenId: string;
+    cost: string;
+}) => {
+    return {
+        typeUrl: INJECTIVE_CONTRACT_MSG_URI,
+        value: {
+            sender: ica,
+            contract: 'inj1qt5ztu5l3cdkcwzsv2pe9u2mk3fq56rdckr0r7', //constant
+            msg: {
+                buy_token: {
+                    token_id: tokenId,
+                    contract_address: nftContract,
+                    class_id: 'injective',
+                },
+            },
+            funds: `${cost}inj`,
         },
     };
 };
