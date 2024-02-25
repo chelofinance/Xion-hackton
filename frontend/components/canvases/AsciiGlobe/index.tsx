@@ -5,7 +5,6 @@ import { useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { AsciiRenderer } from '@react-three/drei';
 import useCanvasFadeInClassName from '@/components/hooks/useCanvasFadeInClassName';
-// import useCanvasPointerCoordinates from '@/components/hooks/useCanvasPointerCoordinates';
 import TorusMesh from './TorusMesh';
 
 type AsciiGlobeProps = {
