@@ -139,7 +139,7 @@ export const getVaultMultisigs = async (
             {
               multisigAddress: multisig,
               icaControllerAddress: icaControllerAddress, //the ica controller should not fallback. it always exists
-              icaAccountAddress: icaAccountAddress ?? INJ_ICA_ACCOUNT_PLACEHOLDER,
+              icaAccountAddress: icaAccountAddress || INJ_ICA_ACCOUNT_PLACEHOLDER, // Use || instead of ?? to handle empty strings
             },
           ]
           : accm;

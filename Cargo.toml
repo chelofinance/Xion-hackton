@@ -27,7 +27,7 @@ overflow-checks = true
 
 [workspace.dependencies]
 cosmwasm-schema = "1.5.0"
-cosmwasm-std = { version = "1.5.0", features = ["cosmwasm_1_3", "stargate"] }
+cosmwasm-std = { version = "1.5.0" }
 cw-utils = "1.0.1"
 cw2 = "1.1.2"
 cw3 = "1.1.2"
