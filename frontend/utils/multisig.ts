@@ -8,12 +8,6 @@ import {AppChains, chainConfigMap, channelOpenInitOptions} from '@/constants/app
 import {AbstraxionAccount} from '@/types/wallet';
 import {ExecutionResult} from 'graphql-ws';
 
-export async function getIcaAccountAddress(client: any, ica_controller_address: string) {
-    const contract_response = await client?.queryContractSmart(ica_controller_address, {get_contract_state: {}});
-    const ica_account_address = contract_response?.contract_state?.address;
-    return ica_account_address;
-}
-
 export async function getIcaControllerAddress(client: any, ica_multisig_address: string) {
     const ica_controller_response = await client?.queryContractSmart(chainConfigMap[AppChains.XION_TESTNET].icaFactory.address, {
         query_controller_by_multisig: ica_multisig_address,

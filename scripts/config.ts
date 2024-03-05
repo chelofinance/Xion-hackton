@@ -29,7 +29,7 @@ const config: Config = {
     "archway-testnet": {
       chainId: "constantine-3",
       node: "https://rpc.constantine.archway.tech",
-      gasPrice: "1000000000000aconst",
+      gasPrice: "150000000000aconst",
       gasAdjustment: 1.3,
       prefix: "archway",
       denom: "aconst",
@@ -41,14 +41,6 @@ const config: Config = {
       gasAdjustment: 1.3,
       prefix: "osmo",
       denom: "uosmo",
-    },
-    "archway-devnet": {
-      chainId: "constantine-3",
-      node: "https://rpc.constantine.archway.io:443",
-      gasPrice: "10000000000aconst",
-      gasAdjustment: 1.3,
-      prefix: "archway",
-      denom: "aconst",
     },
     "neutron-testnet": {
       chainId: "pion-1",
