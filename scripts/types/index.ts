@@ -1,6 +1,6 @@
-import {SigningCosmWasmClient} from "@cosmjs/cosmwasm-stargate";
-import {OfflineSigner} from "@cosmjs/proto-signing";
-import {SigningStargateClient} from "@cosmjs/stargate";
+import { SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
+import { OfflineSigner } from "@cosmjs/proto-signing";
+import { SigningStargateClient } from "@cosmjs/stargate";
 
 export type NetworkConfig = {
   chainId: string;
@@ -30,9 +30,14 @@ export type Arguments = {
   message?: object;
   label?: string;
   controller?: string;
+
+  network2?: string;
+  connectionId?: string;
+  connectionId2?: string;
+  srcChannelId?: string;
 };
 
-export type Action = (args: {
+export type ActionArgs = {
   args: Arguments;
   network: NetworkConfig;
   config: Config;
@@ -40,4 +45,12 @@ export type Action = (args: {
   client: SigningCosmWasmClient;
   stargate: SigningStargateClient;
   accounts: Account[];
-}) => unknown;
+
+  network2?: NetworkConfig;
+  signer2?: OfflineSigner;
+  client2?: SigningCosmWasmClient;
+  stargate2?: SigningStargateClient;
+  accounts2?: Account[];
+}
+
+export type Action = (args: ActionArgs) => unknown;
