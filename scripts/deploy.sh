@@ -4,8 +4,18 @@ NETWORK=$1
 if [ "$NETWORK" = "xion-testnet" ]; then
     DENOM="uxion";
     ICA_CONTROLLER_CODE_ID=59;
-    CONNECTION_ID="connection-43";
-    COUNTER_PARTY_CONNECTION_ID="connection-211";
+    CONNECTION_ID="connection-53";
+    COUNTER_PARTY_CONNECTION_ID="connection-2398";
+elif [ "$NETWORK" = "osmosis-testnet" ]; then
+    DENOM="uosmo";
+    ICA_CONTROLLER_CODE_ID=0 ;
+    CONNECTION_ID="connection-0"; # ToDo
+    COUNTER_PARTY_CONNECTION_ID="connection-0"; # ToDo
+elif [ "$NETWORK" = "archway-testnet" ]; then
+    DENOM="aconst";
+    ICA_CONTROLLER_CODE_ID=2142;
+    CONNECTION_ID="connection-81"; # https://docs.archway.io/resources/ibc-channels
+    COUNTER_PARTY_CONNECTION_ID="connection-1427";
 else 
     echo "Please provide a correct NETWORK.";
     exit 1;
@@ -65,6 +75,27 @@ if [ -z "$EXAMPLE_MULTISIG_CONTRACT" ]; then echo "Failed to get EXAMPLE_MULTISI
 if [ -z "$EXAMPLE_ICA_CONTROLLER_CONTRACT" ]; then echo "Failed to get EXAMPLE_ICA_CONTROLLER_CONTRACT"; exit 1; fi
 echo "Example Multisig Contract: $EXAMPLE_MULTISIG_CONTRACT"
 echo "Example ICA Controller Contract: $EXAMPLE_ICA_CONTROLLER_CONTRACT"
+
+# -----------------------------------------------
+# cw3FixedMultisig.codeId: 2157
+# icaFactory.address: archway1zvc6lv6wv77xenckrgalcfaz2rdg2wqhuvmetpgswjwqql3cm2rqk30k9f
+# proxyMultisig.address: archway1qwhqja6y23yr242pewwaprwgy54kqm74n4egxwp5jn60t6kkd4kqg0z5px
+# -----------------------------------------------
+#  - ica_controller: 2142
+#  - proxy: 2156
+#  - multisig: 2157
+#  - factory: 2158
+# -----------------------------------------------
+#  - factory: archway1zvc6lv6wv77xenckrgalcfaz2rdg2wqhuvmetpgswjwqql3cm2rqk30k9f
+#  - proxy: archway1qwhqja6y23yr242pewwaprwgy54kqm74n4egxwp5jn60t6kkd4kqg0z5px
+#  - example_multisig: archway1ja8r6mjkztc77k9px2jqlyzzfz7jq8jd6xs94p97x327y0yuxeusz5975s
+#  - example_ica_controller: archway1488c9a69ykrhe9gv68uh0m7ncgx0xnkz464mumt2tyrkvthum6asrnrtc4
+# EXAMPLE_ICA_CONTROLLER_CONTRACT="archway1488c9a69ykrhe9gv68uh0m7ncgx0xnkz464mumt2tyrkvthum6asrnrtc4"
+# SRC_CHANNEL_ID="channel-81"
+echo '--------------------------------------------------------------'
+echo 'EXAMPLE_ICA_CONTROLLER_CONTRACT="'$EXAMPLE_ICA_CONTROLLER_CONTRACT'" SRC_CHANNEL_ID="'$SRC_CHANNEL_ID'" ./create.sh'
+echo '--------------------------------------------------------------'
+read -p "Run the command above in the relayer and press Enter to continue..."
 
 yarn start --action query --contract $EXAMPLE_ICA_CONTROLLER_CONTRACT --network archway-testnet --message '{"get_contract_state": {}}'
 
