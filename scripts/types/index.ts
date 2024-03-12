@@ -35,6 +35,8 @@ export type Arguments = {
   connectionId?: string;
   connectionId2?: string;
   srcChannelId?: string;
+  srcClientId?: string;
+  dstClientId?: string;
 };
 
 export type ActionArgs = {

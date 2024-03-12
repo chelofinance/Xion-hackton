@@ -18,8 +18,17 @@ import { required } from "../utils/args";
 //   injective: "07-tendermint-231",
 // };
 
-const clientIdA = "07-tendermint-88";
-const clientIdB = "07-tendermint-1532";
+// Archway -> Osmosis
+// const clientIdA = "07-tendermint-88";
+// const clientIdB = "07-tendermint-1532";
+
+
+// const clientIdA = "07-tendermint-104";
+// const clientIdB = "07-tendermint-2551";
+
+// xion-osmosis
+// const clientIdA = "07-tendermint-117";
+// const clientIdB = "07-tendermint-2552";
 
 // class MyInjClient extends InjectiveStargate.InjectiveSigningStargateClient {
 //   protected constructor(tmClient: any, signer: any, options: any) {
@@ -67,8 +76,6 @@ const clientIdB = "07-tendermint-1532";
 //     return super.signAndBroadcast(signerAddress, messages, fee, memo); //default gas bc "auto" ends without gas
 //   }
 // }
-
-const wait = (sec: number) => new Promise((res) => setTimeout(res, sec * 1000));
 
 const createClients = async (action: Parameters<Action>[0]) => {
   const { network, signer, accounts, network2, signer2 } = action;
@@ -131,6 +138,8 @@ const confio: Action = async (action) => {
 
   required(args, "controller");
   required(args, "srcChannelId");
+  required(args, "srcClientId");
+  required(args, "dstClientId");
 
   if (args.connectionId === undefined) {
     throw new Error("missing --connection-id");
@@ -141,80 +150,33 @@ const confio: Action = async (action) => {
   if (clientB === undefined) {
     throw new Error("clientB is undefined");
   }
+  if (args.srcClientId === undefined) {
+    throw new Error("srcClientId is undefined");
+  }
+  if (args.dstClientId === undefined) {
+    throw new Error("dstClientId is undefined");
+  }
+  if (args.srcChannelId === undefined) {
+    throw new Error("srcChannelId is undefined");
+  }
 
   // const createConnectionResults = await clientA.connOpenInit(clientIdA, clientIdB);
   // const { connectionId: connectionIdA } = createConnectionResults;
   // console.log("connection id A:", connectionIdA);
 
-  // // const connectionIdA = "connection-81";
-  // // const connectionIdA = "connection-105";
-  // const proofTry = await prepareConnectionHandshake(
-  //   clientA,
-  //   clientB,
-  //   clientIdA,
-  //   clientIdB,
-  //   connectionIdA
-  // );
+  const clientIdA = args.srcClientId;
+  const clientIdB = args.dstClientId;
 
-  // const createConnectionTryResults = await clientB.connOpenTry(clientIdB, proofTry);
-  // const { connectionId: connectionIdB } = createConnectionTryResults;
-  // console.log("connection id B:", connectionIdB);
+  const connectionIdA = args.connectionId;
+  const connectionIdB = args.connectionId2;
 
-  // const connectionIdB = "connection-1427";
-  // const connectionIdB = "connection-2369";
-  // const proofAck = await prepareConnectionHandshake(
-  //   clientB,
-  //   clientA,
-  //   clientIdB,
-  //   clientIdA,
-  //   connectionIdB
-  // );
-  // console.log("connOpenAck");
-  // const msgResultsAck = await clientB.connOpenAck(connectionIdB, proofAck);
-  // console.log("connOpenAck", msgResultsAck);
-
-  // await wait(1);
-  // console.log("connOpenConfirm");
-  // const proofConfirm = await prepareConnectionHandshake(
-  //   clientA,
-  //   clientB,
-  //   clientIdA,
-  //   clientIdB,
-  //   connectionIdA
-  // );
-  // // const msgResultsConfirm = await clientA.connOpenConfirm(connectionIdA, proofConfirm);
-  // const msgResultsConfirm = await clientB.connOpenConfirm(connectionIdB, proofConfirm);
-  // console.log("connOpenConfirm", msgResultsConfirm);
-
-  const connectionIdA = args.connectionId; // "connection-81";
-  const connectionIdB = args.connectionId2; //"connection-1427";
-
-  const channelIdA = args.srcChannelId || "";
+  const channelIdA = args.srcChannelId;
 
   const portIdA = "wasm." + args.controller
   const portIdB = "icahost"
   // console.log("portIdA:", portIdA)
-  const link = await Link.createWithExistingConnections(clientA, clientB, connectionIdA, connectionIdB);
-  console.log(
-    "link:",
-    link
-  );
 
-  // const creatChannelResultsInit = await clientA.channelOpenInit(portIdA, portIdB, Order.ORDER_UNORDERED, connectionIdA, "versionA");
-  // const { channelId: channelIdA } = creatChannelResultsInit;
-  // console.log("channel id A:", channelIdA);
-
-  const channelA = await link.endA.client.query.ibc.channel.channel(
-    portIdA,
-    channelIdA,
-  );
-  console.log("channelA:", channelA);
-
-  // const channelB = await link.endB.client.query.ibc.channel.channel(
-  //   portIdB
-  //   channelIdB,
-  // );
-
+  console.log("channelOpenTry");
   const proofTry = await prepareChannelHandshake(
     clientA,
     clientB,
@@ -222,14 +184,20 @@ const confio: Action = async (action) => {
     portIdA,
     channelIdA);
 
-  console.log("channelOpenTry");
+  console.log(
+    clientA,
+    clientB,
+    clientIdB,
+    portIdA,
+    channelIdA);
+
   const creatChannelResultsTry = await clientB.channelOpenTry(
     portIdB,
     {
       portId: portIdA,
       channelId: channelIdA,
     },
-    Order.ORDER_UNORDERED,
+    Order.ORDER_ORDERED,
     connectionIdB,
     "versionA",
     "versionB",
@@ -239,9 +207,25 @@ const confio: Action = async (action) => {
   const { channelId: channelIdB } = creatChannelResultsTry;
   console.log("channel id B:", channelIdB);
 
-  // const link = await Link.createWithExistingConnections(clientA, clientB, connectionIdA, connectionIdB);
-  // link.rela()
-  // const channelPair = await link.createChannel("A", portIdA, portIdB, Order.ORDER_UNORDERED, "versionA");
+  const link = await Link.createWithExistingConnections(clientA, clientB, connectionIdA, connectionIdB);
+
+  // const creatChannelResultsInit = await clientA.channelOpenInit(portIdA, portIdB, Order.ORDER_ORDERED, connectionIdA, "versionA");
+  // const { channelId: channelIdA } = creatChannelResultsInit;
+  // console.log("channel id A:", channelIdA);
+
+  const channelA = await link.endA.client.query.ibc.channel.channel(
+    portIdA,
+    channelIdA,
+  );
+  console.log("channelA:", channelA);
+
+  const channelB = await link.endB.client.query.ibc.channel.channel(
+    portIdB,
+    channelIdB,
+  );
+
+  // const relayedHeights = await link.checkAndRelayPacketsAndAcks({})
+  // console.log("relayedHeights:", relayedHeights);
   // console.log("channelPair:", channelPair);
   // const acks = await link.getPendingAcks("A")
   // console.log("acks:", acks);
